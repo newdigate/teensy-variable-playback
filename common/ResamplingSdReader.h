@@ -20,10 +20,6 @@
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
-
-
-const unsigned int ResamplingSdReader_NUM_BUFFERS = 4;
-
 typedef enum loop_type {
     looptype_none,
     looptype_repeat,
@@ -33,11 +29,8 @@ typedef enum loop_type {
 class ResamplingSdReader {
 public:
     ResamplingSdReader() {
-
-        for (int i=0; i<ResamplingSdReader_NUM_BUFFERS; i++ ) {
-            _buffers[i] = NULL;
-        }
     }
+
     void begin(void);
     bool play(const char *filename);
     void stop(void);
@@ -71,20 +64,11 @@ public:
 
     void close(void);
 
-    bool interpolationEnabled() {
-        return _enable_interpolation;
-    }
-
-    void setInterpolationEnabled(bool enableInterpolation) {
-        _enable_interpolation = enableInterpolation;
-    }
-
 private:
     volatile bool _playing = false;
     volatile int32_t _file_offset;
     volatile int32_t _last_read_offset = 0;
 
-    bool _enable_interpolation = true;
     uint32_t _file_size;
     double _playbackRate = 1.0;
     double _remainder = 0.0;
@@ -92,17 +76,12 @@ private:
      
     int _bufferPosition = 0;
 
-    int16_t *_buffers[AUDIO_BLOCK_SAMPLES];
-    unsigned int _bufferLength[ResamplingSdReader_NUM_BUFFERS];
-    bool bufferIsAvailableForRead[ResamplingSdReader_NUM_BUFFERS];
+    int16_t _buffer[AUDIO_BLOCK_SAMPLES];
+    unsigned int _bufferLength = 0;
 
-    volatile signed char _readBuffer = -1;
-    volatile signed char _playBuffer = -1;
-    signed char _numBuffers = 0;
     File _file;
 
     void updateBuffers(void);
-    bool isInRange(void);
 
     void StartUsingSPI(){
 #if defined(HAS_KINETIS_SDHC)

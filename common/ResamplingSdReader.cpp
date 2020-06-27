@@ -19,71 +19,31 @@ int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
 
 bool ResamplingSdReader::readNextValue(int16_t *value) {
 
-    if (_bufferLength[_playBuffer] == 0)
-        return false;
+    if (_bufferLength == 0)
+        updateBuffers();
 
     if (_playbackRate > 0 ) {
         //forward playback
+        if (_bufferPosition >= _bufferLength) {
 
-        if (_numBuffers == 1 && _last_read_offset + _bufferPosition >= _file_size)
-            return false;
-
-        //Serial.printf("readNextValue: %d/%d \n", _bufferPosition, _bufferLength[_playBuffer]);
-
-        if (_bufferPosition >= _bufferLength[_playBuffer]) {
-            bufferIsAvailableForRead[_playBuffer] = true;
-            //Serial.printf("\ndiscard buffer: %d\n", _playBuffer);
-
-            if (_numBuffers ==1 && _file_offset >= _file_size)
+            if (_last_read_offset + _bufferPosition >= _file_size)
                 return false;
 
-            _numBuffers--;
-            //Serial.printf("num  buffers: %d\n", _numBuffers);
-
-            if (_playBuffer < _numBuffers) {
-                _readBuffer = _playBuffer;
-                //Serial.printf("switch read buffer to: %d\n", _readBuffer);
-            }
-
-            _bufferPosition -= _bufferLength[_playBuffer];
-
-            _playBuffer++;
-            if (_playBuffer >= ResamplingSdReader_NUM_BUFFERS) {
-                _playBuffer = 0;
-            }
-            //Serial.printf("switch play buffer to: %d\n", _playBuffer);
             updateBuffers();
         }
     } else if (_playbackRate < 0) {
-
-        if (_numBuffers == 1)
-            if (_file_offset + (AUDIO_BLOCK_SAMPLES * 2) + _bufferPosition < 0)
-                return false;
-
         // reverse playback
+
+        if (_file_offset + (AUDIO_BLOCK_SAMPLES * 2) + _bufferPosition < 0)
+            return false;
+
         if (_bufferPosition < 0) {
-
-            if (_numBuffers == 0)
-                return false;
-
-            bufferIsAvailableForRead[_playBuffer] = true;
-            _readBuffer = _playBuffer;
-
-            _numBuffers--;
-
-            _playBuffer ++;
-            if (_playBuffer >= ResamplingSdReader_NUM_BUFFERS) {
-                _playBuffer = 0;
-            }
-
-            _bufferPosition += _bufferLength[_playBuffer];
             updateBuffers();
-
         } else if (_bufferPosition > (AUDIO_BLOCK_SAMPLES-1) * 2) {
             _bufferPosition = (AUDIO_BLOCK_SAMPLES-1) * 2;
         }
     }
-    int16_t *_buffer = _buffers[_playBuffer];
+
     int16_t result = _buffer[_bufferPosition/2];
     //Serial.printf("r: %d,", result);
 
@@ -131,25 +91,7 @@ bool ResamplingSdReader::play(const char *filename)
         _file_offset = 0;
     }
 
-
-    for (char i=0; i<ResamplingSdReader_NUM_BUFFERS; i++ ) {
-        _buffers[i] = (int16_t*)malloc( AUDIO_BLOCK_SAMPLES * 2);
-        bufferIsAvailableForRead[i] = true;
-
-    }
-    _readBuffer = 0;
-    _numBuffers = 0;
-    updateBuffers();
-    _playBuffer = 0;
-    if (_numBuffers == 0)
-        return false;
-
     _playing = true;
-
-    if (_playbackRate < 0) {
-        _bufferPosition = _bufferLength[_playBuffer]-2;
-    }
-
     return true;
 }
 
@@ -161,13 +103,6 @@ void ResamplingSdReader::stop()
         __enable_irq();
         _file.close();
         StopUsingSPI();
-
-        for (int i=0; i<ResamplingSdReader_NUM_BUFFERS; i++ ) {
-            if (_buffers[i] != NULL) {
-                free(_buffers[i]);
-                _buffers[i] = NULL;
-            }
-        }
     } else {
         __enable_irq();
     }
@@ -184,53 +119,35 @@ void ResamplingSdReader::close(void) {
 }
 
 void ResamplingSdReader::updateBuffers() {
+    printf("begin: file_offset: %d\n", _file_offset);
 
     bool forward = (_playbackRate >= 0.0);
 
-    while (_readBuffer >= 0
-           && isInRange()
-           && bufferIsAvailableForRead[_readBuffer]) {
-
-        //Serial.printf("read buffer: %d (_numBuffers:%d) \n",_readBuffer, _numBuffers);
-        int16_t *buffer = _buffers[_readBuffer];
-        bufferIsAvailableForRead[_readBuffer] = false;
-
-        _last_read_offset = _file_offset;
-        uint16_t numberOfBytesToRead = AUDIO_BLOCK_SAMPLES * 2;
-        if (!forward) {
-            if (_file_offset < 0) {
-                // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
-                numberOfBytesToRead = _file_offset + AUDIO_BLOCK_SAMPLES * 2;
-            }
-            _file.seek(_file_offset < 0? 0 : _file_offset);
+    uint16_t numberOfBytesToRead = AUDIO_BLOCK_SAMPLES * 2;
+    if (!forward) {
+        if (_file_offset < 0) {
+            // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
+            numberOfBytesToRead = _file_offset + AUDIO_BLOCK_SAMPLES * 2;
         }
-        //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
-        int numRead = _file.read(buffer, numberOfBytesToRead);
-        _bufferLength[_readBuffer] = numRead;
-        //Serial.printf("read %d bytes\n", numRead);
-
-        if (_playbackRate < 0) {
-            _file_offset -= numRead;
-        } else
-            _file_offset += numRead;
-
-        if (numRead > 0) {
-            _readBuffer ++;
-            if (_readBuffer >= ResamplingSdReader_NUM_BUFFERS)
-                _readBuffer = -1;
-
-            _numBuffers++;
-        } else {
-            _readBuffer = -1;
-            //Serial.printf("\n Not able to read anymore buffers for the moment...\n", numRead);
+        _file.seek(_file_offset < 0? 0 : _file_offset);
+        _bufferPosition = (AUDIO_BLOCK_SAMPLES - 1) * 2;
+    } else 
+    {
+        if (_file_offset > _file_size - (AUDIO_BLOCK_SAMPLES * 2)) {
+            numberOfBytesToRead = _file_size - _file_offset;
         }
+        _bufferPosition = 0;
     }
-}
+    //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
+    _last_read_offset = _file_offset;
+    int numRead = _file.read(_buffer, numberOfBytesToRead);
+    _bufferLength = numRead;
+    //Serial.printf("read %d bytes\n", numRead);
 
-bool ResamplingSdReader::isInRange() {
-    if (_playbackRate >= 0.0) {
-        return _file_offset < _file_size;
-    } else {
-        return _file_offset + AUDIO_BLOCK_SAMPLES * 2 > 0;
-    }
+    if (_playbackRate < 0) {
+        _file_offset -= numRead;
+    } else
+        _file_offset += numRead;
+
+    printf("exit: file_offset: %d\n", _file_offset);
 }

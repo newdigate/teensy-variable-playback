@@ -16,8 +16,8 @@ int main(int argc, char **argv){
 	std::cout << "starting app...\n";
     initialize_mock_arduino();
 
-    //test_resampling_forward();
-    test_resampling_reverse();
+    test_resampling_forward();
+    //test_resampling_reverse();
     std::cout << "complete...\n";
 }
 
@@ -37,9 +37,11 @@ void test_resampling_forward() {
         bytesRead = reader.read( buffer, 512 );
         total_bytes_read += bytesRead;
         printf("j:%d bytesRead: %d \n", j, bytesRead);
+        /*
         for (int i=0; i < bytesRead/2; i++) {
             printf("\t\t[%x]:%x", i, buffer[i]);
         }
+        */
         printf("\n");
         j++;
     } while (bytesRead > 0);
@@ -63,7 +65,7 @@ void test_resampling_reverse() {
         total_bytes_read += bytesRead;
         printf("j:%d bytesRead: %d \n", j, bytesRead);
         for (int i=0; i < bytesRead/2; i++) {
-            printf("\t\t[%x]:%x", i, buffer[i]);
+        //    printf("\t\t[%x]:%x", i, buffer[i]);
         }
         printf("\n");
         j++;
