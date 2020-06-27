@@ -6,8 +6,6 @@ project(test_resampling_sdreader C CXX)
 include_directories(../teensy_cores_x86)
 include_directories(../common)
 
-link_directories(../teensy_cores_x86/cmake-build-debug)
-link_directories(../common/cmake-build-debug)
 
 add_executable(test_resampling_sdreader
         runtests.cpp)
