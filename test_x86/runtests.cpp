@@ -20,9 +20,9 @@ int main(int argc, char **argv){
 }
 
 void test_resampling_forward() {
-    printf("test_resampling_forward()\n");
+    const uint32_t testFileSize = 800;
+    printf("test_resampling_forward(%d)\n", testFileSize);
 
-    const size_t testFileSize = 1000;
     int16_t testbuffer[testFileSize];
     for (int16_t i = 0; i < testFileSize; i++) {
       testbuffer[i] = i;
@@ -46,7 +46,7 @@ void test_resampling_forward() {
         for (int i=0; i < bytesRead/2; i++) {
             printf("\t\t[%x]:%x", i, buffer[i]);
         }
-        
+        //char c = cin.get();
         printf("\n");
         j++;
     } while (bytesRead > 0);
@@ -54,9 +54,9 @@ void test_resampling_forward() {
 }
 
 void test_resampling_reverse() {
-    printf("test_resampling_reverse()\n");
+    const uint32_t testFileSize = 800;
+    printf("test_resampling_reverse(%d)\n", testFileSize);
 
-    const size_t testFileSize = 1000;
     int16_t testbuffer[testFileSize];
     for (int16_t i = 0; i < testFileSize; i++) {
       testbuffer[i] = i;
@@ -80,6 +80,7 @@ void test_resampling_reverse() {
             printf("\t\t[%x]:%x", i, buffer[i]);
         }
         printf("\n");
+        // char c = cin.get();
         j++;
     } while (bytesRead > 0);
     printf("total_bytes_read: %d \n", total_bytes_read);

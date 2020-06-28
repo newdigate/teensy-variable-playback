@@ -81,7 +81,7 @@ private:
 
     File _file;
 
-    void updateBuffers(void);
+    bool updateBuffers(void);
 
     void StartUsingSPI(){
 #if defined(HAS_KINETIS_SDHC)
