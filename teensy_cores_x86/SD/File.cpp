@@ -18,50 +18,29 @@
 using namespace std;
 
 std::streampos File::fileSize( const char* filePath ){
-    
-    std::streampos fsize = 0;
-    std::ifstream file( filePath, std::ios::binary );
-    
-    fsize = file.tellg();
-    file.seekg( 0, std::ios::end );
-    fsize = file.tellg() - fsize;
-    file.close();
-    
-    return fsize;
+    return _size;
 }
 
 File::File(SdFile f, const char *n) {
-    std::string actualFileName = SDClass::getSDCardFolderPath() + std::string("/") + std::string(n);
-    cout << actualFileName;
-    mockFile.open(actualFileName);
-    _size = fileSize(actualFileName.c_str());
-    _isDirectory = is_directory(actualFileName.c_str());
+    _position = 0;
 }
+
 File::File(const char *n, uint8_t mode) {
-    std::string actualFileName = SDClass::getSDCardFolderPath() + std::string("/") + std::string(n);
-    // cout << actualFileName;
-    switch (mode) {
-        case xO_READ : mockFile.open(actualFileName); break;
-        case xO_WRITE : mockFile.open(actualFileName, std::fstream::out | std::fstream::app); break;
-        default:
-            break;
-    }
-    _size = fileSize(actualFileName.c_str());
+    _position = 0;
 }
 
 File::File(void) {
-  _name[0] = 0;
-    _size = 0;
+  _size = 0;
 }
 
 // returns a pointer to the file name
 char *File::name(void) {
-  return _name;
+    return NULL;
 }
 
 // a directory is a special type of file
 bool File::isDirectory(void) {
-  return _isDirectory;
+  return false;
 }
 
 int File::write(uint8_t val) {
@@ -69,59 +48,52 @@ int File::write(uint8_t val) {
 }
 
 int File::write(const uint8_t *buf, size_t size) {
-    size_t t;
-    if (!mockFile.is_open()) {
-        return 0;
-    }
-    
-    _size += size;
-    char * memblock = (char *)buf;
-    mockFile.write(memblock, size);
-
-    return t;
+    return 0;
 }
 
 int File::peek() {
-  if (! mockFile.is_open())
     return 0;
-
-  return mockFile.peek();
 }
 
 int File::read() {
-    char p[1];
-    mockFile.read(p, 1);
-    return p[0];
+    if (_position >= _size) {
+        printf("!!! CRITICAL: read outside bounds of file...");
+        return 0;
+    }
+
+    int result = _data[_position];
+    _position++;
+    return result;
 }
 
 // buffered read for more efficient, high speed reading
 int File::read(void *buf, uint16_t nbyte) {
-    char *bbb = (char *)buf;
-    mockFile.read(bbb, nbyte);
+    char * target = (char*)buf;
+    for (int i=0; i < nbyte; i++) {
+        if  (_position >= _size)
+            return i;
+        int byteRead = File::read();
+        target[i] = static_cast<char>(byteRead);
+    }
     return nbyte;
 }
 
 int File::available() {
-    if (! mockFile.is_open()) return 0;
-    uint32_t p = position();
-    uint32_t n = size() - p;
-
-    return n > 0X7FFF ? 0X7FFF : n;
+    return (_position < _size);
 }
 
 void File::flush() {
-  if (mockFile.is_open())
-      mockFile.flush();
 }
 bool File::seek(uint32_t pos) {
-    if (! mockFile.is_open()) return false;
-    mockFile.seekp(pos, ios_base::seekdir::cur);
-    return true;
+    if (pos < _size) {
+        _position = pos;
+        return true;
+    }
+    return false;
 }
 
 uint32_t File::position() {
-    if (! mockFile.is_open()) return -1;
-    return mockFile.tellp();
+    return _position;
 }
 
 uint32_t File::size() {
@@ -129,28 +101,18 @@ uint32_t File::size() {
 }
 
 void File::close() {
-    if (mockFile.is_open())
-        mockFile.close();
 }
 
 File::operator bool() {
-    return  mockFile.is_open();
+    return  true;
 }
 
 bool File::is_directory( const char* pzPath )
 {
-    if ( pzPath == NULL) return false;
+    return false;
+}
 
-    DIR *pDir;
-    bool bExists = false;
-
-    pDir = opendir (pzPath);
-
-    if (pDir != NULL)
-    {
-        bExists = true;
-        (void) closedir (pDir);
-    }
-
-    return bExists;
+void File::setMockData( char *data, uint32_t size) {
+    _data = data;
+    _size = size;
 }

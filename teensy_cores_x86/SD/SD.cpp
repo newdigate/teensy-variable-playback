@@ -414,7 +414,8 @@ SdFile SDClass::getParentDir(const char *filepath, int *index) {
 
 
 File SDClass::open(const char *filepath, uint8_t mode) {
-    File file = File(filepath, mode);
+	File file = File(filepath, _fileSize);
+	file.setMockData(_fileData, _fileSize);
     return file;
 }
 

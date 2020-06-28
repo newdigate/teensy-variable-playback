@@ -5,13 +5,36 @@ int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
 
     unsigned int count = 0;
     int16_t *index = (int16_t*)buf;
-    for (int i=0; i< nbyte/2; i++) {
+    while (count < nbyte) {
 
         if (readNextValue(index))
             count+=2;
-        else
-            return count;
+        else {
+            // we have reached the end of the file
+            switch (_loopType){
+                case looptype_repeat:
+                {
+                    if (_playbackRate >= 0.0) 
+                        _file_offset = 0;
+                    else
+                        _file_offset = _file_size;
+                    _bufferLength = 0;
+                }
 
+                case looptype_pingpong:
+                {
+                    _playbackRate = -_playbackRate;
+                }            
+
+                case looptype_none:            
+                default:
+                {   
+                    /* no looping - return the number of (resampled) bytes returned... */
+                    return count;
+                    break;
+                }
+            }   
+        }
         index++;
     }
     return count;
@@ -132,7 +155,7 @@ void ResamplingSdReader::updateBuffers() {
             _file.seek(0);
         } else 
             _file.seek(_file_offset);
-            
+
         _bufferPosition = numberOfBytesToRead - 2;
     } else 
     {

@@ -33,14 +33,14 @@ namespace SDLib {
 
 class File {
  private:
-    char _name[13];
     uint32_t _size;
     bool _isDirectory;
     std::streampos fileSize( const char* filePath );
 
+     char* _data;
+     uint32_t _position;
 
 public:
-    std::fstream mockFile = std::fstream();
     File(const char *name, uint8_t mode = xO_READ);
     File(SdFile f, const char *n); // wraps an underlying SdFile
     File(void);      // 'empty' constructor
@@ -60,6 +60,8 @@ public:
 
     bool isDirectory(void);
     static bool is_directory( const char* pzPath );
+
+    void setMockData( char *data, uint32_t size);
 };
 
 class SDClass {
@@ -73,11 +75,20 @@ private:
     SdFile getParentDir(const char *filepath, int *indx);
 
     static std::string _sdCardFolderLocation;
-public:
+
+    char *_fileData;
+    uint32_t _fileSize;
+
+    public:
 
     static std::string getSDCardFolderPath();
 
     static void setSDCardFolderPath(std::string path);
+    
+    void setSDCardFileData(char *data, uint32_t size) {
+        _fileData = data;
+        _fileSize = size;
+    }
 
     // This needs to be called to set up the connection to the SD card
     // before other methods are used.

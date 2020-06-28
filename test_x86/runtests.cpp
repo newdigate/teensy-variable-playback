@@ -6,14 +6,12 @@
 #include "../common/ResamplingSdReader.h"
 using namespace std;
 
-//TODO: Change this
-const char *sdcardlocation = const_cast<const char *>("/Users/nicholasnewdigate/Development/SD");
 
 void test_resampling_forward();
 void test_resampling_reverse();
 
 int main(int argc, char **argv){
-	std::cout << "starting app...\n";
+	  std::cout << "starting app...\n";
     initialize_mock_arduino();
 
     test_resampling_forward();
@@ -22,8 +20,15 @@ int main(int argc, char **argv){
 }
 
 void test_resampling_forward() {
+    printf("test_resampling_forward()\n");
 
-    SD.setSDCardFolderPath(sdcardlocation);
+    const size_t testFileSize = 1000;
+    int16_t testbuffer[testFileSize];
+    for (int16_t i = 0; i < testFileSize; i++) {
+      testbuffer[i] = i;
+    }
+
+    SD.setSDCardFileData( (char*) testbuffer, testFileSize * 2);
 
     ResamplingSdReader reader;
     reader.begin();
@@ -49,8 +54,15 @@ void test_resampling_forward() {
 }
 
 void test_resampling_reverse() {
+    printf("test_resampling_reverse()\n");
 
-    SD.setSDCardFolderPath(sdcardlocation);
+    const size_t testFileSize = 1000;
+    int16_t testbuffer[testFileSize];
+    for (int16_t i = 0; i < testFileSize; i++) {
+      testbuffer[i] = i;
+    }
+
+    SD.setSDCardFileData( (char*) testbuffer, testFileSize * 2);
 
     ResamplingSdReader reader;
     reader.begin();
