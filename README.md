@@ -1,4 +1,4 @@
-# teensy-resampling-sdreader
+# teensy-resampling-sdreader ![C/C++ CI](https://github.com/newdigate/teensy-resampling-sdreader/workflows/C/C++%20CI/badge.svg)
 (experimental) class to read resampled raw audio from sd card using teensy  
 
 this is a work in progress, please bare with us...
