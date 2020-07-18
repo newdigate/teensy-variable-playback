@@ -5,7 +5,7 @@ project(teensy-resampling-src C CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 # location of header files
-include_directories(../teensy_cores_x86)
+include_directories(../teensy)
 
 add_library(teensy-resampling-src STATIC
 		ResamplingSdReader.h

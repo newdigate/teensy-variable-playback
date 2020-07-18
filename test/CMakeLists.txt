@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(test_resampling_sdreader C CXX)
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(../teensy_cores_x86)
+include_directories(../teensy)
 include_directories(../src)
 
 set (Boost_USE_STATIC_LIBS OFF)

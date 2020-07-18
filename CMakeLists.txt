@@ -3,6 +3,6 @@ project(teensy_resampling_sdreader C CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_subdirectory( teensy_cores_x86 )
+add_subdirectory(teensy)
 add_subdirectory(src)
 add_subdirectory(test)

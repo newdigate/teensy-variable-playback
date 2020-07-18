@@ -21,7 +21,7 @@
 #define HardwareSerial_h
 
 #include <inttypes.h>
-#include "Teensy/Print.h"
+#include "Print.h"
 
 class HardwareSerial {
 public:
