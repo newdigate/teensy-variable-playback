@@ -17,7 +17,7 @@
 
 #include "../mock_arduino.h"
 #include "utility/SdFat.h"
-#include "../Teensy/Print.h"
+#include "../Print.h"
 #include <cstdio>
 #include "utility/SdFatUtil.h"
 

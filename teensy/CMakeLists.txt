@@ -9,9 +9,9 @@ add_library(teensy_cores_x86 STATIC
         hardware_serial.h
         mock_arduino.cpp
         mock_arduino.h       
-        Teensy/Print.cpp
-        Teensy/Print.h
-        Teensy/Printable.h
+        Print.cpp
+        Print.h
+        Printable.h
         SD/File.cpp
         SD/SD.cpp
         SD/SD.h
