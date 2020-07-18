@@ -43,6 +43,7 @@ jobs:
       run: ./TeensyduinoInstall.linux64 -dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
       env:
         ARDUINO_IDE_VERSION: 1.8.13
+        DISPLAY: :1.0  
     - name: build
       run: ./build.sh
     - name: test
