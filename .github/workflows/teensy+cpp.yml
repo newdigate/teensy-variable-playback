@@ -33,6 +33,12 @@ jobs:
         TEENSYDUINO_IDE_VERSION: 153         
     - name: make teensyduino executable
       run: chmod +x TeensyduinoInstall.linux64
+    - name: run xvfb framebuffer so arduino doesn't die
+      run: |
+        /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+        sleep 3
+        set xwindows display, workaround to get teensyduino working
+        export DISPLAY=:1.0
     - name: install teensyduino
       run: ./TeensyduinoInstall.linux64 -dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
       env:
