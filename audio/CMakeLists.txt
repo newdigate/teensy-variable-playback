@@ -143,7 +143,7 @@ macro(import_arduino_library LIB_ROOT LIB_NAME)
 
 endmacro(import_arduino_library)
 
-set(ARDUINO_LIB_ROOT "{ARDUINOPATH}/hardware/teensy/avr/libraries")
+set(ARDUINO_LIB_ROOT "${ARDUINOPATH}hardware/teensy/avr/libraries")
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio/utility)
 import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
