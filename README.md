@@ -1,10 +1,9 @@
-# teensy-resampling-sdreader [![C/C++ CI](https://github.com/newdigate/teensy-resampling-sdreader/workflows/C/C++%20CI/badge.svg) ](https://github.com/newdigate/teensy-resampling-sdreader/actions)
-(experimental) class to read resampled raw audio from sd card using teensy  
-
-this is a work in progress, please bare with us...
+# resampling sdreader [![C/C++ CI](https://github.com/newdigate/teensy-resampling-sdreader/workflows/C/C++%20CI/badge.svg) ](https://github.com/newdigate/teensy-resampling-sdreader/actions)
+* class to read audio from sd card at variable forward and backward playback rates on teensy  
 
 ## requirements
-  * cmake
+  * cmake, 
+  * boost unit-test library 
 
 ## build, run tests on x86 
 ### clone repo
