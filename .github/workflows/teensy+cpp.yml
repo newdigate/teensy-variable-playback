@@ -16,7 +16,8 @@ jobs:
     - name: boost
       run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev
     - name: download arduino
-      run: wget https://www.arduino.cc/download_handler.php?f=/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -O arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz      env:
+      run: wget https://www.arduino.cc/download_handler.php?f=/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -O arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
+      env:
         ARDUINO_IDE_VERSION: 1.8.13
     - name: print home directory
       run: echo $HOME
