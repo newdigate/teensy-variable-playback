@@ -151,7 +151,10 @@ void ResamplingSdReader::stop()
 }
 
 int ResamplingSdReader::available(void) {
-    return _file.available() / _playbackRate;
+    if (_playbackRate >= 0.0)
+        return _last_read_offset + _bufferPosition < _file_size;
+    else
+        return _last_read_offset + _bufferPosition >= _header_size;
 }
 
 void ResamplingSdReader::close(void) {
