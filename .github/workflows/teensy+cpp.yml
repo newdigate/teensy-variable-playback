@@ -40,7 +40,7 @@ jobs:
         set xwindows display, workaround to get teensyduino working
         export DISPLAY=:1.0
     - name: install teensyduino
-      run: ./TeensyduinoInstall.linux64 -dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
+      run: ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
       env:
         ARDUINO_IDE_VERSION: 1.8.13
         DISPLAY: :1.0  
