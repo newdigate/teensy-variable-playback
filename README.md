@@ -24,7 +24,7 @@ make
 ```
 ### run tests
 ```
-cmake-build-debug/test_x86/test_resampling_sdreader
+cmake-build-debug/test/test_suite1
 ```
 
 ## visual studio code
