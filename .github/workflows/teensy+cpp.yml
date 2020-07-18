@@ -16,7 +16,7 @@ jobs:
     - name: boost
       run: sudo apt-get update && sudo apt-get install -yq libboost-all-dev
     - name: install dependencies
-      run:
+      run: |
         export ARDUINO_IDE_VERSION="1.8.13"
         export TEENSYDUINO_IDE_VERSION="153"
         wget --quiet https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
