@@ -5,7 +5,7 @@
   * cmake, 
   * boost unit-test library 
 
-## build, run tests on x86 
+## build and run/debug tests locally on pc
 ### clone repo
 ``` sh
 git clone https://github.com/newdigate/teensy-resampling-sdreader.git
