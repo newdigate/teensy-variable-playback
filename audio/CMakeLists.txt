@@ -13,8 +13,7 @@ include(CMakeForceCompiler)
 #
 set(TEENSY_VERSION 40 CACHE STRING "Set to the Teensy version corresponding to your board (30 or 31 allowed)" FORCE)
 set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 or 96000000 to set CPU core speed" FORCE)
-set(ARDUINOPATH "/Applications/Teensyduino.app/Contents/Java/" CACHE STRING "Path to Arduino installation" FORCE)
-
+set(ARDUINOPATH "${HOME}/arduino_ide/arduino-1.8.13/Java/" CACHE STRING "Path to Arduino installation" FORCE)
 
 # Derived variables
 #
@@ -144,9 +143,7 @@ macro(import_arduino_library LIB_ROOT LIB_NAME)
 
 endmacro(import_arduino_library)
 
-set(ARDUINO_LIB_ROOT "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/libraries")
-set(ARDUINO_DOCUMENTS_LIB_ROOT "/Users/nicholasnewdigate/Documents/Arduino/libraries")
-set(DOWNLOADS_LIB_ROOT "/Users/nicholasnewdigate/Downloads/")
+set(ARDUINO_LIB_ROOT "{ARDUINOPATH}/hardware/teensy/avr/libraries")
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio/utility)
 import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
@@ -158,5 +155,4 @@ import_arduino_library(${ARDUINO_LIB_ROOT} SerialFlash)
 teensy_add_executable(teensy-audio-resampler
         main.cpp
         playsdrawresmp.h
-        playsdrawresmp.cpp
-        )
+        playsdrawresmp.cpp)
