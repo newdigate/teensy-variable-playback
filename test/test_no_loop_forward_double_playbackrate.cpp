@@ -7,6 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
+#include <cmath>
 
 BOOST_AUTO_TEST_SUITE(ReadForwardAtDoublePlaybackRate)
     const double playBackRate = 2.0;
