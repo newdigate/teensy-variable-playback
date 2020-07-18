@@ -64,12 +64,17 @@ public:
 
     void close(void);
 
+    void setHeaderSize(uint32_t headerSize) {
+        _header_size = headerSize;
+    }
+
 private:
     volatile bool _playing = false;
     volatile int32_t _file_offset;
     volatile int32_t _last_read_offset = 0;
 
     uint32_t _file_size;
+    uint32_t _header_size = 0;
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;

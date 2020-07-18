@@ -130,7 +130,7 @@ bool ResamplingSdReader::play(const char *filename)
         _file_offset = _file_size - AUDIO_BLOCK_SAMPLES * 2;
     } else {
         // forward playabck - set _file_offset to first audio block in file
-        _file_offset = 0;
+        _file_offset = _header_size;
     }
 
     _playing = true;
@@ -167,10 +167,10 @@ bool ResamplingSdReader::updateBuffers() {
 
     uint16_t numberOfBytesToRead = AUDIO_BLOCK_SAMPLES * 2;
     if (!forward) {
-        if (_file_offset < 0) {
+        if (_file_offset < _header_size) {
             // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
             numberOfBytesToRead = _file_offset + AUDIO_BLOCK_SAMPLES * 2;
-            _file.seek(0);
+            _file.seek(_header_size);
         
             if (numberOfBytesToRead == 0)
                 return false;

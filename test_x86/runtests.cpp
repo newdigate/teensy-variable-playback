@@ -1,8 +1,6 @@
-#include <stdint.h>
 #include <iostream>
 #include "SD/SD.h"
 #include <unistd.h>
-#include <dirent.h>
 #include "../common/ResamplingSdReader.h"
 using namespace std;
 
