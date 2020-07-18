@@ -5,7 +5,7 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 #define TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 
-#include "../common/ResamplingSdReader.h"
+#include "../src/ResamplingSdReader.h"
 
 struct ResamplingReaderFixture {
 

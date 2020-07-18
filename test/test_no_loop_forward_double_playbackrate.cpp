@@ -5,14 +5,10 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_READERTESTS_CPP
 #define TEENSY_RESAMPLING_SDREADER_READERTESTS_CPP
 
-#define BOOST_TEST_MODULE ResamplingReaderTests
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
 
 BOOST_AUTO_TEST_SUITE(ReadForwardAtDoublePlaybackRate)
-
     const double playBackRate = 2.0;
 
     void populateDataSourceAndSetSDCardMockData(const uint32_t size_of_datasource, int16_t dataSource[]) {
