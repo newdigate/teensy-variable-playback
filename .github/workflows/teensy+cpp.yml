@@ -20,7 +20,7 @@ jobs:
     - name: teensyduino version
       run: export TEENSYDUINO_IDE_VERSION="153"
     - name: download arduino
-      run: wget --quiet https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
+      run: wget https://www.arduino.cc/download_handler.php?f=/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
     - name: print home directory
       run: echo $HOME
     - name: make dir arduino_ido
