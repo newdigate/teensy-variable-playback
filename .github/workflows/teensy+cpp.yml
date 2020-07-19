@@ -15,39 +15,39 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/checkout@v2
       with:
-      - repository: PaulStoffregen/cores.git
-      - path: ./deps/teensy-cores
-      - depth: 1
+        repository: PaulStoffregen/cores.git
+        path: ./deps/teensy-cores
+        fetch-depth: 1
 
     - uses: actions/checkout@v2
       with:
-        - repository: PaulStoffregen/Audio.git
-        - path: ./deps/Audio
-        - depth: 1
+        repository: PaulStoffregen/Audio.git
+        path: ./deps/Audio
+        fetch-depth: 1
 
     - uses: actions/checkout@v2
       with:
-        - repository: PaulStoffregen/SD.git
-        - path: ./deps/SD
-        - depth: 1
+        repository: PaulStoffregen/SD.git
+        path: ./deps/SD
+        fetch-depth: 1
 
     - uses: actions/checkout@v2
       with:
-        - repository: PaulStoffregen/Wire.git
-        - path: ./deps/Wire
-        - depth: 1
+        repository: PaulStoffregen/Wire.git
+        path: ./deps/Wire
+        fetch-depth: 1
 
     - uses: actions/checkout@v2
       with:
-        - repository: PaulStoffregen/SPI.git
-        - path: ./deps/SPI
-        - depth: 1
+        repository: PaulStoffregen/SPI.git
+        path: ./deps/SPI
+        fetch-depth: 1
 
     - uses: actions/checkout@v2
       with:
-        - repository: PaulStoffregen/SerialFlash.git
-        - path: ./deps/SerialFlash
-        - depth: 1
+        repository: PaulStoffregen/SerialFlash.git
+        path: ./deps/SerialFlash
+        fetch-depth: 1
 
     - name: download dependencies
       run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev
