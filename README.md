@@ -9,6 +9,7 @@ A set of classes to read and play audio from micro sd-card at variable forward a
     * cmake
     * gcc or llvm: c++ standard library (using std::vector, std::function)
     * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
+    
   * teensy variable playback library  
     * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
     * github
@@ -24,10 +25,10 @@ A set of classes to read and play audio from micro sd-card at variable forward a
 
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| ```audio```  | teensy             | extends teensy audio library,<br/> * adds AudioPlaySdRawResmp<br/> * play raw audio at variable forward and backward playback rates |
-| ```src```    | teensy / <br/>x86-tests | shared code used by audio and x86-tests                                                                               |
-| ```teensy``` | x86-tests          | used by x86-tests <br/> * mock arduino/teensyduino functions <br/> * allows unit-tests to be compiled on x86/x64 architecture  |
-| ```test```   | x86-tests          | unit tests that run on linux x64 or x86 architecture, <br/> tests code in ```src``` folder         |
+| ```audio```  | ```teensy```             | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates |
+| ```src```    | ```teensy``` / <br/>```x86-tests``` | shared code used by ```audio``` and ```tests```                                                                               |
+| ```teensy``` | ```x86-tests```          | used by ```tests``` <br/> * mock arduino/teensyduino functions <br/> * allows unit-tests to be compiled on x86/x64 architecture  |
+| ```test```   | ```x86-tests```          | unit tests that run on linux x64 or x86 architecture, <br/> tests code in ```src``` folder|
   
 ## build and run/debug tests locally on pc
 ### clone repo
