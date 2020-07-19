@@ -5,18 +5,20 @@ A set of classes to read and play audio from micro sd-card at variable forward a
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## requirements
-  * cmake
-  * gcc or llvm: c++ standard library (using std::vector, std::function)
-  * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
-  * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
-  * github
-    * PaulStoffregen
-      * cores.git
-      * Audio.git
-        * SD.git
-        * Wire.git
-        * SPI.git
-        * SerialFlash.git
+  * x86 / x64 linux unit tests
+    * cmake
+    * gcc or llvm: c++ standard library (using std::vector, std::function)
+    * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
+  * teensy variable playback library  
+    * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
+    * github
+      * PaulStoffregen
+        * cores.git
+        * Audio.git
+          * SD.git
+          * Wire.git
+          * SPI.git
+          * SerialFlash.git
         
 ## code structure
 
