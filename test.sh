@@ -1,3 +1,3 @@
 #!/bin/bash
 cd cmake-build-debug/test/
-./test_suite1
+./test_suite1 
