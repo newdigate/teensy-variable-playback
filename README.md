@@ -2,7 +2,7 @@
 * class to read audio from sd card at variable forward and backward playback rates on teensy  
 
 ## requirements
-  * cmake, 
+  * cmake 
   * boost unit-test library 
 
 ## build and run/debug tests locally on pc

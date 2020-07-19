@@ -13,30 +13,54 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: boost
-      run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev ffmpeg libvpx-dev 
-    - name: download arduino
-      run: wget https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
-      env:
-        ARDUINO_IDE_VERSION: 1.8.13
-    - name: print home directory
-      run: echo $HOME
-    - name: make dir arduino_ido
-      run: mkdir $HOME/arduino_ide
-    - name: unzip arduino
-      run: tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -C $HOME/arduino_ide/ 
-      env:
-        ARDUINO_IDE_VERSION: 1.8.13
-    - name: download teensyduino
-      run: curl -fsSL https://www.pjrc.com/teensy/td_$TEENSYDUINO_IDE_VERSION/TeensyduinoInstall.linux64 -o TeensyduinoInstall.linux64
-      env:
-        TEENSYDUINO_IDE_VERSION: 153        
-    - name: make teensyduino executable
-      run: chmod +x TeensyduinoInstall.linux64
-    - name: install teensyduino
-      run: xvfb-run --auto-servernum --server-args "-screen 0 1024x768x24" -e /dev/stdout ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION && ffmpeg -f x11grab -s 1024x768 -r 25 -i :0.0 out.mp4
-      env:
-        ARDUINO_IDE_VERSION: 1.8.13 
+    - uses: actions/checkout@v2
+      with:
+      - repo: PaulStoffregen/cores.git
+      - path: ./deps/teensy-cores
+      - depth: 1
+
+    - uses: actions/checkout@v2
+      with:
+        - repo: PaulStoffregen/Audio.git
+        - path: ./deps/Audio
+        - depth: 1
+
+    - uses: actions/checkout@v2
+      with:
+        - repo: https://github.com/PaulStoffregen/SD.git
+        - path: ./deps/SD
+        - depth: 1
+
+    - uses: actions/checkout@v2
+      with:
+        - repo: https://github.com/PaulStoffregen/Wire.git
+        - path: ./deps/Wire
+        - depth: 1
+
+    - uses: actions/checkout@v2
+      with:
+        - repo: https://github.com/PaulStoffregen/SPI.git
+        - path: ./deps/SPI
+        - depth: 1
+
+    - uses: actions/checkout@v2
+      with:
+        - repo: https://github.com/PaulStoffregen/SerialFlash.git
+        - path: ./deps/SerialFlash
+        - depth: 1
+
+    - name: download dependencies
+      run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev
+
+    - name: download toolchain
+      run: |
+        curl  -L "https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2" --output /tmp/gcc-arm-none-eabi.tar.bz2
+        mkdir -p /opt
+        cd /opt
+        tar xjf /tmp/gcc-arm-none-eabi.tar.bz2
+        rm /tmp/gcc-arm-none-eabi.tar.bz2
+        echo "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
+
     - uses: actions/upload-artifact@v2
       with:
         name: teensyduino installer video
