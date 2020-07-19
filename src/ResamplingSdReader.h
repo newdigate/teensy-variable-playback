@@ -7,7 +7,7 @@
 
 
 
-#ifdef XXXXXX
+#ifdef ARDUINO
 #include "stdint.h"
 #include <SD.h>
 #include <AudioStream.h>
