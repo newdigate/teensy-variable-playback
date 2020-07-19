@@ -41,8 +41,8 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
 ## build and run/debug tests locally on pc
 ### clone repo
 ``` sh
-git clone https://github.com/newdigate/teensy-resampling-sdreader.git
-cd teensy-resampling-sdreader
+git clone https://github.com/newdigate/teensy-variable-playback.git
+cd teensy-variable-playback
 ```
 ### build tests on linux
 ``` sh
