@@ -66,12 +66,11 @@ jobs:
         tar xjf /tmp/gcc-arm-none-eabi.tar.bz2
         rm /tmp/gcc-arm-none-eabi.tar.bz2
         echo "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: teensyduino installer video
-        path: out.mp4
     - name: build
       run: ./build.sh
     - name: test
       run: ./test.sh
+    - uses: actions/upload-artifact@v2
+      with:
+        name: hex file
+        path: cmake-build-debug/audio/teensy-audio-resampler.hex
