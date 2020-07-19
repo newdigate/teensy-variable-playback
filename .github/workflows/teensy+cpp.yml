@@ -18,7 +18,7 @@ jobs:
     - name: download arduino
       run: wget https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
       env:
-        ARDUINO_IDE_VERSION: 1.8.6
+        ARDUINO_IDE_VERSION: 1.8.8
     - name: print home directory
       run: echo $HOME
     - name: make dir arduino_ido
@@ -26,11 +26,11 @@ jobs:
     - name: unzip arduino
       run: tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz -C $HOME/arduino_ide/ 
       env:
-        ARDUINO_IDE_VERSION: 1.8.6
+        ARDUINO_IDE_VERSION: 1.8.8
     - name: download teensyduino
       run: curl -fsSL https://www.pjrc.com/teensy/td_$TEENSYDUINO_IDE_VERSION/TeensyduinoInstall.linux64 -o TeensyduinoInstall.linux64
       env:
-        TEENSYDUINO_IDE_VERSION: 143         
+        TEENSYDUINO_IDE_VERSION: 145        
     - name: make teensyduino executable
       run: chmod +x TeensyduinoInstall.linux64
     - name: run xvfb framebuffer so arduino doesn't die
@@ -41,7 +41,7 @@ jobs:
     - name: install teensyduino
       run: ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION
       env:
-        ARDUINO_IDE_VERSION: 1.8.6
+        ARDUINO_IDE_VERSION: 1.8.8
         DISPLAY: :1.0  
     - name: build
       run: ./build.sh
