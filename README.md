@@ -2,14 +2,15 @@
 * class to read audio from sd card at variable forward and backward playback rates on teensy  
 
 ## requirements
-  * cmake 
+  * cmake
   * boost unit-test library 
+  
 ## code structure
 
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| audio  | teensy             | extends pjrc Audio library, adds AudioPlaySdRawResmp to play raw audio at variable forward and backward playback rates |
-| src    | teensy / x86-tests | shared code used by teensy and x86 tests                                                                               |
+| audio  | teensy             | extends teensy audio library,<br/> * adds AudioPlaySdRawResmp<br/>    * play raw audio at variable forward and backward playback rates |
+| src    | teensy / <br/>x86-tests | shared code used by teensy and x86 tests                                                                               |
 | teensy | x86-tests          | used by x86 tests, provides teensy-core stubs to allow teensy code to be compiled on x86 architecture                  |
 | test   | x86-tests          | unit tests run on linux x64 or x86 architecture                                                                        |
   
