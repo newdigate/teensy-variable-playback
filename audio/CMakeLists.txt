@@ -17,7 +17,8 @@ set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 o
 set(CPU cortex-m7)
 
 set(COMPILERPATH "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/")
-set(COREPATH "/home/runner/work/teensy-resampling-sdreader/teensy-resampling-sdreader/deps/teensy-cores/teensy4/")
+set(DEPSPATH "/home/runner/work/teensy-variable-playback/teensy-variable-playback/deps")
+set(COREPATH "${DEPSPATH}/teensy-cores/teensy4/")
 
 # Normal toolchain configuration
 #
@@ -136,7 +137,7 @@ macro(import_arduino_library LIB_ROOT LIB_NAME)
     endforeach(SOURCE_S ${SOURCES_S})
 
 endmacro(import_arduino_library)
-set(ARDUINO_LIB_ROOT "/home/runner/work/teensy-resampling-sdreader/teensy-resampling-sdreader/deps/")
+set(ARDUINO_LIB_ROOT "${DEPSPATH}/")
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio/utility)
 import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
