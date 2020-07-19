@@ -1,4 +1,4 @@
-# variable playback rate library for teensy audio library
+# variable playback rate for teensy audio library
 [![C/C++ CI](https://github.com/newdigate/teensy-resampling-sdreader/workflows/C/C++%20CI/badge.svg) ](https://github.com/newdigate/teensy-resampling-sdreader/actions)
 
 A set of classes to read and play audio from micro sd-card at variable forward and backward playback rates on teensy
