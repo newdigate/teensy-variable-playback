@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: boost
-      run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev ffmpeg x11grab libvpx-dev 
+      run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev ffmpeg libvpx-dev 
     - name: download arduino
       run: wget https://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz
       env:
