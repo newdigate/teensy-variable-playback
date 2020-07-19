@@ -4,7 +4,7 @@
 ## requirements
   * cmake
   * gcc or llvm: c++ standard library (using std::vector, std::function)
-  * boost unit-test library: `sudo apt-get install -yq libboost-test-dev
+  * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
   * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
   * github
     * PaulStoffregen
