@@ -18,6 +18,7 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
     * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
     
   * teensy variable playback library  
+    * cmake
     * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
     * github
       * PaulStoffregen
