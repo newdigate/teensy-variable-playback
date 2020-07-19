@@ -1,8 +1,14 @@
 # variable playback rate for teensy audio library
 [![C/C++ CI](https://github.com/newdigate/teensy-resampling-sdreader/workflows/C/C++%20CI/badge.svg) ](https://github.com/newdigate/teensy-resampling-sdreader/actions)
 
-A set of classes to read and play audio from micro sd-card at variable forward and backward playback rates on teensy
+A set of classes to read and play 16-bit raw mono audio from micro sd-card at variable forward and backward playback rates on teensy
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+
+## todo
+* read .wav files
+* improve looping controls, allow xm-tracker like sample looping, 
+  * loop start and finish markers, ping ponging, repeating, etc.
+* stereo  
 
 ## requirements
   * x86 / x64 linux unit tests
