@@ -12,17 +12,12 @@ include(CMakeForceCompiler)
 # (show up in cmake-gui)
 #
 set(TEENSY_VERSION 40 CACHE STRING "Set to the Teensy version corresponding to your board (30 or 31 allowed)" FORCE)
-set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 or 96000000 to set CPU core speed" FORCE)
-set(ARDUINOPATH "/home/runner/arduino_ide/arduino-1.8.13/Java/" CACHE STRING "Path to Arduino installation" FORCE)
+set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 or 96000000 to set CPU core speed" FORCE) # Derived variables
 
-# Derived variables
-#
 set(CPU cortex-m7)
 
-set(TOOLSPATH "${ARDUINOPATH}hardware/tools/")
-set(COMPILERPATH "${TOOLSPATH}arm/bin/")
-set(COREPATH "${ARDUINOPATH}hardware/teensy/avr/cores/teensy4/")
-
+set(COMPILERPATH "/Users/nicholasnewdigate/Downloads/gcc-arm-none-eabi-7-2017-q4-major/bin/")
+set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/cores/teensy4/")
 
 # Normal toolchain configuration
 #
@@ -99,7 +94,6 @@ function(teensy_add_executable TARGET)
     add_custom_command(OUTPUT ${TARGET}.hex
             COMMAND ${COMPILERPATH}arm-none-eabi-size ${ELFTARGET}
             COMMAND ${COMPILERPATH}arm-none-eabi-objcopy -O ihex -R .eeprom ${ELFTARGET} ${TARGET}.hex
-            COMMAND ${TOOLSPATH}teensy_post_compile -file=${TARGET} -path=${CMAKE_CURRENT_BINARY_DIR} -tools=${TOOLSPATH}
             DEPENDS ${ELFTARGET}
             COMMENT "Creating HEX file for ${ELFTARGET}")
 
@@ -142,8 +136,7 @@ macro(import_arduino_library LIB_ROOT LIB_NAME)
     endforeach(SOURCE_S ${SOURCES_S})
 
 endmacro(import_arduino_library)
-message("${ARDUINOPATH}hardware/teensy/avr/libraries")
-set(ARDUINO_LIB_ROOT "${ARDUINOPATH}hardware/teensy/avr/libraries")
+set(ARDUINO_LIB_ROOT "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/libraries")
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
 import_arduino_library(${ARDUINO_LIB_ROOT} Audio/utility)
 import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
