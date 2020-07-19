@@ -34,7 +34,7 @@ jobs:
     - name: make teensyduino executable
       run: chmod +x TeensyduinoInstall.linux64
     - name: install teensyduino
-      run: xvfb-run --auto-servernum --server-args "-screen 0 1024x768x24" -e /dev/stdout ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION ; ffmpeg -f x11grab -s 1024x768 -r 25 -i :0.0+0,0 out.mp4
+      run: xvfb-run --auto-servernum --server-args "-screen 0 1024x768x24" -e /dev/stdout ./TeensyduinoInstall.linux64 --dir=$HOME/arduino_ide/arduino-$ARDUINO_IDE_VERSION && ffmpeg -f x11grab -s 1024x768 -r 25 -i :0.0 out.mp4
       env:
         ARDUINO_IDE_VERSION: 1.8.13 
     - uses: actions/upload-artifact@v2
