@@ -16,7 +16,7 @@ set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 o
 
 set(CPU cortex-m7)
 
-set(COMPILERPATH "/Users/nicholasnewdigate/Downloads/gcc-arm-none-eabi-7-2017-q4-major/bin/")
+set(COMPILERPATH "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/")
 set(COREPATH "/home/runner/work/teensy-resampling-sdreader/teensy-resampling-sdreader/deps/teensy-cores/teensy4/")
 
 # Normal toolchain configuration
