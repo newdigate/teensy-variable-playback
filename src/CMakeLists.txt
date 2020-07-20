@@ -11,4 +11,4 @@ add_library(teensy-resampling-src STATIC
 		ResamplingSdReader.h
 		ResamplingSdReader.cpp
         spi_interrupt.h
-        spi_interrupt.cpp)
+        spi_interrupt.cpp waveheaderparser.cpp waveheaderparser.h)

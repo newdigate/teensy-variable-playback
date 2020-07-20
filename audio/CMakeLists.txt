@@ -149,4 +149,6 @@ import_arduino_library(${ARDUINO_LIB_ROOT} SerialFlash)
 teensy_add_executable(teensy-audio-resampler
         main.cpp
         playsdrawresmp.h
-        playsdrawresmp.cpp)
+        playsdrawresmp.cpp
+        playsdwavresmp.h
+        playsdwavresmp.cpp)
