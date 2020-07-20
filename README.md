@@ -44,6 +44,18 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
 git clone https://github.com/newdigate/teensy-variable-playback.git
 cd teensy-variable-playback
 ```
+
+* manual configuration steps required:
+  * if you just want to compile, and run/debug the tests, you can comment out the ```audio``` subdirectory in the root ```CMakeLists.txt```
+    * ```add_subdirectory(audio)``` -> ```#add_subdirectory(audio)```
+  * update ```audio/CMakeLists.txt```:
+    * set cmake path variables to point to your arm gcc toolchain, teensy cores, and library dependencies
+ ``` cmake
+set(COMPILERPATH "/Users/xxx/gcc-arm-none-eabi-7-2017-q4-major/bin/")
+set(DEPSPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/libraries")
+set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/cores/teensy4/")
+```
+
 ### build tests on linux
 ``` sh
 ./build
