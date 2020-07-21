@@ -10,7 +10,7 @@
 
 BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
 
-    BOOST_FIXTURE_TEST_CASE(ReadForwardAtRegularPlaybackRate, WaveHeaderParserFixture) {
+    BOOST_FIXTURE_TEST_CASE(ReadWaveHeader, WaveHeaderParserFixture) {
 
         unsigned char test_sndhdrdata_sndhdr_wav[] = {
                 0x52, 0x49, 0x46, 0x46, 0x38, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
@@ -27,7 +27,13 @@ BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
         wav_header header;
         bool success = waveHeaderParser->readWaveHeader("blah.wav", header);
         BOOST_CHECK_EQUAL(success, true);
-   }
+        const char expectedRIFF[5] = "RIFF";
+        BOOST_CHECK_EQUAL_COLLECTIONS(&header.riff_header[0], &header.riff_header[3],&expectedRIFF[0], &expectedRIFF[3]);
+        BOOST_CHECK_EQUAL(header.header_chunk_size,56);
+        const char expectedWave[5] = "WAVE";
+        BOOST_CHECK_EQUAL_COLLECTIONS(&header.wave_header[0], &header.wave_header[3],&expectedWave[0], &expectedWave[3]);
+
+    }
 BOOST_AUTO_TEST_SUITE_END()
 
 #endif //TEENSY_RESAMPLING_WAVEHEADER_PARSER_TESTS_CPP
