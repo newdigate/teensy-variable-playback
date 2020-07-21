@@ -1,4 +1,5 @@
 # variable playback rate for teensy audio library
+[![Teensy 4.0](https://img.shields.io/badge/project-4.0-brightgreen.svg?label=Teensy&colorA=555555&colorB=ff8aff&logo=)](https://www.pjrc.com/store/teensy40.html)
 [![C/C++ CI](https://github.com/newdigate/teensy-variable-playback/workflows/C/C++%20CI/badge.svg) ](https://github.com/newdigate/teensy-variable-playback/actions)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![made-for-VSCode](https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg)](https://code.visualstudio.com/)
