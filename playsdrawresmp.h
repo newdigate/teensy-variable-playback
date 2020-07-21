@@ -10,7 +10,7 @@
 #include "AudioStream.h"
 #include "SD.h"
 #include "stdint.h"
-#include "../src/ResamplingSdReader.h"
+#include "ResamplingSdReader.h"
 
 class AudioPlaySdRawResmp : public AudioStream
 {

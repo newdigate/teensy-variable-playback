@@ -4,6 +4,7 @@
 
 #include "playsdwavresmp.h"
 #include "spi_interrupt.h"
+#include "waveheaderparser.h"
 
 void AudioPlaySdWavResmp::begin()
 {
@@ -12,11 +13,36 @@ void AudioPlaySdWavResmp::begin()
     file_size = 0;
 }
 
-bool AudioPlaySdWavResmp::play(const char *filename)
+bool AudioPlaySdWavResmp::play(char *filename)
 {
     stop();
-    //WaveHeaderParser waveHeaderParser;
-    //bool parseWavHeader =
+    if (strcmp(_filename,filename) != 0) {
+        _filename = new char[strlen(filename)];
+        strcpy( _filename, filename);
+
+        WaveHeaderParser waveHeaderParser;
+        bool parseWavHeader = waveHeaderParser.readWaveHeader(filename, wave_header);
+        if (parseWavHeader) {
+            Serial.printf("parsed header...2%s\n", _filename);
+            sdReader.setHeaderSize(44);
+        } else
+            Serial.printf("failed to parse header...\n");
+    }
+    if (wave_header.bit_depth != 16) {
+        Serial.printf("needs 16 bit/sample, got %d bits/sample\n", wave_header.bit_depth);
+        return false;
+    }
+
+    if (wave_header.audio_format != 1) {
+        Serial.printf("needs signed 16 bit audio format (1), got %d\n", wave_header.audio_format);
+        return false;
+    }
+
+    if (wave_header.num_channels != 1) {
+        Serial.printf("needs single channel audio, got %d channels\n", wave_header.num_channels);
+        return false;
+    }
+
     playing = sdReader.play(filename);
     return playing;
 }

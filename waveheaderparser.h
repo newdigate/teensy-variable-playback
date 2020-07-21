@@ -10,16 +10,17 @@
 #include "stdint.h"
 #include <SD.h>
 #include <AudioStream.h>
-#include "../spi_interrupt.h"
+#include "spi_interrupt.h"
 #else
 #include <cstdint>
-#include "SD/SD.h"
-#include "spi_interrupt.h"
+#include "teensy/SD/SD.h"
+#include "teensy/spi_interrupt.h"
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
 using namespace std;
 
+// from https://gist.github.com/Jon-Schneider/8b7c53d27a7a13346a643dac9c19d34f
 struct wav_header {
     // RIFF Header
     char riff_header[4]; // Contains "RIFF"
@@ -32,20 +33,25 @@ struct wav_header {
     short audio_format; // Should be 1 for PCM. 3 for IEEE Float
     short num_channels;
     int sample_rate;
-    int byte_rate; // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
-    short sample_alignment; // num_channels * Bytes Per Sample
-    short bit_depth; // Number of bits per sample
+    int byte_rate;
+    short sample_alignment;
+    short bit_depth;
 
     // Data
-    char data_header[4]; // Contains "data"
-    int data_bytes; // Number of bytes in data. Number of samples * num_channels * sample byte size
-    // uint8_t bytes[]; // Remainder of wave file is bytes
+    char data_header[4];
+    int data_bytes;
 };
 
 class WaveHeaderParser {
 public:
     bool readWaveHeader(const char *filename, wav_header &header) {
         File wavFile = SD.open(filename);
+        bool result = readWaveHeader(filename, header, wavFile);
+        wavFile.close();
+        return result;
+    }
+
+    bool readWaveHeader(const char *filename, wav_header &header, File &wavFile) {
         char buffer[5] = {0, 0, 0, 0, 0};
         int bytesRead = wavFile.read(buffer, 4);
         if (bytesRead != 4) return false;
@@ -135,7 +141,6 @@ public:
         return true;
     }
 private:
-
 };
 
 

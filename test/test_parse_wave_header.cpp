@@ -32,6 +32,8 @@ BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
         BOOST_CHECK_EQUAL(header.header_chunk_size,56);
         const char expectedWave[5] = "WAVE";
         BOOST_CHECK_EQUAL_COLLECTIONS(&header.wave_header[0], &header.wave_header[3],&expectedWave[0], &expectedWave[3]);
+        const char expectedfmt[5] = "fmt ";
+        BOOST_CHECK_EQUAL_COLLECTIONS(&header.fmt_header[0], &header.fmt_header[3],&expectedfmt[0], &expectedfmt[3]);
 
     }
 BOOST_AUTO_TEST_SUITE_END()

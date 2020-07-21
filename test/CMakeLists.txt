@@ -3,7 +3,7 @@ project(test_resampling_sdreader C CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(../teensy)
-include_directories(../src)
+include_directories(..)
 
 set (Boost_USE_STATIC_LIBS OFF)
 find_package (Boost REQUIRED COMPONENTS unit_test_framework)

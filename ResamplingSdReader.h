@@ -12,11 +12,11 @@
 #include <SD.h>
 #include <AudioStream.h>
 
-#include "../spi_interrupt.h"
+#include "spi_interrupt.h"
 #else
 #include <cstdint>
-#include "SD/SD.h"
-#include "spi_interrupt.h"
+#include "teensy/SD/SD.h"
+#include "teensy/spi_interrupt.h"
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 

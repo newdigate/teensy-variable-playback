@@ -24,4 +24,6 @@ add_library(teensy_cores_x86 STATIC
         SD/utility/SdFatmainpage.h
         SD/utility/SdFile.cpp
         SD/utility/SdInfo.h
-        SD/utility/SdVolume.cpp)
+        SD/utility/SdVolume.cpp
+		spi_interrupt.h
+		spi_interrupt.cpp)
