@@ -17,20 +17,35 @@
 
 using namespace std;
 
+uint32_t File::numInstances = 0;
+uint32_t File::numOpenFiles = 0;
+
+char *SDClass::_fileData = NULL;
+uint32_t SDClass::_fileSize = 0;
+
 std::streampos File::fileSize( const char* filePath ){
-    return _size;
+    return SDClass::_fileSize;
 }
 
 File::File(SdFile f, const char *n) {
     _position = 0;
+    numInstances++;
+    numOpenFiles++;
+    Serial.printf("File::numInstances = %d; (SdFile: %s)\n", numInstances, n);
 }
 
 File::File(const char *n, uint8_t mode) {
     _position = 0;
+    numInstances++;
+    numOpenFiles++;
+    Serial.printf("File::numInstances = %d; (filename: %s, numOpenFiles: %d)\n", numInstances, n, numOpenFiles);
 }
 
 File::File(void) {
   _size = 0;
+  numInstances++;
+  numOpenFiles++;
+  Serial.printf("File::numInstances = %d; empty ()\n", numInstances);
 }
 
 // returns a pointer to the file name
@@ -56,12 +71,12 @@ int File::peek() {
 }
 
 int File::read() {
-    if (_position >= _size) {
+    if (_position >= SDClass::_fileSize) {
         printf("!!! CRITICAL: read outside bounds of file...");
         return 0;
     }
 
-    int result = _data[_position];
+    int result = SDClass::_fileData[_position];
     _position++;
     return result;
 }
@@ -70,7 +85,7 @@ int File::read() {
 int File::read(void *buf, uint16_t nbyte) {
     char * target = (char*)buf;
     for (int i=0; i < nbyte; i++) {
-        if  (_position >= _size)
+        if  (_position >= SDClass::_fileSize)
             return i;
         int byteRead = File::read();
         target[i] = static_cast<char>(byteRead);
@@ -79,13 +94,13 @@ int File::read(void *buf, uint16_t nbyte) {
 }
 
 int File::available() {
-    return (_position < _size);
+    return (_position < SDClass::_fileSize);
 }
 
 void File::flush() {
 }
 bool File::seek(uint32_t pos) {
-    if (pos < _size) {
+    if (pos < SDClass::_fileSize) {
         _position = pos;
         return true;
     }
@@ -97,10 +112,12 @@ uint32_t File::position() {
 }
 
 uint32_t File::size() {
-    return _size;
+    return SDClass::_fileSize;
 }
 
 void File::close() {
+    numOpenFiles--;
+    Serial.printf("File::close() - open files: %d\n", numOpenFiles);
 }
 
 File::operator bool() {
@@ -110,9 +127,4 @@ File::operator bool() {
 bool File::is_directory( const char* pzPath )
 {
     return false;
-}
-
-void File::setMockData( char *data, uint32_t size) {
-    _data = data;
-    _size = size;
 }

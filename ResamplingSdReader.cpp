@@ -102,7 +102,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
 void ResamplingSdReader::begin(void)
 {
     _playing = false;
-    _file_offset = 0;
+    _file_offset = _header_size;
     _file_size = 0;
 }
 
@@ -114,6 +114,8 @@ bool ResamplingSdReader::play(const char *filename)
 
     __disable_irq();
     _file = SD.open(filename);
+    if ((_header_size > 0) && (_playbackRate > 0.0))
+        _file.seek(_header_size);
     __enable_irq();
 
     if (!_file) {

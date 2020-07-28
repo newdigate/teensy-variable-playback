@@ -9,7 +9,7 @@
 #include "ResamplingReaderFixture.h"
 #include <cmath>
 
-BOOST_AUTO_TEST_SUITE(ReadForwardAtDoublePlaybackRate)
+BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
     const double playBackRate = 2.0;
 
     void populateDataSourceAndSetSDCardMockData(const uint32_t size_of_datasource, int16_t dataSource[]) {
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(ReadForwardAtDoublePlaybackRate)
     }
 
     void testReadForwardAtDoublePlaybackRate(const uint32_t size_of_datasource, ResamplingSdReader *resamplingSdReader) {
-        printf("RawFileHasZeroSamples(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
+        printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
 
         int16_t dataSource[size_of_datasource];
         populateDataSourceAndSetSDCardMockData(size_of_datasource, dataSource);

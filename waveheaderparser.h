@@ -105,7 +105,7 @@ public:
         header.bit_depth = bit_depth;
 
         for (int i=0; i < 4; i++)
-            header.data_header[i] = buffer[i];
+            header.data_header[i] = buffer[i+36];
         if (buffer[36] != 'd' || buffer[37] != 'a' || buffer[38] != 't' || buffer[39] != 'a') {
             Serial.printf("expected data... (was %d)\n", buffer);
             return false;

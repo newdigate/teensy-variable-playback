@@ -415,70 +415,23 @@ SdFile SDClass::getParentDir(const char *filepath, int *index) {
 
 File SDClass::open(const char *filepath, uint8_t mode) {
 	File file = File(filepath, _fileSize);
-	file.setMockData(_fileData, _fileSize);
-    return file;
+	return file;
 }
 
 bool SDClass::exists(const char *filepath) {
-
-    const string path = _sdCardFolderLocation + "/" + std::string(filepath);
-    const char *pathCstr = path.c_str();
-    fstream file(pathCstr);
-    bool isFile = (bool)file;
-    if (isFile)
-        return true;
-
-    bool is_Directory = File::is_directory (pathCstr);
-    return is_Directory;
+    return true;
 }
-
-std::string SDClass::getSDCardFolderPath() {
-    return _sdCardFolderLocation;
-}
-
-void SDClass::setSDCardFolderPath(std::string path) {
-    _sdCardFolderLocation = path;
-}
-
-std::string SDClass::_sdCardFolderLocation = std::string("~/Users/sdcard/");
 
 bool SDClass::mkdir(const char *filepath) {
-    if (_sdCardFolderLocation.size() == 0)
-        return false;
-
-    std::string path = _sdCardFolderLocation + "/" + std::string(filepath);
-    if (!exists(path.c_str())) {
-        std::string cmd = std::string("mkdir -p ") + std::string(path);
-        system(cmd.c_str());
-        return true;
-    }
     return true;
 }
 
 bool SDClass::rmdir(const char *filepath) {
-    if (_sdCardFolderLocation.size() == 0)
-        return false;
-
-    std::string path = _sdCardFolderLocation + "/" + std::string(filepath);
-    if (exists(filepath)) {
-        std::string cmd = std::string("rm -rf ") + std::string(path);
-        system(cmd.c_str());
-        return true;
-    }
     return true;
 }
 
 bool SDClass::remove(const char *filepath) {
-    if (_sdCardFolderLocation.size() == 0)
-        return false;
-    
-    std::string path = _sdCardFolderLocation + "/" + std::string(filepath);
-    if (exists(filepath)) {
-        std::string cmd = std::string("rm -rf ") + std::string(path);
-        system(cmd.c_str());
-        return true;
-    }
-    return true;
+  return true;
 }
 
 SDClass SD;

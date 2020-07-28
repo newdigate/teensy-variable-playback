@@ -37,13 +37,20 @@ class File {
     bool _isDirectory;
     std::streampos fileSize( const char* filePath );
 
-     char* _data;
-     uint32_t _position;
+     uint32_t _position = 0;
 
 public:
+    static uint32_t numInstances;
+    static uint32_t numOpenFiles;
+
     File(const char *name, uint8_t mode = xO_READ);
     File(SdFile f, const char *n); // wraps an underlying SdFile
     File(void);      // 'empty' constructor
+    ~File() {
+        numInstances--;
+        Serial.printf("~ File::numInstances = %d\n", numInstances);
+    }
+
     virtual int write(uint8_t);
     virtual int write(const uint8_t *buf, size_t size);
     virtual int read();
@@ -61,7 +68,6 @@ public:
     bool isDirectory(void);
     static bool is_directory( const char* pzPath );
 
-    void setMockData( char *data, uint32_t size);
 };
 
 class SDClass {
@@ -74,17 +80,11 @@ private:
     // my quick&dirty iterator, should be replaced
     SdFile getParentDir(const char *filepath, int *indx);
 
-    static std::string _sdCardFolderLocation;
+    static char *_fileData;
+    static uint32_t _fileSize;
 
-    char *_fileData;
-    uint32_t _fileSize;
+public:
 
-    public:
-
-    static std::string getSDCardFolderPath();
-
-    static void setSDCardFolderPath(std::string path);
-    
     void setSDCardFileData(char *data, uint32_t size) {
         _fileData = data;
         _fileSize = size;
