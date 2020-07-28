@@ -23,10 +23,12 @@ bool AudioPlaySdWavResmp::play(char *filename)
         WaveHeaderParser waveHeaderParser;
         bool parseWavHeader = waveHeaderParser.readWaveHeader(filename, wave_header);
         if (parseWavHeader) {
-            Serial.printf("parsed header...2%s\n", _filename);
+            Serial.printf("parsed header...%s\n", _filename);
             sdReader.setHeaderSize(44);
-        } else
-            Serial.printf("failed to parse header...\n");
+        } else {
+            Serial.printf("failed to parse header...%s\n", _filename);
+            return false;
+        }
     }
     if (wave_header.bit_depth != 16) {
         Serial.printf("needs 16 bit/sample, got %d bits/sample\n", wave_header.bit_depth);

@@ -52,9 +52,9 @@ public:
     }
 
     bool readWaveHeader(const char *filename, wav_header &header, File &wavFile) {
-        char buffer[5] = {0, 0, 0, 0, 0};
-        int bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
+        char buffer[44];
+        int bytesRead = wavFile.read(buffer, 44);
+        if (bytesRead != 44) return false;
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
             Serial.printf("expected RIFF (was %s)\n", buffer);
             return false;
@@ -62,81 +62,56 @@ public:
         for (int i=0; i < 4; i++)
             header.riff_header[i] = buffer[i];
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
-        auto header_chunk_size = static_cast<unsigned long>(buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0]);
+        auto header_chunk_size = static_cast<unsigned long>(buffer[7] << 24 | buffer[6] << 16 | buffer[5] << 8 | buffer[4]);
         header.header_chunk_size = header_chunk_size;
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
         for (int i=0; i < 4; i++)
-            header.wave_header[i] = buffer[i];
-        if (buffer[0] != 'W' || buffer[1] != 'A' || buffer[2] != 'V' || buffer[3] != 'E') {
+            header.wave_header[i] = buffer[i+8];
+        if (buffer[8] != 'W' || buffer[9] != 'A' || buffer[10] != 'V' || buffer[11] != 'E') {
             Serial.printf("expected WAVE (was %d)\n", buffer);
             return false;
         }
 
-
-        bytesRead = wavFile.read(buffer, 4);
         for (int i=0; i < 4; i++)
-            header.fmt_header[i] = buffer[i];
-        if (bytesRead != 4) return false;
-        if (buffer[0] != 'f' || buffer[1] != 'm' || buffer[2] != 't' || buffer[3] != ' ') {
+            header.fmt_header[i] = buffer[i+12];
+        if (buffer[12] != 'f' || buffer[13] != 'm' || buffer[14] != 't' || buffer[15] != ' ') {
             Serial.printf("expected 'fmt ' (was %d)\n", buffer);
             return false;
         }
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
-        auto fmt_chunk_size = static_cast<unsigned long>(buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0]);
+        auto fmt_chunk_size = static_cast<unsigned long>(buffer[19] << 24 | buffer[18] << 16 | buffer[17] << 8 | buffer[16]);
         header.fmt_chunk_size = fmt_chunk_size;
         if (fmt_chunk_size != 16) {
             Serial.printf("chunk size should be 16 for PCM wave data... (was %d)\n", fmt_chunk_size);
             return false;
         }
 
-        bytesRead = wavFile.read(buffer, 2);
-        if (bytesRead != 2) return false;
-        auto audio_format = static_cast<unsigned long>((buffer[1] << 8) | buffer[0]);
+        auto audio_format = static_cast<unsigned long>((buffer[21] << 8) | buffer[20]);
         header.audio_format = audio_format;
 
-        bytesRead = wavFile.read(buffer, 2);
-        if (bytesRead != 2) return false;
-        auto num_channels = static_cast<unsigned long>((buffer[1] << 8) | buffer[0]);
+        auto num_channels = static_cast<unsigned long>((buffer[23] << 8) | buffer[22]);
         header.num_channels = num_channels;
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
-        uint32_t sample_rate = static_cast<uint32_t>((unsigned char)buffer[3] << 24 | (unsigned char)buffer[2] << 16 | (unsigned char)buffer[1] << 8 | (unsigned char)buffer[0]);
+        uint32_t sample_rate = static_cast<uint32_t>((unsigned char)buffer[27] << 24 | (unsigned char)buffer[26] << 16 | (unsigned char)buffer[25] << 8 | (unsigned char)buffer[24]);
         header.sample_rate = sample_rate;
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
-        uint32_t byte_rate = static_cast<uint32_t>((unsigned char)buffer[3] << 24 | (unsigned char)buffer[2] << 16 | (unsigned char)buffer[1] << 8 | (unsigned char)buffer[0]);
+        uint32_t byte_rate = static_cast<uint32_t>((unsigned char)buffer[31] << 24 | (unsigned char)buffer[30] << 16 | (unsigned char)buffer[29] << 8 | (unsigned char)buffer[28]);
         header.byte_rate = byte_rate;
 
-        bytesRead = wavFile.read(buffer, 2);
-        if (bytesRead != 2) return false;
-        auto sample_alignment = static_cast<unsigned long>((buffer[1] << 8) | buffer[0]);
+        auto sample_alignment = static_cast<unsigned long>((buffer[33] << 8) | buffer[32]);
         header.sample_alignment = sample_alignment;
 
-        bytesRead = wavFile.read(buffer, 2);
-        if (bytesRead != 2) return false;
-        auto bit_depth = static_cast<unsigned long>(buffer[1] << 8 | buffer[0]);
+        auto bit_depth = static_cast<unsigned long>(buffer[35] << 8 | buffer[34]);
         header.bit_depth = bit_depth;
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
         for (int i=0; i < 4; i++)
             header.data_header[i] = buffer[i];
-        if (buffer[0] != 'd' || buffer[1] != 'a' || buffer[2] != 't' || buffer[3] != 'a') {
+        if (buffer[36] != 'd' || buffer[37] != 'a' || buffer[38] != 't' || buffer[39] != 'a') {
             Serial.printf("expected data... (was %d)\n", buffer);
             return false;
         }
 
-        bytesRead = wavFile.read(buffer, 4);
-        if (bytesRead != 4) return false;
-        auto data_bytes = static_cast<unsigned long>(buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0]);
+        auto data_bytes = static_cast<unsigned long>(buffer[43] << 24 | buffer[42] << 16 | buffer[41] << 8 | buffer[40]);
         header.data_bytes = data_bytes;
         return true;
     }
