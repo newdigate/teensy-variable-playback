@@ -44,7 +44,6 @@ File::File(const char *n, uint8_t mode) {
 File::File(void) {
   _size = 0;
   numInstances++;
-  numOpenFiles++;
   Serial.printf("File::numInstances = %d; empty ()\n", numInstances);
 }
 

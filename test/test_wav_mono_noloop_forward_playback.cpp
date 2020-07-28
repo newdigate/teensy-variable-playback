@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
             j++;
         } while (bytesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), false);
         resamplingSdReader->close();
 
         BOOST_CHECK_EQUAL_COLLECTIONS(&expected[0], &expected[expectedDataSize-1], &actual[0], &actual[(total_bytes_read / 2)-1]);

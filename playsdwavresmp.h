@@ -26,7 +26,7 @@ public:
     void begin(void);
     bool play(char *filename);
     void stop(void);
-    bool isPlaying(void) { return playing; }
+    bool isPlaying(void) { return sdReader.isPlaying(); }
     uint32_t positionMillis(void);
     uint32_t lengthMillis(void);
     virtual void update(void);
@@ -44,7 +44,6 @@ private:
     char *_filename = "";
     uint32_t file_size;
     volatile uint32_t file_offset;
-    volatile bool playing;
     ResamplingSdReader sdReader;
 };
 

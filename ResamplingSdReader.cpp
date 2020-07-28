@@ -48,6 +48,8 @@ int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
                 default:
                 {   
                     /* no looping - return the number of (resampled) bytes returned... */
+                    _playing = false;
+                    _bufferLength = 0;
                     return count;
                     break;
                 }
@@ -120,6 +122,7 @@ bool ResamplingSdReader::play(const char *filename)
 
     if (!_file) {
         StopUsingSPI();
+        Serial.printf("Not able to open file: %s\n", filename);
         return false;
     }
 
