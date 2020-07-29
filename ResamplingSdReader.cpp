@@ -116,8 +116,6 @@ bool ResamplingSdReader::play(const char *filename)
 
     __disable_irq();
     _file = SD.open(filename);
-    if ((_header_size > 0) && (_playbackRate > 0.0))
-        _file.seek(_header_size);
     __enable_irq();
 
     if (!_file) {
@@ -126,17 +124,31 @@ bool ResamplingSdReader::play(const char *filename)
         return false;
     }
 
-    __disable_irq();
+    //__disable_irq();
     _file_size = _file.size();
-    __enable_irq();
+    //__enable_irq();
 
-    if (_playbackRate < 0) {
-        // reverse playback - forward _file_offset to last audio block in file
-        _file_offset = _file_size - AUDIO_BLOCK_SAMPLES * 2;
-    } else {
+    if (_file_size <= _header_size) {
+        _playing = false;
+        Serial.printf("Wave file contains no samples: %s\n", filename);
+        return false;
+    }
+
+    if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _file_offset = _header_size;
     }
+    else{
+        // reverse playback - forward _file_offset to last audio block in file
+        if (_file_size > _header_size + (AUDIO_BLOCK_SAMPLES * 2))
+            _file_offset = _file_size - (AUDIO_BLOCK_SAMPLES * 2);
+        else
+            _file_offset = _header_size;
+    }
+
+    __disable_irq();
+    _file.seek(_file_offset);
+    __enable_irq();
 
     _playing = true;
     return true;
@@ -144,22 +156,17 @@ bool ResamplingSdReader::play(const char *filename)
 
 void ResamplingSdReader::stop()
 {
-    __disable_irq();
     if (_playing) {
+        __disable_irq();
         _playing = false;
-        __enable_irq();
         _file.close();
-        StopUsingSPI();
-    } else {
         __enable_irq();
+        StopUsingSPI();
     }
 }
 
 int ResamplingSdReader::available(void) {
-    if (_playbackRate >= 0.0)
-        return _last_read_offset + _bufferPosition < _file_size;
-    else
-        return _last_read_offset + _bufferPosition >= _header_size;
+    return _playing;
 }
 
 void ResamplingSdReader::close(void) {

@@ -66,7 +66,7 @@ void AudioPlaySdWavResmp::update()
     block = allocate();
     if (block == NULL) return;
 
-    //if (sdReader.available()) {
+    if (sdReader.available()) {
         // we can read more data from the file...
         n = sdReader.read(block->data, AUDIO_BLOCK_SAMPLES*2);
         file_offset += n;
@@ -74,14 +74,14 @@ void AudioPlaySdWavResmp::update()
             block->data[i] = 0;
         }
         transmit(block);
-    /*} else {
+    } else {
         sdReader.close();
 #if defined(HAS_KINETIS_SDHC)
         if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 #else
         AudioStopUsingSPI();
 #endif
-    }*/
+    }
     release(block);
 }
 
