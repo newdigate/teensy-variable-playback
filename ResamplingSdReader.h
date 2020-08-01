@@ -20,6 +20,8 @@
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 1024
+
 typedef enum loop_type {
     looptype_none,
     looptype_repeat,
@@ -33,10 +35,11 @@ public:
 
     void begin(void);
     bool play(const char *filename);
+    bool play();
     void stop(void);
     bool isPlaying(void) { return _playing; }
 
-    int read(void *buf, uint16_t nbyte);
+    unsigned int read(void *buf, uint16_t nbyte);
     bool readNextValue(int16_t *value);
 
     void setPlaybackRate(double f) {
@@ -61,7 +64,7 @@ public:
     }
 
     int available(void);
-
+    void reset(void);
     void close(void);
 
     void setHeaderSize(uint32_t headerSize) {
@@ -78,10 +81,10 @@ private:
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
-     
+    char *_filename = "";
     int _bufferPosition = 0;
 
-    int16_t _buffer[AUDIO_BLOCK_SAMPLES];
+    int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE];
     unsigned int _bufferLength = 0;
 
     File _file;
@@ -89,6 +92,8 @@ private:
     bool updateBuffers(void);
 
     void StartUsingSPI(){
+        //Serial.printf("start spi: %s\n", _filename);
+
 #if defined(HAS_KINETIS_SDHC)
         if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
 #else
@@ -97,6 +102,7 @@ private:
     }
 
     void StopUsingSPI() {
+        //Serial.printf("stop spi: %s\n", _filename);
 #if defined(HAS_KINETIS_SDHC)
         if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 #else

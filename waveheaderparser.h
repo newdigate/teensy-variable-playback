@@ -45,7 +45,9 @@ struct wav_header {
 class WaveHeaderParser {
 public:
     bool readWaveHeader(const char *filename, wav_header &header) {
+        __disable_irq();
         File wavFile = SD.open(filename);
+        __enable_irq();
         bool result = readWaveHeader(filename, header, wavFile);
         wavFile.close();
         return result;
@@ -53,7 +55,9 @@ public:
 
     bool readWaveHeader(const char *filename, wav_header &header, File &wavFile) {
         char buffer[44];
+        __disable_irq();
         int bytesRead = wavFile.read(buffer, 44);
+        __enable_irq();
         if (bytesRead != 44) return false;
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
             Serial.printf("expected RIFF (was %s)\n", buffer);
