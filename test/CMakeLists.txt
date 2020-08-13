@@ -13,7 +13,10 @@ add_executable(test_suite1
         test_raw_mono_noloop_forward_playback.cpp
         ResamplingReaderFixture.h
         test_raw_mono_noloop_forward_double_rate_playback.cpp
+        test_raw_mono_loop_forward_playback.cpp
         test_wav_mono_noloop_forward_playback.cpp
+        test_wav_mono_loop_forward_playback.cpp
+        test_wav_mono_noloop_backward_playback.cpp
         test_parse_wave_header.cpp
         WaveHeaderParserFixture.h)
 target_link_libraries(test_suite1 teensy_cores_x86)

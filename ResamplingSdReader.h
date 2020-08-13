@@ -20,7 +20,7 @@
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 1024
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 256
 
 typedef enum loop_type {
     looptype_none,
@@ -44,9 +44,9 @@ public:
 
     void setPlaybackRate(double f) {
         _playbackRate = f;
-        if (f < 0 && _file_offset == 0) {
-            _file.seek(_file_size);
-            _file_offset = _file.position();
+        if (f < 0 && _file_offset == _header_size) {
+            //_file.seek(_file_size);
+            _file_offset = _file_size;
         }
     }
 
@@ -71,18 +71,29 @@ public:
         _header_size = headerSize;
     }
 
+    void setLoopStart(uint32_t loop_start) {
+        _loop_start = loop_start;
+    }
+
+    void setLoopFinish(uint32_t loop_finish) {
+        // sample number, (NOT byte number)
+        _loop_finish = loop_finish;
+    }
+
 private:
     volatile bool _playing = false;
     volatile int32_t _file_offset;
     volatile int32_t _last_read_offset = 0;
 
-    uint32_t _file_size;
-    uint32_t _header_size = 0;
+    int32_t _file_size;
+    int32_t _header_size = 0;
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
     char *_filename = "";
     int _bufferPosition = 0;
+    int32_t _loop_start = 0;
+    int32_t _loop_finish = 0;
 
     int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE];
     unsigned int _bufferLength = 0;

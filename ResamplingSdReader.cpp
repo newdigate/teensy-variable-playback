@@ -18,9 +18,9 @@ unsigned int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
                 case looptype_repeat:
                 {
                     if (_playbackRate >= 0.0) 
-                        _file_offset = 0;
+                        _file_offset = _header_size + (_loop_start * 2);
                     else
-                        _file_offset = _file_size - 512;
+                        _file_offset = _header_size + (_loop_finish * 2) - 512;
 
                     _bufferLength = 0;
                     _file.seek(_file_offset);
@@ -68,7 +68,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         //forward playback
         if (_bufferPosition >= _bufferLength) {
 
-            if (_last_read_offset + _bufferPosition >= _file_size)
+            if (_last_read_offset + _bufferPosition >= _header_size + (_loop_finish * 2))
                 return false;
 
             if (!updateBuffers()) 
@@ -76,7 +76,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         }
     } else if (_playbackRate < 0) {
         // reverse playback    
-        if (_last_read_offset < 0)
+        if (_last_read_offset < _header_size)
         {  
             if (_bufferPosition < 0)
                 return false;
@@ -134,7 +134,8 @@ bool ResamplingSdReader::play(const char *filename)
         __disable_irq();
         _file_size = _file.size();
         __enable_irq();
-
+        _loop_start = 0;
+        _loop_finish = (_file_size - _header_size) / 2;
         if (_file_size <= _header_size) {
             _playing = false;
             Serial.printf("Wave file contains no samples: %s\n", filename);
@@ -150,7 +151,6 @@ bool ResamplingSdReader::play(const char *filename)
 
 bool ResamplingSdReader::play()
 {
-    Serial.printf("play():%s \n", _filename);
     stop();
     reset();
     //updateBuffers();
@@ -207,7 +207,7 @@ bool ResamplingSdReader::updateBuffers() {
     if (!forward) {
         if (_file_offset < _header_size) {
             // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
-            numberOfBytesToRead = _file_offset + RESAMPLE_BUFFER_SAMPLE_SIZE * 2;
+            numberOfBytesToRead = _file_offset - _header_size + RESAMPLE_BUFFER_SAMPLE_SIZE * 2;
             //__disable_irq();
             _file.seek(_header_size);
             //__enable_irq();
@@ -222,11 +222,14 @@ bool ResamplingSdReader::updateBuffers() {
         _bufferPosition = numberOfBytesToRead - 2;
     } else 
     {
-        if (_file_offset > _file_size - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2)) {
-            numberOfBytesToRead = _file_size - _file_offset;
+        int final_file_offset = _header_size + (_loop_finish * 2) - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2);
+        if (_file_offset > final_file_offset) {
+            numberOfBytesToRead = _header_size + (_loop_finish * 2) - _file_offset;
         }
         _bufferPosition = 0;
     }
+    if (numberOfBytesToRead == 0) return false;
+
     //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
     _last_read_offset = _file_offset;
     //__disable_irq();
