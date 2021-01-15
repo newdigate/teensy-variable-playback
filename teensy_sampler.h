@@ -5,9 +5,9 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_TEENSY_SAMPLER_H
 #define TEENSY_RESAMPLING_SDREADER_TEENSY_SAMPLER_H
 
-#include "waveheaderparser.h"
-#include "ResamplingSdReader.h"
-#include "playsdrawresmp.h"
-#include "playsdwavresmp.h"
+#include "src/waveheaderparser.h"
+#include "src/ResamplingSdReader.h"
+#include "audio/playsdrawresmp.h"
+#include "audio/playsdwavresmp.h"
 
 #endif //TEENSY_RESAMPLING_SDREADER_TEENSY_SAMPLER_H

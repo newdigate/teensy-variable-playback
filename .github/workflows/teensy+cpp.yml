@@ -20,42 +20,55 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/cores.git
-        path: ./deps/teensy-cores
+        path: deps/teensy-cores
         fetch-depth: 1
         ref: master
 
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/Audio.git
-        path: ./deps/Audio
+        path: deps/Audio
         fetch-depth: 1
         ref: master
 
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/SD.git
-        path: ./deps/SD
+        path: deps/SD
         fetch-depth: 1
-        ref: master
+        ref: Juse_Use_SdFat
 
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/Wire.git
-        path: ./deps/Wire
+        path: deps/Wire
         fetch-depth: 1
         ref: master
 
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/SPI.git
-        path: ./deps/SPI
+        path: deps/SPI
         fetch-depth: 1
         ref: master
 
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/SerialFlash.git
-        path: ./deps/SerialFlash
+        path: deps/SerialFlash
+        fetch-depth: 1
+        ref: master
+
+    - uses: actions/checkout@v2
+      with:
+        repository: PaulStoffregen/arm_math.git
+        path: deps/arm_math
+        ref: master
+
+    - uses: actions/checkout@v2
+      with:
+        repository: greiman/SdFat.git
+        path: deps/SdFat
         fetch-depth: 1
         ref: master
 

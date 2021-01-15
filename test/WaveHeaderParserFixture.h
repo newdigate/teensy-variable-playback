@@ -5,7 +5,7 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 #define TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 
-#include "../waveheaderparser.h"
+#include "../src/waveheaderparser.h"
 
 struct WaveHeaderParserFixture {
 
