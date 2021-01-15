@@ -7,7 +7,7 @@
 
 #include "src/waveheaderparser.h"
 #include "src/ResamplingSdReader.h"
-#include "audio/playsdrawresmp.h"
-#include "audio/playsdwavresmp.h"
+#include "src/playsdrawresmp.h"
+#include "src/playsdwavresmp.h"
 
 #endif //TEENSY_RESAMPLING_SDREADER_TEENSY_SAMPLER_H
