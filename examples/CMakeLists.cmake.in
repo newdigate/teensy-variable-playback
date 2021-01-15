@@ -171,9 +171,4 @@ teensy_remove_sources(${ARDUINO_LIB_ROOT}/SerialFlash/examples)
 teensy_remove_sources(${ARDUINO_LIB_ROOT}/SerialFlash/util)
 teensy_remove_sources(${ARDUINO_LIB_ROOT}/Wire/examples)
 
-teensy_add_executable(teensy-audio-resampler
-        main.cpp
-        playsdrawresmp.h
-        playsdrawresmp.cpp
-        playsdwavresmp.h
-        playsdwavresmp.cpp)
+
