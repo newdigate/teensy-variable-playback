@@ -86,8 +86,6 @@ jobs:
         echo "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
     - name: build
       run: ./build.sh
-    - name: test
-      run: ./test.sh
     - uses: actions/upload-artifact@v2
       with:
         name: hex file
