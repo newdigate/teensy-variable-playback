@@ -16,13 +16,9 @@ set(CPU_CORE_SPEED 600000000 CACHE STRING "Set to 24000000, 48000000, 72000000 o
 
 set(CPU cortex-m7)
 
-#set(COMPILERPATH "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/")
-#set(DEPSPATH "/home/runner/work/teensy-variable-playback/teensy-variable-playback/deps")
-#set(COREPATH "${DEPSPATH}/teensy-cores/teensy4/")
-
-set(COMPILERPATH "/Applications/ARM/bin/")
-set(DEPSPATH "/Users/moolet/Development/newdigate/temp_dep")
-set(COREPATH "${DEPSPATH}/cores/teensy4/")
+set(COMPILERPATH "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/")
+set(DEPSPATH "/home/runner/work/teensy-variable-playback/teensy-variable-playback/deps")
+set(COREPATH "${DEPSPATH}/teensy-cores/teensy4/")
 
 
 # Normal toolchain configuration
