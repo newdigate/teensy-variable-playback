@@ -39,10 +39,9 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
 
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| ```audio```  | ```teensy```             | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates |
-| ```src```    | ```teensy``` / <br/>```x86-tests``` | shared code used by ```audio``` and ```test```                                                                               |
-| ```teensy``` | ```x86-tests```          | used by ```test``` <br/> * mock arduino/teensyduino functions <br/> * allows unit-tests to be compiled on x86/x64 architecture  |
-| ```test```   | ```x86-tests```          | unit tests that run on linux x64 or x86 architecture, <br/> tests code in ```src``` folder|
+| ```examples```    | ```teensy``` | basic example how to use  |
+| ```src```    | ```teensy``` / <br/>```test``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
+| ```test```   | ```test```          | unit tests that run on linux x64 or x86 architecture, <br/> tests certain non-audio code in ```src``` folder|
   
 ## build and run/debug tests locally on pc
 ### clone repo
@@ -54,7 +53,7 @@ cd teensy-variable-playback
 * manual configuration steps required:
   * if you just want to compile, and run/debug the tests, you can comment out the ```audio``` subdirectory in the root ```CMakeLists.txt```
     * ```add_subdirectory(audio)``` -> ```#add_subdirectory(audio)```
-  * update ```audio/CMakeLists.txt```:
+  * update ```examples/CMakeLists.cmake.in```:
     * set cmake path variables to point to your arm gcc toolchain, teensy cores, and library dependencies
  ``` cmake
 set(COMPILERPATH "/Users/xxx/gcc-arm-none-eabi-7-2017-q4-major/bin/")
