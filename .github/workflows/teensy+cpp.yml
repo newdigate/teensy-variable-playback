@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - 'docs/**'    
     - '**.md'    
-    branches: [ master ]
+    branches: [ master, cleanup ]
 
   pull_request:
     branches: [ master ]
