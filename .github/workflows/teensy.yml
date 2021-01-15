@@ -5,7 +5,7 @@ on:
     paths-ignore:
     - 'docs/**'    
     - '**.md'
-    - '.github/workflows/teensy.yml'
+    - '.github/workflows/ubuntu_x64_cmake.yml'
     branches: [ master, cleanup ]
 
   pull_request:
