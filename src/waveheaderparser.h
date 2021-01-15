@@ -1,20 +1,14 @@
 //
 // Created by Nicholas Newdigate on 20/07/2020.
 //
-
 #ifndef TEENSY_RESAMPLING_SDREADER_WAVEHEADERPARSER_H
 #define TEENSY_RESAMPLING_SDREADER_WAVEHEADERPARSER_H
 
 #include <string>
-#ifdef ARDUINO
-#include "stdint.h"
 #include <SD.h>
-#include <AudioStream.h>
-#include "spi_interrupt.h"
-#else
 #include <cstdint>
-#include "teensy/SD/SD.h"
-#include "teensy/spi_interrupt.h"
+#include "spi_interrupt.h"
+#ifndef ARDUINO
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 

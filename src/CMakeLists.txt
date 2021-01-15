@@ -20,6 +20,7 @@ set(COMPILERPATH "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/")
 set(DEPSPATH "/home/runner/work/teensy-variable-playback/teensy-variable-playback/deps")
 set(COREPATH "${DEPSPATH}/teensy-cores/teensy4/")
 
+
 # Normal toolchain configuration
 #
 
@@ -44,11 +45,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 # Additional C and CPP files for Arduino support
 #
 
-file(GLOB TEENSY_C_FILES ${COREPATH}*.c)
-file(GLOB TEENSY_CPP_FILES ${COREPATH}*.cpp)
+file(GLOB_RECURSE TEENSY_C_FILES ${COREPATH}*.c)
+file(GLOB_RECURSE TEENSY_CPP_FILES ${COREPATH}*.cpp)
 set(TEENSY_SOURCES ${TEENSY_C_FILES} ${TEENSY_CPP_FILES})
 list(REMOVE_ITEM TEENSY_SOURCES ${COREPATH}main.cpp)
-
 
 # Teensy 3.0 and 3.1 differentiation
 #
@@ -86,7 +86,7 @@ function(teensy_add_executable TARGET)
     message("mm ${ELFTARGET} ${ARGN} ${TEENSY_SOURCES} ${TEENSY_LIB_SOURCES}")
     add_executable(${ELFTARGET} ${ARGN} ${TEENSY_SOURCES} ${TEENSY_LIB_SOURCES})
 
-    set_target_properties(${ELFTARGET} PROPERTIES COMPILE_FLAGS "-Wall -g -Os -mcpu=${CPU} -mthumb -nostdlib -MMD -felide-constructors -fno-exceptions -fno-rtti -std=gnu++0x")
+    set_target_properties(${ELFTARGET} PROPERTIES COMPILE_FLAGS "-Wall -g -Os -mcpu=${CPU} -mthumb -MMD -fno-exceptions ")
     set_target_properties(${ELFTARGET} PROPERTIES COMPILE_DEFINITIONS "${TEENSY_DEFINITIONS} ${INCLUDE_DIRECTORIES} -D__arm__ ")
     set_target_properties(${ELFTARGET} PROPERTIES INCLUDE_DIRECTORIES "${COREPATH}")
     set_target_properties(${ELFTARGET} PROPERTIES LINK_FLAGS "-O -Wl,--gc-sections,--defsym=__rtc_localtime=0 --specs=nano.specs -mcpu=${CPU} -mthumb -T${LINKER_FILE}")
@@ -104,51 +104,76 @@ endfunction()
 macro(import_arduino_library LIB_ROOT LIB_NAME)
     # Check if we can find the library.
     if(NOT EXISTS ${LIB_ROOT})
-        message(FATAL_ERROR "Could not find the Arduino library directory")
+        message(FATAL_ERROR "Could not find the Arduino library directory ${LIB_ROOT}")
     endif(NOT EXISTS ${LIB_ROOT})
     set(LIB_DIR "${LIB_ROOT}/${LIB_NAME}")
-    #message(LIB_DIR ${LIB_DIR})
+    import_arduino_library_absolute(${LIB_DIR})
+endmacro(import_arduino_library)
+
+macro(import_arduino_library_absolute LIB_DIR)
+    message(STATUS LIB_DIR ${LIB_DIR})
     if(NOT EXISTS "${LIB_DIR}")
-        message(FATAL_ERROR "Could not find the directory for library '${LIB_NAME}'")
+        message(FATAL_ERROR "Could not find the directory for library '${LIB_DIR}'")
     endif(NOT EXISTS "${LIB_DIR}")
 
     # Add it to the include path.
     include_directories("${LIB_DIR}")
     set(INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}-I${LIB_DIR} ")
-    message("include_directories " ${LIB_DIR} "  - " ${INCLUDE_DIRECTORIES})
+    message("include_directories ${LIB_DIR}")
 
     # Mark source files to be built along with the sketch code.
-    file(GLOB SOURCES_CPP ABSOLUTE "${LIB_DIR}/*.cpp")
+    file(GLOB_RECURSE SOURCES_CPP ABSOLUTE "${LIB_DIR}/*.cpp")
     foreach(SOURCE_CPP ${SOURCES_CPP})
         set(TEENSY_LIB_SOURCES ${TEENSY_LIB_SOURCES} ${SOURCE_CPP})
+        set_source_files_properties(${SOURCE_S} PROPERTIES COMPILE_FLAGS "-std=gnu++0x -felide-constructors -fno-rtti")
+        message("SOURCE_CPP ${SOURCE_CPP}")
     endforeach(SOURCE_CPP ${SOURCES_CPP})
-    file(GLOB SOURCES_C ABSOLUTE "${LIB_DIR}/*.c")
+
+    file(GLOB_RECURSE SOURCES_C ABSOLUTE "${LIB_DIR}/*.c")
     foreach(SOURCE_C ${SOURCES_C})
         set(TEENSY_LIB_SOURCES ${TEENSY_LIB_SOURCES} ${SOURCE_C})
-        message("lib src ${TEENSY_LIB_SOURCES}")
+        set_source_files_properties(${SOURCE_S} PROPERTIES COMPILE_FLAGS "-nostdlib")
+        message("SOURCE_C ${SOURCE_C}")
     endforeach(SOURCE_C ${SOURCES_C})
 
-    file(GLOB SOURCES_S ABSOLUTE "${LIB_DIR}/*.S")
+    file(GLOB_RECURSE SOURCES_S ABSOLUTE "${LIB_DIR}/*.S")
     foreach(SOURCE_S ${SOURCES_S})
         set_property(SOURCE ${SOURCE_S} PROPERTY LANGUAGE C)
         set_source_files_properties(${SOURCE_S} PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp")
         set(TEENSY_LIB_SOURCES ${TEENSY_LIB_SOURCES} ${SOURCE_S})
-        message(">>>> :L:: lib src asm ${SOURCE_S}")
+        message("SOURCE_S ${SOURCE_S}")
     endforeach(SOURCE_S ${SOURCES_S})
 
-endmacro(import_arduino_library)
-set(ARDUINO_LIB_ROOT "${DEPSPATH}/")
-import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
-import_arduino_library(${ARDUINO_LIB_ROOT} Audio/utility)
-import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
+endmacro(import_arduino_library_absolute)
+
+macro(teensy_remove_sources LIB_DIR)
+    file(GLOB_RECURSE FILES_TO_REMOVE ABSOLUTE "${LIB_DIR}/*.*")
+    foreach(FILE_TO_REMOVE ${FILES_TO_REMOVE})
+        list(REMOVE_ITEM TEENSY_LIB_SOURCES ${FILE_TO_REMOVE})
+        message("REMOVED ${FILE_TO_REMOVE}")
+    endforeach(FILE_TO_REMOVE ${FILES_TO_REMOVE})
+endmacro(teensy_remove_sources)
+
+set(ARDUINO_LIB_ROOT "${DEPSPATH}")
+set(INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}-I${ARDUINO_LIB_ROOT}/Audio/utility ")
 import_arduino_library(${ARDUINO_LIB_ROOT} SPI)
-import_arduino_library(${ARDUINO_LIB_ROOT} SD)
-import_arduino_library(${ARDUINO_LIB_ROOT} SD/utility)
+import_arduino_library(${ARDUINO_LIB_ROOT} SdFat/src)
+import_arduino_library(${ARDUINO_LIB_ROOT} SD/src)
+import_arduino_library(${ARDUINO_LIB_ROOT} Audio)
 import_arduino_library(${ARDUINO_LIB_ROOT} SerialFlash)
+import_arduino_library(${ARDUINO_LIB_ROOT} Wire)
+import_arduino_library(${ARDUINO_LIB_ROOT} arm_math/src)
+
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/Audio/extras)
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/Audio/examples)
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/SPI/examples)
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/SerialFlash/examples)
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/SerialFlash/util)
+teensy_remove_sources(${ARDUINO_LIB_ROOT}/Wire/examples)
 
 teensy_add_executable(teensy-audio-resampler
         main.cpp
-        ../playsdrawresmp.h
-        ../playsdrawresmp.cpp
-        ../playsdwavresmp.h
-        ../playsdwavresmp.cpp)
+        playsdrawresmp.h
+        playsdrawresmp.cpp
+        playsdwavresmp.h
+        playsdwavresmp.cpp)

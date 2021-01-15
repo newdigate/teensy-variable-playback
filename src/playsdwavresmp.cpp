@@ -4,7 +4,6 @@
 
 #include "playsdwavresmp.h"
 #include "spi_interrupt.h"
-#include "waveheaderparser.h"
 
 void AudioPlaySdWavResmp::begin()
 {

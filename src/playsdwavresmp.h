@@ -11,7 +11,7 @@
 #include "SD.h"
 #include "stdint.h"
 #include "ResamplingSdReader.h"
-#include "teensy_sampler.h"
+#include "../teensy_sampler.h"
 
 class AudioPlaySdWavResmp : public AudioStream
 {

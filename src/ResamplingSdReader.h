@@ -5,18 +5,11 @@
 #ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 #define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 
-
-
-#ifdef ARDUINO
-#include "stdint.h"
 #include <SD.h>
-#include <AudioStream.h>
-
-#include "spi_interrupt.h"
-#else
 #include <cstdint>
-#include "teensy/SD/SD.h"
-#include "teensy/spi_interrupt.h"
+#include "spi_interrupt.h"
+
+#ifndef AUDIO_BLOCK_SAMPLES
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
