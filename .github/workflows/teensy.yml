@@ -1,10 +1,11 @@
-name: C/C++ CI
+name: teensy40
 
 on:
   push:
     paths-ignore:
     - 'docs/**'    
-    - '**.md'    
+    - '**.md'
+    - '.github/workflows/teensy.yml'
     branches: [ master, cleanup ]
 
   pull_request:
@@ -90,4 +91,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: hex file
-        path: cmake-build-debug/audio/teensy-audio-resampler.hex
+        path: audio/cmake-build-debug/audio/teensy-audio-resampler.hex
