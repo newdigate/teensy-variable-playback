@@ -1,0 +1,6 @@
+get_filename_component(CURRENT_FOLDER_NAME ${CMAKE_SOURCE_DIR} NAME)
+if(CURRENT_FOLDER_NAME STREQUAL "examples")
+  import_arduino_library(${CMAKE_SOURCE_DIR} ../src)
+else()
+    import_arduino_library(${CMAKE_SOURCE_DIR} ../../src)
+endif()

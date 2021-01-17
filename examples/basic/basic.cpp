@@ -44,7 +44,6 @@ void setup() {
     Serial.println("playing...");
 }
 
-
 void loop() {
 
     int newsensorValue = analogRead(analogInPin);
@@ -58,12 +57,5 @@ void loop() {
     if (!playSdRaw1.isPlaying()) {
         Serial.println("playing...");
         playSdRaw1.play(_filename);
-    }
-}
-
-int main() {
-    setup();
-    while(true) {
-        loop();
     }
 }

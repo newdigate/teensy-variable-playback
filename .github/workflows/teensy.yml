@@ -18,10 +18,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: actions/checkout@v2
+      with:
+        repository: newdigate/teensy-cmake-macros
+        path: deps/teensy-cmake-macros
+
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/cores.git
-        path: deps/teensy-cores
+        path: deps/cores
         fetch-depth: 1
         ref: master
 
@@ -84,6 +90,10 @@ jobs:
         tar xjf /tmp/gcc-arm-none-eabi.tar.bz2
         rm /tmp/gcc-arm-none-eabi.tar.bz2
         echo "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin"
+
+    - name: install teensy-cmake-macros
+      run: cd deps/teensy-cmake-macros && mkdir cmake-build-debug && cd cmake-build-debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && sudo make install
+
     - name: build
       run: ./build.sh
     - uses: actions/upload-artifact@v2
