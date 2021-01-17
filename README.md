@@ -12,7 +12,6 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## todo
-* read .wav files
 * improve looping controls, allow xm-tracker like sample looping, 
   * loop start and finish markers, ping ponging, repeating, etc.
 * stereo  
