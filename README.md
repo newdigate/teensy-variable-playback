@@ -95,8 +95,9 @@ set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/co
 
 ### build tests on linux
 ``` sh
-./build
+> ./build
 ```
+
 ### build tests on win
 ``` sh
 > mkdir cmake-build-debug
@@ -104,6 +105,7 @@ set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/co
 > cmake -DCMAKE_BUILD_TYPE=Debug
 > make
 ```
+
 ### run tests
 ``` sh
 > cmake-build-debug/test/test_suite1
