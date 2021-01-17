@@ -27,13 +27,45 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
     * cmake
     * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1): for cross-compiling to arm cortex m7 architecture (for teensy 4.0)
     * github
+      * newdigate
+        * [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros)
+        ```shell
+        > git clone https://github.com/newdigate/teensy-cmake-macros.git
+        > cd teensy-cmake-macros
+        > mkdir cmake-build-debug
+        > cd cmake-build-debug
+        > cmake ..
+        > sudo make install        
+        ```
       * PaulStoffregen
-        * cores.git
-        * Audio.git
-          * SD.git
-          * Wire.git
-          * SPI.git
-          * SerialFlash.git
+        * [cores.git](https://github.com/PaulStoffregen/cores)
+        * [Audio.git](https://github.com/PaulStoffregen/Audio)
+        * [SD.git @ Juse_Use_SdFat](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat)
+        * [Wire.git](https://github.com/PaulStoffregen/Wire)
+        * [SPI.git](https://github.com/PaulStoffregen/SPI)
+        * [SerialFlash.git](https://github.com/PaulStoffregen/SerialFlash)
+        * [arm_math.git](https://github.com/PaulStoffregen/arm_math)
+      * greiman
+        * [SdFat.git](https://github.com/greiman/SdFat)
+
+![dependencies](docs/dependencies.png)
+```dot
+graph G {
+  graph[rankdir="LR"]
+  "teensy variable playback" -- "teensy-cmake-macros" -- "cmake" [label="dev"]
+  "teensy-cmake-macros" -- "arm-none-eabi-gcc"  [label="dev"]
+  "PaulStoffregen/Audio.git" -- "PaulStoffregen/cores.git"
+  "teensy variable playback" -- "PaulStoffregen/Audio.git"
+  "PaulStoffregen/Audio.git" -- "PaulStoffregen/SD.git@Juse_Use_SdFat"
+  "PaulStoffregen/SD.git@Juse_Use_SdFat" -- "PaulStoffregen/SPI.git"
+  "PaulStoffregen/SD.git@Juse_Use_SdFat" -- "greiman/SdFat.git"
+  "PaulStoffregen/Audio.git" -- "PaulStoffregen/Wire.git"
+  "PaulStoffregen/Audio.git" -- "PaulStoffregen/SerialFlash.git"
+  "PaulStoffregen/Audio.git" -- "PaulStoffregen/arm_math.git"
+}
+
+```
+
         
 ## code structure
 
@@ -46,8 +78,8 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
 ## build and run/debug tests locally on pc
 ### clone repo
 ``` sh
-git clone https://github.com/newdigate/teensy-variable-playback.git
-cd teensy-variable-playback
+> git clone https://github.com/newdigate/teensy-variable-playback.git
+> cd teensy-variable-playback
 ```
 
 * manual configuration steps required:
@@ -67,14 +99,14 @@ set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/co
 ```
 ### build tests on win
 ``` sh
-mkdir cmake-build-debug
-cd cmake-build-debug
-cmake -DCMAKE_BUILD_TYPE=Debug
-make
+> mkdir cmake-build-debug
+> cd cmake-build-debug
+> cmake -DCMAKE_BUILD_TYPE=Debug
+> make
 ```
 ### run tests
-```
-cmake-build-debug/test/test_suite1
+``` sh
+> cmake-build-debug/test/test_suite1
 ```
 
 ## visual studio code

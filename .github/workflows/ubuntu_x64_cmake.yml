@@ -3,6 +3,7 @@ name: Ubuntu-x64
 on:
   push:
     paths-ignore:
+      - 'docs/**'
       - 'README.md'
       - 'LICENSE'
       - '.gitignore'
