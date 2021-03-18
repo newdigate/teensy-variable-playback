@@ -120,7 +120,7 @@ bool ResamplingSdReader::play(const char *filename)
             __enable_irq();
         }
         _filename = new char[strlen(filename)];
-        strcpy(_filename, filename);
+        strncpy(_filename, filename, strlen(filename));
         StartUsingSPI();
 
         __disable_irq();
