@@ -20,6 +20,7 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
   * x86 / x64 linux unit tests
     * cmake
     * gcc or llvm: c++ standard library (using std::vector, std::function)
+    * [teensy-x86-stubs](https://github.com/newdigate/teensy-x86-stubs)
     * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
     
   * teensy variable playback library  
@@ -36,6 +37,7 @@ A set of classes to read and play 16-bit raw mono audio from micro sd-card at va
         > cmake ..
         > sudo make install        
         ```
+
       * PaulStoffregen
         * [cores.git](https://github.com/PaulStoffregen/cores)
         * [Audio.git](https://github.com/PaulStoffregen/Audio)

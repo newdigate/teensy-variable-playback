@@ -2,8 +2,43 @@ cmake_minimum_required(VERSION 3.10)
 project(basic)
 
 set(CMAKE_CXX_STANDARD 11)
-include(../CMakeLists.cmake.in)
-include(../examples.cmake.in)
 
-teensy_add_executable(basic basic.cpp)
+option(OPT_BUILD_FOR_LINUX "Build for linux emulator" ON)
+if (OPT_BUILD_FOR_LINUX)
+    set(BUILD_FOR_LINUX 1)
+    add_definitions(-DBUILD_FOR_LINUX)
+endif()
+
+if (DEFINED BUILD_FOR_LINUX)
+    find_package(teensy_x86_stubs)
+    include_directories(${teensy_x86_stubs_INCLUDE_DIR})
+
+    find_package(teensy_audio_x86_stubs)
+    include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
+
+    add_executable(basic
+            basic.cpp
+            ../../src/ResamplingArrayReader.cpp
+            ../../src/waveheaderparser.cpp
+            ../../src/ResamplingSdReader.cpp
+            ../../src/playsdwavresmp.cpp
+            ../../src/playsdrawresmp.cpp)
+
+    target_link_libraries(basic ${teensy_x86_stubs_LIBS})
+    target_link_libraries(basic ${teensy_audio_x86_stubs_LIBS})
+    set(CMAKE_VERBOSE_MAKEFILE  1)
+else()
+    include(../../teensy.options.cmake.in)
+    include(../../teensy.build.cmake.in)
+    include(../examples.cmake.in)
+    include(../CMakeLists.cmake.in)
+
+    add_custom_target(installarduino
+            "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/install_arduino_library.cmake")
+
+    teensy_add_executable(basic basic.cpp)
+
+endif()
+
+
 #set(CMAKE_VERBOSE_MAKEFILE 1)

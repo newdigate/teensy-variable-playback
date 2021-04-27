@@ -66,14 +66,14 @@ public:
         for (int i=0; i < 4; i++)
             header.wave_header[i] = buffer[i+8];
         if (buffer[8] != 'W' || buffer[9] != 'A' || buffer[10] != 'V' || buffer[11] != 'E') {
-            Serial.printf("expected WAVE (was %d)\n", buffer);
+            Serial.printf("expected WAVE (was %s)\n", buffer[8]);
             return false;
         }
 
         for (int i=0; i < 4; i++)
             header.fmt_header[i] = buffer[i+12];
         if (buffer[12] != 'f' || buffer[13] != 'm' || buffer[14] != 't' || buffer[15] != ' ') {
-            Serial.printf("expected 'fmt ' (was %d)\n", buffer);
+            Serial.printf("expected 'fmt ' (was %s)\n",  buffer[12]);
             return false;
         }
 

@@ -1,9 +1,5 @@
-//
-// Created by Nicholas Newdigate on 10/02/2019.
-//
-
-#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
-#define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
+#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
+#define TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
 
 #include <SD.h>
 #include <cstdint>
@@ -14,15 +10,13 @@
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 256
-
-class ResamplingSdReader {
+class ResamplingArrayReader {
 public:
-    ResamplingSdReader() {
+    ResamplingArrayReader() {
     }
 
     void begin(void);
-    bool play(const char *filename);
+    bool play(int16_t *array, uint32_t length);
     bool play();
     void stop(void);
     bool isPlaying(void) { return _playing; }
@@ -32,7 +26,7 @@ public:
 
     void setPlaybackRate(double f) {
         _playbackRate = f;
-        if (f < 0 && _file_offset == _header_size) {
+        if (f < 0 && _file_offset == 0) {
             //_file.seek(_file_size);
             _file_offset = _file_size;
         }
@@ -55,10 +49,6 @@ public:
     void reset(void);
     void close(void);
 
-    void setHeaderSize(uint32_t headerSize) {
-        _header_size = headerSize;
-    }
-
     void setLoopStart(uint32_t loop_start) {
         _loop_start = loop_start;
     }
@@ -74,41 +64,20 @@ private:
     volatile int32_t _last_read_offset = 0;
 
     int32_t _file_size;
-    int32_t _header_size = 0;
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
-    char *_filename = "";
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
 
-    int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE];
+    int16_t _destinationBuffer[AUDIO_BLOCK_SAMPLES];
+    int16_t *_sourceBuffer;
     unsigned int _bufferLength = 0;
-
-    File _file;
 
     bool updateBuffers(void);
 
-    void StartUsingSPI(){
-        //Serial.printf("start spi: %s\n", _filename);
-
-#if defined(HAS_KINETIS_SDHC)
-        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
-#else
-        AudioStartUsingSPI();
-#endif
-    }
-
-    void StopUsingSPI() {
-        //Serial.printf("stop spi: %s\n", _filename);
-#if defined(HAS_KINETIS_SDHC)
-        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-#else
-        AudioStopUsingSPI();
-#endif
-    }
 };
 
 
-#endif //PAULSTOFFREGEN_RESAMPLINGSDREADER_H
+#endif //TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H

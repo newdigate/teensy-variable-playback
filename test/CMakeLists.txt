@@ -10,6 +10,9 @@ find_package(teensy_x86_stubs)
 include_directories(${teensy_x86_stubs_INCLUDE_DIR})
 message(STATUS "include-dir: teensy_x86_stubs: ${teensy_x86_stubs_INCLUDE_DIR}")
 
+find_package(teensy_audio_x86_stubs)
+include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
+
 include_directories(../src)
 
 add_executable(test_suite1
@@ -23,9 +26,10 @@ add_executable(test_suite1
         test_wav_mono_loop_forward_playback.cpp
         test_wav_mono_noloop_backward_playback.cpp
         test_parse_wave_header.cpp
-        WaveHeaderParserFixture.h)
+        WaveHeaderParserFixture.h ../src/loop_type.h)
 
 target_link_libraries(test_suite1 ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 target_link_libraries(test_suite1 ${teensy_x86_stubs_LIBS})
+target_link_libraries(test_suite1 ${teensy_audio_x86_stubs_LIBS})
 message(STATUS ${teensy_x86_stubs_LIBS})
 set(CMAKE_VERBOSE_MAKEFILE 1)

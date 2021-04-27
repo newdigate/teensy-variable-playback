@@ -1,0 +1,9 @@
+set(teensy_variable_playback_VERSION "@teensy_variable_playback_VERSION@")
+set(teensy_variable_playback_LIBS teensy_variable_playback -L@LIB_INSTALL_DIR@)
+
+@PACKAGE_INIT@
+
+set_and_check(teensy_variable_playback_INCLUDE_DIR "@INCLUDE_INSTALL_DIR@")
+set_and_check(teensy_variable_playback_DIR "@LIB_INSTALL_DIR@")
+
+check_required_components(teensy_variable_playback)

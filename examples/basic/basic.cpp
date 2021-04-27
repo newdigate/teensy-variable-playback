@@ -1,7 +1,8 @@
 // Plays a RAW (16-bit signed) PCM audio file at slower or faster rate
 // this example requires an uSD-card inserted to teensy 3.6 with a file called DEMO.RAW
+#include <Arduino.h>
+#include <AudioStream.h>
 #include <Audio.h>
-#include <Wire.h>
 #include <SD.h>
 #include "../../src/playsdrawresmp.h"
 
@@ -14,6 +15,7 @@ AudioConnection          patchCord2(playSdRaw1, 0, i2s2, 1);
 // GUItool: end automatically generated code
 
 #define A14 10
+#define BUILTIN_SDCARD 10
 
 const char* _filename = "DEMO.RAW";
 const int analogInPin = A14;
@@ -51,11 +53,17 @@ void loop() {
         sensorValue = newsensorValue;
         float rate = (sensorValue - 512.0) / 512.0;
         playSdRaw1.setPlaybackRate(rate);
-        Serial.printf("rate: %f %x\n", rate, sensorValue );
+        Serial.printf("rate: %f %x\n", rate, sensorValue);
     }
 
     if (!playSdRaw1.isPlaying()) {
         Serial.println("playing...");
         playSdRaw1.play(_filename);
     }
+}
+
+int main() {
+    Serial.printf("hello %s\n", "world");
+    Serial.printf("hello %d\n", 1);
+    return -1;
 }
