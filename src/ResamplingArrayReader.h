@@ -3,7 +3,6 @@
 
 #include <SD.h>
 #include <cstdint>
-#include "spi_interrupt.h"
 #include "loop_type.h"
 
 #ifndef AUDIO_BLOCK_SAMPLES
@@ -73,10 +72,6 @@ private:
 
     int16_t _destinationBuffer[AUDIO_BLOCK_SAMPLES];
     int16_t *_sourceBuffer;
-    unsigned int _bufferLength = 0;
-
-    bool updateBuffers(void);
-
 };
 
 

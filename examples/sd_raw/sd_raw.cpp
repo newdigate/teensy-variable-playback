@@ -62,8 +62,13 @@ void loop() {
     }
 }
 
+#ifdef BUILD_FOR_LINUX
 int main() {
-    Serial.printf("hello %s\n", "world");
-    Serial.printf("hello %d\n", 1);
-    return -1;
+    initialize_mock_arduino();
+    SD.setSDCardFileData("234234234", 5);
+    setup();
+    while(true){
+        loop();
+    }
 }
+#endif

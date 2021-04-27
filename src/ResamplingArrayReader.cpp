@@ -8,7 +8,7 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
     while (count < nbyte) {
 
         if (readNextValue(index)){
-            count+=2;
+            count++;
             index++;
         }
         else {
@@ -22,7 +22,6 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                     else
                         _file_offset = 0 + (_loop_finish) - 512;
 
-                    _bufferLength = 0;
                     break;
                 }
 
@@ -38,7 +37,6 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                         //printf("switching to forward playback...\n");
                     }
                     _playbackRate = -_playbackRate;
-                    _bufferLength = 0;
                     break;
                 }            
 
@@ -58,19 +56,13 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
 
 bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
-    if (_bufferLength == 0)
-        if (!updateBuffers()) 
-            return false;
-
     if (_playbackRate > 0 ) {
         //forward playback
-        if (_bufferPosition >= _bufferLength) {
+        if (_bufferPosition >= _file_size) {
 
             if (_last_read_offset + _bufferPosition >=  _loop_finish )
                 return false;
 
-            if (!updateBuffers()) 
-                return false;
         }
     } else if (_playbackRate < 0) {
         // reverse playback    
@@ -79,13 +71,10 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             if (_bufferPosition < 0)
                 return false;
         }
-        if (_bufferPosition < 0) {
-            if (!updateBuffers()) 
-                return false;
-        }
+
     }
 
-    int16_t result = _sourceBuffer[_bufferPosition/2];
+    int16_t result = _sourceBuffer[_bufferPosition];
     //Serial.printf("r: %d,", result);
 
     _remainder += _playbackRate;
@@ -93,7 +82,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
     auto delta = static_cast<signed int>(_remainder);
     _remainder -= static_cast<double>(delta);
 
-    _bufferPosition += 2 * delta;
+    _bufferPosition +=  delta;
     *value = result;
     return true;
 }
@@ -129,7 +118,6 @@ bool ResamplingArrayReader::play()
 }
 
 void ResamplingArrayReader::reset(){
-    _bufferLength = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _file_offset = 0;
@@ -158,49 +146,3 @@ void ResamplingArrayReader::close(void) {
         stop();
 }
 
-bool ResamplingArrayReader::updateBuffers() {
-    //printf("begin: file_offset: %d\n", _file_offset);
-
-    bool forward = (_playbackRate >= 0.0);
-
-    uint16_t numberOfBytesToRead = AUDIO_BLOCK_SAMPLES;
-    if (!forward) {
-        if (_file_offset < 0) {
-            // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
-            numberOfBytesToRead = _file_offset + AUDIO_BLOCK_SAMPLES;
-            if (numberOfBytesToRead == 0)
-                return false;
-
-        }
-        _bufferPosition = numberOfBytesToRead - 2;
-    } else 
-    {
-        int final_file_offset = _loop_finish - AUDIO_BLOCK_SAMPLES;
-        if (_file_offset > final_file_offset) {
-            numberOfBytesToRead = _loop_finish  - _file_offset;
-        }
-        _bufferPosition = 0;
-    }
-    if (numberOfBytesToRead == 0) return false;
-
-    //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
-    _last_read_offset = _file_offset;
-    //__disable_irq();
-    if (numberOfBytesToRead +_file_offset > _file_size) {
-        numberOfBytesToRead = _file_size - (numberOfBytesToRead +_file_offset );
-    }
-    if (numberOfBytesToRead == 0) return false;
-    memcpy(_destinationBuffer, _sourceBuffer, numberOfBytesToRead);
-    int numRead = numberOfBytesToRead;
-    //__enable_irq();
-    _bufferLength = numRead;
-    //Serial.printf("read %d bytes\n", numRead);
-
-    if (_playbackRate < 0) {
-        _file_offset -= numRead;     
-    } else
-        _file_offset += numRead;
-
-    //printf("exit: file_offset: %d\n", _file_offset);
-    return true;
-}

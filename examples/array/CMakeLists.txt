@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(basic)
+project(array)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -16,16 +16,16 @@ if (DEFINED BUILD_FOR_LINUX)
     find_package(teensy_audio_x86_stubs)
     include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
 
-    add_executable(basic
-            basic.cpp
+    add_executable(array
+            array.cpp
             ../../src/ResamplingArrayReader.cpp
             ../../src/waveheaderparser.cpp
             ../../src/ResamplingSdReader.cpp
             ../../src/playsdwavresmp.cpp
             ../../src/playsdrawresmp.cpp)
 
-    target_link_libraries(basic ${teensy_x86_stubs_LIBS})
-    target_link_libraries(basic ${teensy_audio_x86_stubs_LIBS})
+    target_link_libraries(array ${teensy_x86_stubs_LIBS})
+    target_link_libraries(array ${teensy_audio_x86_stubs_LIBS})
     set(CMAKE_VERBOSE_MAKEFILE  1)
 else()
     include(../../teensy.options.cmake.in)
@@ -36,7 +36,7 @@ else()
     add_custom_target(installarduino
             "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/install_arduino_library.cmake")
 
-    teensy_add_executable(basic basic.cpp)
+    teensy_add_executable(array array.cpp)
 
 endif()
 
