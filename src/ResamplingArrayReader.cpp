@@ -20,7 +20,7 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                     if (_playbackRate >= 0.0) 
                         _file_offset = 0 + (_loop_start);
                     else
-                        _file_offset = 0 + (_loop_finish) - 512;
+                        _file_offset = 0 + (_loop_finish);
 
                     break;
                 }
@@ -28,7 +28,7 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                 case looptype_pingpong:
                 {
                     if (_playbackRate >= 0.0) {
-                        _file_offset = _file_size - 512;
+                        _file_offset = _file_size;
                         //printf("switching to reverse playback...\n");
                     }
                     else {
@@ -71,11 +71,9 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             if (_bufferPosition < 0)
                 return false;
         }
-
     }
 
     int16_t result = _sourceBuffer[_bufferPosition];
-    //Serial.printf("r: %d,", result);
 
     _remainder += _playbackRate;
 
@@ -123,10 +121,7 @@ void ResamplingArrayReader::reset(){
         _file_offset = 0;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        if (_file_size > AUDIO_BLOCK_SAMPLES)
-            _file_offset = _file_size - AUDIO_BLOCK_SAMPLES;
-        else
-            _file_offset = 0;
+        _file_offset = _file_size;
     }
 }
 
