@@ -16,11 +16,13 @@ void setup() {
     AudioMemory(100);
     playArrayResampler.play(samples, sizeof (samples) /sizeof(int16_t));
     playArrayResampler.setPlaybackRate(0.5);
+    playArrayResampler.setLoopType(looptype_repeat);
 }
 
 void loop() {
-    playArrayResampler.update();
-    i2s.update();
+    #ifdef BUILD_FOR_LINUX
+    software_isr();
+    #endif
 }
 
 #ifdef BUILD_FOR_LINUX

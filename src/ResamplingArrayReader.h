@@ -25,9 +25,9 @@ public:
 
     void setPlaybackRate(double f) {
         _playbackRate = f;
-        if (f < 0 && _file_offset == 0) {
+        if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _file_offset = _file_size;
+            _bufferPosition = _file_size;
         }
     }
 
@@ -59,8 +59,6 @@ public:
 
 private:
     volatile bool _playing = false;
-    volatile int32_t _file_offset;
-    volatile int32_t _last_read_offset = 0;
 
     int32_t _file_size;
     double _playbackRate = 1.0;

@@ -18,9 +18,9 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                 case looptype_repeat:
                 {
                     if (_playbackRate >= 0.0) 
-                        _file_offset = 0 + (_loop_start);
+                        _bufferPosition = _loop_start;
                     else
-                        _file_offset = 0 + (_loop_finish);
+                        _bufferPosition = _loop_finish;
 
                     break;
                 }
@@ -28,11 +28,10 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
                 case looptype_pingpong:
                 {
                     if (_playbackRate >= 0.0) {
-                        _file_offset = _file_size;
+                        _bufferPosition = _file_size;
                         //printf("switching to reverse playback...\n");
                     }
                     else {
-                        _file_offset = 0;
                         _bufferPosition = 0;
                         //printf("switching to forward playback...\n");
                     }
@@ -60,17 +59,14 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
         //forward playback
         if (_bufferPosition >= _file_size) {
 
-            if (_last_read_offset + _bufferPosition >=  _loop_finish )
+            if (_bufferPosition >=  _loop_finish )
                 return false;
 
         }
     } else if (_playbackRate < 0) {
         // reverse playback    
-        if (_last_read_offset < 0)
-        {  
-            if (_bufferPosition < 0)
-                return false;
-        }
+        if (_bufferPosition < 0)
+            return false;
     }
 
     int16_t result = _sourceBuffer[_bufferPosition];
@@ -88,7 +84,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
 void ResamplingArrayReader::begin(void)
 {
     _playing = false;
-    _file_offset = 0;
+    _bufferPosition = 0;
     _file_size = 0;
 }
 
@@ -118,10 +114,10 @@ bool ResamplingArrayReader::play()
 void ResamplingArrayReader::reset(){
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
-        _file_offset = 0;
+        _bufferPosition = 0;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _file_offset = _file_size;
+        _bufferPosition = _file_size;
     }
 }
 
