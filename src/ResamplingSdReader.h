@@ -5,7 +5,7 @@
 #ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 #define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 
-#include <SD.h>
+#include "SD.h"
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"

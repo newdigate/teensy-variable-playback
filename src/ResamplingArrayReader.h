@@ -1,7 +1,7 @@
 #ifndef TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
 #define TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
 
-#include <SD.h>
+#include "SD.h"
 #include <cstdint>
 #include "loop_type.h"
 

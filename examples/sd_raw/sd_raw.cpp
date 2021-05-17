@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <AudioStream.h>
 #include <Audio.h>
-#include <SD.h>
+#include "SD.h"
 #include "../../src/playsdrawresmp.h"
 
 // GUItool: begin automatically generated code
