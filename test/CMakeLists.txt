@@ -16,7 +16,6 @@ include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
 include_directories(../src)
 
 add_executable(test_suite1
-        ../src/waveheaderparser.cpp
         ../src/ResamplingSdReader.cpp
         test_raw_mono_noloop_forward_playback.cpp
         ResamplingReaderFixture.h

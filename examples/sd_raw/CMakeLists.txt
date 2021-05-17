@@ -19,7 +19,6 @@ if (DEFINED BUILD_FOR_LINUX)
     add_executable(basic
             sd_raw.cpp
             ../../src/ResamplingArrayReader.cpp
-            ../../src/waveheaderparser.cpp
             ../../src/ResamplingSdReader.cpp
             ../../src/playsdwavresmp.cpp
             ../../src/playsdrawresmp.cpp)
