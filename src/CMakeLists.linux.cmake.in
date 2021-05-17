@@ -10,6 +10,9 @@ include_directories(${teensy_x86_stubs_INCLUDE_DIR})
 find_package(teensy_audio_x86_stubs)
 include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
 
+find_package(teensy_x86_sd_stubs)
+include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
+
 add_library(teensy_variable_playback STATIC
         ${HEADER_FILES}
         ${SOURCE_FILES}
