@@ -5,7 +5,6 @@
 #define TEENSY_RESAMPLING_SDREADER_WAVEHEADERPARSER_H
 
 #include <string>
-#include <SD.h>
 #include <cstdint>
 #include "spi_interrupt.h"
 #ifndef ARDUINO

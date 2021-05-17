@@ -13,7 +13,6 @@ set(SOURCE_FILES
         playsdrawresmp.cpp
         playsdwavresmp.cpp
         ResamplingSdReader.cpp
-        waveheaderparser.cpp
         ResamplingArrayReader.cpp
         playarrayresmp.cpp)
 
