@@ -19,7 +19,6 @@ if (DEFINED BUILD_FOR_LINUX)
     add_executable(playarrayresmp
             playarrayresmp.cpp
             ../../src/ResamplingArrayReader.cpp
-            ../../src/waveheaderparser.cpp
             ../../src/ResamplingSdReader.cpp
             ../../src/playsdwavresmp.cpp
             ../../src/playsdrawresmp.cpp
@@ -32,9 +31,6 @@ else()
     include(../../teensy.build.cmake.in)
     include(../examples.cmake.in)
     include(../CMakeLists.cmake.in)
-
-    add_custom_target(installarduino
-            "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/install_arduino_library.cmake")
 
     teensy_add_executable(playarrayresmp playarrayresmp.cpp)
 

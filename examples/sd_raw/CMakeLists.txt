@@ -32,9 +32,6 @@ else()
     include(../examples.cmake.in)
     include(../CMakeLists.cmake.in)
 
-    add_custom_target(installarduino
-            "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/install_arduino_library.cmake")
-
     teensy_add_executable(basic sd_raw.cpp)
 
 endif()

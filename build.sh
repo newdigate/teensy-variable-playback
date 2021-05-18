@@ -1,5 +1,5 @@
 #!/bin/bash
-cd examples/basic
+cd examples
 rm -rf cmake-build-debug
 mkdir cmake-build-debug
 cd cmake-build-debug
