@@ -42,6 +42,10 @@ public:
         __disable_irq();
         File wavFile = SD.open(filename);
         __enable_irq();
+        if (!wavFile) {
+            Serial.printf("Not able to open wave file... %s", filename);
+            return false;
+        }
         bool result = readWaveHeader(filename, header, wavFile);
         wavFile.close();
         return result;
@@ -52,7 +56,10 @@ public:
         __disable_irq();
         int bytesRead = wavFile.read(buffer, 44);
         __enable_irq();
-        if (bytesRead != 44) return false;
+        if (bytesRead != 44) {
+            Serial.printf("expected 44 bytes (was %d)\n", bytesRead);
+            return false;
+        }
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
             Serial.printf("expected RIFF (was %s)\n", buffer);
             return false;
