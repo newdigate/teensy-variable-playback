@@ -5,21 +5,16 @@
 #ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 #define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
 
-#include <SD.h>
+#include "SD.h"
 #include <cstdint>
 #include "spi_interrupt.h"
+#include "loop_type.h"
 
 #ifndef AUDIO_BLOCK_SAMPLES
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 256
-
-typedef enum loop_type {
-    looptype_none,
-    looptype_repeat,
-    looptype_pingpong
-} loop_type;
 
 class ResamplingSdReader {
 public:

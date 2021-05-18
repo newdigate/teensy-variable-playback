@@ -5,8 +5,8 @@
 #define TEENSY_RESAMPLING_SDREADER_WAVEHEADERPARSER_H
 
 #include <string>
-#include <SD.h>
 #include <cstdint>
+#include <SD.h>
 #include "spi_interrupt.h"
 #ifndef ARDUINO
 #define AUDIO_BLOCK_SAMPLES 256
@@ -42,6 +42,10 @@ public:
         __disable_irq();
         File wavFile = SD.open(filename);
         __enable_irq();
+        if (!wavFile) {
+            Serial.printf("Not able to open wave file... %s", filename);
+            return false;
+        }
         bool result = readWaveHeader(filename, header, wavFile);
         wavFile.close();
         return result;
@@ -52,7 +56,10 @@ public:
         __disable_irq();
         int bytesRead = wavFile.read(buffer, 44);
         __enable_irq();
-        if (bytesRead != 44) return false;
+        if (bytesRead != 44) {
+            Serial.printf("expected 44 bytes (was %d)\n", bytesRead);
+            return false;
+        }
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
             Serial.printf("expected RIFF (was %s)\n", buffer);
             return false;
@@ -66,14 +73,14 @@ public:
         for (int i=0; i < 4; i++)
             header.wave_header[i] = buffer[i+8];
         if (buffer[8] != 'W' || buffer[9] != 'A' || buffer[10] != 'V' || buffer[11] != 'E') {
-            Serial.printf("expected WAVE (was %d)\n", buffer);
+            Serial.printf("expected WAVE (was %s)\n", buffer[8]);
             return false;
         }
 
         for (int i=0; i < 4; i++)
             header.fmt_header[i] = buffer[i+12];
         if (buffer[12] != 'f' || buffer[13] != 'm' || buffer[14] != 't' || buffer[15] != ' ') {
-            Serial.printf("expected 'fmt ' (was %d)\n", buffer);
+            Serial.printf("expected 'fmt ' (was %s)\n",  buffer[12]);
             return false;
         }
 

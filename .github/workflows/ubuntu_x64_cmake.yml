@@ -11,7 +11,7 @@ on:
       - '.github/workflows/teensy.yml'
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
 
 jobs:
   build:
@@ -29,13 +29,27 @@ jobs:
           repository: newdigate/teensy-x86-stubs
           path: teensy-x86-stubs
 
+      - uses: actions/checkout@v2
+        with:
+          repository: newdigate/teensy-audio-x86-stubs
+          path: teensy-audio-x86-stubs
+
+      - uses: actions/checkout@v2
+        with:
+          repository: newdigate/teensy-x86-sd-stubs
+          path: teensy-x86-sd-stubs
+
       - name: download dependencies
         run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev
 
-      - name: Make and Install Dependencies
-        run: |
-          cd teensy-x86-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
-          cat /usr/local/lib/cmake/teensy_x86_stubs/teensy_x86_stubsConfig.cmake
+      - name: Make and Install teensy-x86-stubs
+        run: cd teensy-x86-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
+
+      - name: Make and Install teensy-x86-sd-stubs
+        run: cd teensy-x86-sd-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
+
+      - name: Make and Install teensy-audio-x86-stubs
+        run: cd teensy-audio-x86-stubs/src && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
 
       - name: Create Build Environment
         # Some projects don't allow in-source building, so create a separate build directory
@@ -50,7 +64,7 @@ jobs:
         # Note the current convention is to use the -S and -B options here to specify source
         # and build directories, but this is only available with CMake 3.13 and higher.
         # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOPT_BUILD_FOR_LINUX=ON
 
       - name: Build
         working-directory: ${{github.workspace}}/build
@@ -58,14 +72,6 @@ jobs:
         # Execute the build.  You can specify a specific target with "--target <NAME>"
         run: cmake --build . --config $BUILD_TYPE
       
-      - name: ls
-        working-directory: ${{github.workspace}}/build
-        shell: bash
-        # Execute the build.  You can specify a specific target with "--target <NAME>"
-        run: |
-          ls -lrt
-          pwd
-
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash

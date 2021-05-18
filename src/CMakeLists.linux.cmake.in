@@ -1,0 +1,52 @@
+message("building for linux...")
+add_definitions(-DBUILD_FOR_LINUX)
+
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include/teensy_variable_playback/)
+set(LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/teensy_variable_playback )
+
+find_package(teensy_x86_stubs)
+include_directories(${teensy_x86_stubs_INCLUDE_DIR})
+
+find_package(teensy_audio_x86_stubs)
+include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
+
+find_package(teensy_x86_sd_stubs)
+include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
+
+add_library(teensy_variable_playback STATIC
+        ${HEADER_FILES}
+        ${SOURCE_FILES}
+        )
+
+set_target_properties(teensy_variable_playback PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+set_target_properties(teensy_variable_playback PROPERTIES LINKER_LANGUAGE C)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(../cmake/teensy_variable_playback.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/teensy_variable_playbackConfig.cmake
+        INSTALL_DESTINATION ${LIB_INSTALL_DIR}/teensy_variable_playback/cmake
+        PATH_VARS)
+
+write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/teensy_variable_playbackConfigVersion.cmake
+        VERSION ${teensy_variable_playback_VERSION}
+        COMPATIBILITY SameMajorVersion )
+
+install(TARGETS teensy_variable_playback DESTINATION
+        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+        PUBLIC_HEADER DESTINATION "include/teensy_variable_playback"
+        )
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/teensy_variable_playbackConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/teensy_variable_playbackConfigVersion.cmake
+        ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/uninstall.cmake
+        DESTINATION "lib/cmake/teensy_variable_playback" )
+
+##
+# copied from: https://gist.github.com/royvandam/3033428
+# Add uninstall target
+# Requirements: Copy the uninstall.cmake file to the appropriate CMAKE_MODULE_PATH.
+add_custom_target(uninstall
+        "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake")
