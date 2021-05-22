@@ -9,12 +9,18 @@
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"
+#include <list>
 
 #ifndef AUDIO_BLOCK_SAMPLES
 #define AUDIO_BLOCK_SAMPLES 256
 #endif
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 256
+
+struct IntepolationData
+{
+    double x, y;
+};
 
 class ResamplingSdReader {
 public:
@@ -68,6 +74,10 @@ public:
         _loop_finish = loop_finish;
     }
 
+    void enableInterpolation(bool enabled) {
+        _enable_interpolation = enabled;
+    }
+
 private:
     volatile bool _playing = false;
     volatile int32_t _file_offset;
@@ -88,6 +98,11 @@ private:
 
     File _file;
 
+    bool _enable_interpolation = true;
+    unsigned int _numInterpolationPoints = 0;
+    int16_t _sampleAtLastWholeNumber = 0;
+    IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
+    double interpolate(IntepolationData f[], double xi, int n);
     bool updateBuffers(void);
 
     void StartUsingSPI(){
