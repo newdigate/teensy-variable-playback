@@ -98,7 +98,7 @@ private:
 
     File _file;
 
-    bool _enable_interpolation = true;
+    bool _enable_interpolation = false;
     unsigned int _numInterpolationPoints = 0;
     IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
     double interpolate(IntepolationData f[], double xi, int n);
