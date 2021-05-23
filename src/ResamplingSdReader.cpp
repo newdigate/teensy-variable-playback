@@ -98,7 +98,6 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         if (_remainder != 0.0f) {
             if (_numInterpolationPoints < 4) {
                 if (_numInterpolationPoints > 0) {
-                    double diff = abs(pos - _interpolationPoints[3].x);
                     double lastX = _interpolationPoints[3].x - samplePosition;
                     if (lastX >= 0) {
                         double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
@@ -111,21 +110,10 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
 
                 }
             } else {
-                IntepolationData t[5] = {
-                        _interpolationPoints[0],
-                        _interpolationPoints[1],
-                        _interpolationPoints[2],
-                        _interpolationPoints[3],
-                };
-
-                double interpolation = interpolate(t, pos, 4);
+                double interpolation = interpolate(_interpolationPoints, pos, 4);
                 result = interpolation;
             }
         }
-        else {
-            _sampleAtLastWholeNumber = result;
-        }
-
         _interpolationPoints[0] = _interpolationPoints[1];
         _interpolationPoints[1] = _interpolationPoints[2];
         _interpolationPoints[2] = _interpolationPoints[3];
@@ -134,7 +122,6 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         if (_numInterpolationPoints < 4)
             _numInterpolationPoints++;
     }
-
 
     _remainder += _playbackRate;
     auto delta = static_cast<signed int>(_remainder);

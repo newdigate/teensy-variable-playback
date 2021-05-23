@@ -44,7 +44,7 @@ public:
         }
     }
 
-    float playbackRate() {
+    double playbackRate() {
         return _playbackRate;
     }
 
@@ -100,7 +100,6 @@ private:
 
     bool _enable_interpolation = true;
     unsigned int _numInterpolationPoints = 0;
-    int16_t _sampleAtLastWholeNumber = 0;
     IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
     double interpolate(IntepolationData f[], double xi, int n);
     bool updateBuffers(void);
