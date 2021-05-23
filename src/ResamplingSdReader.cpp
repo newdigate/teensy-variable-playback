@@ -89,16 +89,50 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         }
     }
 
-    int16_t result = _buffer[_bufferPosition/2];
+    int samplePosition = _bufferPosition/2;
+    double result = _buffer[samplePosition];
     //Serial.printf("r: %d,", result);
 
-    _remainder += _playbackRate;
+    if (_enable_interpolation) {
+        double pos =  _remainder + samplePosition;
+        if (_remainder > 0.01f) {
+            if (_numInterpolationPoints < 4) {
+                if (_numInterpolationPoints > 0) {
+                    double lastX = _interpolationPoints[3].x - samplePosition;
+                    if (lastX >= 0) {
+                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
+                        double linearInterpolation =
+                                (_interpolationPoints[3].y * (total)) + (_buffer[samplePosition + 1] * (1 - total));
+                        result = linearInterpolation;
+                    } else {
+                        result = _buffer[samplePosition];
+                    }
 
+                }
+            } else {
+                double interpolation = interpolate(_interpolationPoints, pos, 4);
+                result = interpolation;
+            }
+        } else {
+            //Serial.printf("[%i, %f]\n", samplePosition, result);
+            _interpolationPoints[0] = _interpolationPoints[1];
+            _interpolationPoints[1] = _interpolationPoints[2];
+            _interpolationPoints[2] = _interpolationPoints[3];
+            _interpolationPoints[3].y = result;
+            _interpolationPoints[3].x = pos;
+            if (_numInterpolationPoints < 4)
+                _numInterpolationPoints++;
+        }
+
+    }
+
+    _remainder += _playbackRate;
     auto delta = static_cast<signed int>(_remainder);
     _remainder -= static_cast<double>(delta);
-
     _bufferPosition += 2 * delta;
-    *value = result;
+
+
+    *value = (int16_t) round(result);
     return true;
 }
 
@@ -251,3 +285,30 @@ bool ResamplingSdReader::updateBuffers() {
     //printf("exit: file_offset: %d\n", _file_offset);
     return true;
 }
+
+// https://en.wikipedia.org/wiki/Lagrange_polynomial
+// https://www.geeksforgeeks.org/lagranges-interpolation/
+// function to interpolate the given data points using Lagrange's formula
+// xi corresponds to the new data point whose value is to be obtained
+// n represents the number of known data points
+double ResamplingSdReader::interpolate(IntepolationData *f, double xi, int n) {
+    double result = 0; // Initialize result
+    for (int i=0; i<n; i++)
+    {
+        //Serial.printf("(%f,%f),", f[i].x, f[i].y);
+        // Compute individual terms of above formula
+        double term = f[i].y;
+        for (int j=0;j<n;j++)
+        {
+            if (j!=i)
+                term = term*(xi - f[j].x)/(f[i].x - f[j].x);
+        }
+
+        // Add current term to result
+        result += term;
+    }
+    //Serial.printf(" = (%f, %f)", xi, result);
+    //Serial.println();
+    return result;
+}
+

@@ -6,7 +6,6 @@ on:
     - 'docs/**'    
     - '**.md'
     - '.github/workflows/ubuntu_x64_cmake.yml'
-    branches: [ master, cleanup ]
 
   pull_request:
     branches: [ master ]
