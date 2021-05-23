@@ -95,7 +95,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
 
     if (_enable_interpolation) {
         double pos =  _remainder + samplePosition;
-        if (_remainder != 0.0f) {
+        if (_remainder > 0.01f) {
             if (_numInterpolationPoints < 4) {
                 if (_numInterpolationPoints > 0) {
                     double lastX = _interpolationPoints[3].x - samplePosition;
@@ -113,14 +113,17 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                 double interpolation = interpolate(_interpolationPoints, pos, 4);
                 result = interpolation;
             }
+        } else {
+            //Serial.printf("[%i, %f]\n", samplePosition, result);
+            _interpolationPoints[0] = _interpolationPoints[1];
+            _interpolationPoints[1] = _interpolationPoints[2];
+            _interpolationPoints[2] = _interpolationPoints[3];
+            _interpolationPoints[3].y = result;
+            _interpolationPoints[3].x = pos;
+            if (_numInterpolationPoints < 4)
+                _numInterpolationPoints++;
         }
-        _interpolationPoints[0] = _interpolationPoints[1];
-        _interpolationPoints[1] = _interpolationPoints[2];
-        _interpolationPoints[2] = _interpolationPoints[3];
-        _interpolationPoints[3].y = result;
-        _interpolationPoints[3].x = pos;
-        if (_numInterpolationPoints < 4)
-            _numInterpolationPoints++;
+
     }
 
     _remainder += _playbackRate;
