@@ -24,6 +24,7 @@ set(HEADER_FILES
         waveheaderparser.h
         ResamplingArrayReader.h
         playarrayresmp.h
+        interpolation.h
 )
 
 if (DEFINED BUILD_FOR_LINUX)
