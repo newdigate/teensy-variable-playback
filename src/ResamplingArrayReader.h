@@ -57,6 +57,9 @@ public:
         _loop_finish = loop_finish;
     }
 
+    void enableInterpolation(bool enabled) {
+        _enable_interpolation = enabled;
+    }
 private:
     volatile bool _playing = false;
 
@@ -70,6 +73,10 @@ private:
 
     int16_t _destinationBuffer[AUDIO_BLOCK_SAMPLES];
     int16_t *_sourceBuffer;
+
+    bool _enable_interpolation = false;
+    unsigned int _numInterpolationPoints = 0;
+    IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
 };
 
 
