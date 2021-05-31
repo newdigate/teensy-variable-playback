@@ -14,7 +14,8 @@ set(SOURCE_FILES
         playsdwavresmp.cpp
         ResamplingSdReader.cpp
         ResamplingArrayReader.cpp
-        playarrayresmp.cpp)
+        playarrayresmp.cpp
+        interpolation.cpp)
 
 set(HEADER_FILES
         loop_type.h
@@ -24,6 +25,7 @@ set(HEADER_FILES
         waveheaderparser.h
         ResamplingArrayReader.h
         playarrayresmp.h
+        interpolation.h
 )
 
 if (DEFINED BUILD_FOR_LINUX)
