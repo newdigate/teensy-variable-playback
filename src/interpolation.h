@@ -4,6 +4,11 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_INTERPOLATION_H
 #define TEENSY_RESAMPLING_SDREADER_INTERPOLATION_H
 
+struct IntepolationData
+{
+    double x, y;
+};
+
 // https://en.wikipedia.org/wiki/Lagrange_polynomial
 // https://www.geeksforgeeks.org/lagranges-interpolation/
 // function to interpolate the given data points using Lagrange's formula

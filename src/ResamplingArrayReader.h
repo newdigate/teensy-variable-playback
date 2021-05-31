@@ -4,6 +4,7 @@
 #include "SD.h"
 #include <cstdint>
 #include "loop_type.h"
+#include "interpolation.h"
 
 #ifndef AUDIO_BLOCK_SAMPLES
 #define AUDIO_BLOCK_SAMPLES 256
