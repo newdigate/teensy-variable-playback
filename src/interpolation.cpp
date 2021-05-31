@@ -12,7 +12,6 @@ double interpolate(IntepolationData *f, double xi, int n) {
     double result = 0; // Initialize result
     for (int i=0; i<n; i++)
     {
-        //Serial.printf("(%f,%f),", f[i].x, f[i].y);
         // Compute individual terms of above formula
         double term = f[i].y;
         for (int j=0;j<n;j++)
@@ -24,7 +23,5 @@ double interpolate(IntepolationData *f, double xi, int n) {
         // Add current term to result
         result += term;
     }
-    //Serial.printf(" = (%f, %f)", xi, result);
-    //Serial.println();
     return result;
 }
