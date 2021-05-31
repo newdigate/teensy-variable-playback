@@ -72,18 +72,18 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
     double result = _sourceBuffer[_bufferPosition];
     if (_enable_interpolation) {
-        double pos =  _remainder + samplePosition;
+        double pos =  _remainder + _bufferPosition;
         if (_remainder > 0.01f) {
             if (_numInterpolationPoints < 4) {
                 if (_numInterpolationPoints > 0) {
-                    double lastX = _interpolationPoints[3].x - samplePosition;
+                    double lastX = _interpolationPoints[3].x - _bufferPosition;
                     if (lastX >= 0) {
                         double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
                         double linearInterpolation =
-                                (_interpolationPoints[3].y * (total)) + (_buffer[samplePosition + 1] * (1 - total));
+                                (_interpolationPoints[3].y * (total)) + (_sourceBuffer[_bufferPosition + 1] * (1 - total));
                         result = linearInterpolation;
                     } else {
-                        result = _buffer[samplePosition];
+                        result = _sourceBuffer[_bufferPosition];
                     }
 
                 }
