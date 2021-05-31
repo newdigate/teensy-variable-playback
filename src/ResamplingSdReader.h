@@ -9,6 +9,7 @@
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"
+#include "interpolation.h"
 #include <list>
 
 #ifndef AUDIO_BLOCK_SAMPLES
@@ -16,11 +17,6 @@
 #endif
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 256
-
-struct IntepolationData
-{
-    double x, y;
-};
 
 class ResamplingSdReader {
 public:
@@ -101,7 +97,7 @@ private:
     bool _enable_interpolation = false;
     unsigned int _numInterpolationPoints = 0;
     IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
-    double interpolate(IntepolationData f[], double xi, int n);
+
     bool updateBuffers(void);
 
     void StartUsingSPI(){

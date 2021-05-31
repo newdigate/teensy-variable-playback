@@ -16,6 +16,9 @@ if (DEFINED BUILD_FOR_LINUX)
     find_package(teensy_audio_x86_stubs)
     include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
 
+    find_package(teensy_x86_sd_stubs)
+    include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
+
     add_executable(playarrayresmp
             playarrayresmp.cpp
             ../../src/ResamplingArrayReader.cpp
@@ -27,6 +30,7 @@ if (DEFINED BUILD_FOR_LINUX)
 
     target_link_libraries(playarrayresmp ${teensy_x86_stubs_LIBS})
     target_link_libraries(playarrayresmp ${teensy_audio_x86_stubs_LIBS})
+    target_link_libraries(playarrayresmp ${teensy_x86_sd_stubs_LIBS})
 else()
     include(../../teensy.options.cmake.in)
     include(../../teensy.build.cmake.in)

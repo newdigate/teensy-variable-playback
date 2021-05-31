@@ -1,4 +1,5 @@
 #include "ResamplingArrayReader.h"
+#include "interpolation.h"
 
 unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
     if (!_playing) return 0;
@@ -69,7 +70,39 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             return false;
     }
 
-    int16_t result = _sourceBuffer[_bufferPosition];
+    double result = _sourceBuffer[_bufferPosition];
+    if (_enable_interpolation) {
+        double pos =  _remainder + _bufferPosition;
+        if (_remainder > 0.01f) {
+            if (_numInterpolationPoints < 4) {
+                if (_numInterpolationPoints > 0) {
+                    double lastX = _interpolationPoints[3].x - _bufferPosition;
+                    if (lastX >= 0) {
+                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
+                        double linearInterpolation =
+                                (_interpolationPoints[3].y * (total)) + (_sourceBuffer[_bufferPosition + 1] * (1 - total));
+                        result = linearInterpolation;
+                    } else {
+                        result = _sourceBuffer[_bufferPosition];
+                    }
+
+                }
+            } else {
+                double interpolation = interpolate(_interpolationPoints, pos, 4);
+                result = interpolation;
+            }
+        } else {
+            //Serial.printf("[%i, %f]\n", samplePosition, result);
+            _interpolationPoints[0] = _interpolationPoints[1];
+            _interpolationPoints[1] = _interpolationPoints[2];
+            _interpolationPoints[2] = _interpolationPoints[3];
+            _interpolationPoints[3].y = result;
+            _interpolationPoints[3].x = pos;
+            if (_numInterpolationPoints < 4)
+                _numInterpolationPoints++;
+        }
+
+    }
 
     _remainder += _playbackRate;
 
@@ -77,7 +110,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
     _remainder -= static_cast<double>(delta);
 
     _bufferPosition +=  delta;
-    *value = result;
+    *value = round(result);
     return true;
 }
 
