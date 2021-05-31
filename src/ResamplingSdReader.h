@@ -9,6 +9,7 @@
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"
+#include "interpolation.h"
 #include <list>
 
 #ifndef AUDIO_BLOCK_SAMPLES
