@@ -17,11 +17,6 @@
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 256
 
-struct IntepolationData
-{
-    double x, y;
-};
-
 class ResamplingSdReader {
 public:
     ResamplingSdReader() {
