@@ -1,0 +1,9 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "boost-test-adapter.logpanel": true,
+    "boost-test-adapter.testExecutable": "cmake-build-Debug/test/test_suite1",
+    "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "${buildType}"
+     }
+}
