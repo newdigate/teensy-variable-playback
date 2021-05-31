@@ -14,7 +14,8 @@ set(SOURCE_FILES
         playsdwavresmp.cpp
         ResamplingSdReader.cpp
         ResamplingArrayReader.cpp
-        playarrayresmp.cpp)
+        playarrayresmp.cpp
+        interpolation.cpp)
 
 set(HEADER_FILES
         loop_type.h
