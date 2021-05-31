@@ -21,7 +21,8 @@ if (DEFINED BUILD_FOR_LINUX)
             ../../src/ResamplingArrayReader.cpp
             ../../src/ResamplingSdReader.cpp
             ../../src/playsdwavresmp.cpp
-            ../../src/playsdrawresmp.cpp)
+            ../../src/playsdrawresmp.cpp
+            ../../src/interpolation.cpp)
 
     target_link_libraries(basic ${teensy_x86_stubs_LIBS})
     target_link_libraries(basic ${teensy_audio_x86_stubs_LIBS})
