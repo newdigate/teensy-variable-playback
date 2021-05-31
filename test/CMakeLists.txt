@@ -20,6 +20,7 @@ include_directories(../src)
 
 add_executable(test_suite1
         ../src/ResamplingSdReader.cpp
+        ../src/interpolation.cpp
         test_raw_mono_noloop_forward_playback.cpp
         ResamplingReaderFixture.h
         test_raw_mono_noloop_forward_double_rate_playback.cpp
