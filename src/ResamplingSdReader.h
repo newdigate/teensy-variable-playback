@@ -84,7 +84,7 @@ private:
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
-    char *_filename = "";
+    char *_filename = (char *)"";
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
