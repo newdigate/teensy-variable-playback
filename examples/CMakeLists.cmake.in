@@ -9,9 +9,7 @@ include(CMakeForceCompiler)
 # User configurable variables
 # (show up in cmake-gui)
 #
-include(${TEENSY_VARIABLE_PLAYBACK_ROOT}/teensy.options.cmake.in)
 
-find_package(teensy_cmake_macros)
 
 
 

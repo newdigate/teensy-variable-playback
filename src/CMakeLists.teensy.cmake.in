@@ -1,8 +1,3 @@
 message("building for teensy...")
 include(../teensy.options.cmake.in)
 include(../teensy.build.cmake.in)
-teensy_add_library(
-        teensy_variable_playback
-        ${HEADER_FILES}
-        ${SOURCE_FILES}
-)

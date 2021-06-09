@@ -41,7 +41,7 @@ public:
 
 private:
     wav_header wave_header = wav_header();
-    char *_filename = "";
+    char *_filename = (char*)"";
     uint32_t file_size;
     volatile uint32_t file_offset;
     ResamplingSdReader sdReader;

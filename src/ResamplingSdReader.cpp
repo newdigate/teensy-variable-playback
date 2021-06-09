@@ -162,7 +162,7 @@ bool ResamplingSdReader::play(const char *filename)
         if (!_file) {
             StopUsingSPI();
             Serial.printf("Not able to open file: %s\n", filename);
-            _filename = "";
+            _filename = (char *)"";
             return false;
         }
 
@@ -173,7 +173,7 @@ bool ResamplingSdReader::play(const char *filename)
         _loop_finish = (_file_size - _header_size) / 2;
         if (_file_size <= _header_size) {
             _playing = false;
-            _filename =  "";
+            _filename =  (char *)"";
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }

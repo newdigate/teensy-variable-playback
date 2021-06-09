@@ -8,7 +8,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
       - 'examples/**'
-      - '.github/workflows/teensy.yml'
+      - '.github/workflows/teensy*.yml'
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Debug
