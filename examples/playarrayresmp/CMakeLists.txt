@@ -39,10 +39,8 @@ if (DEFINED BUILD_FOR_LINUX)
     target_link_libraries(playarrayresmp ${teensy_audio_x86_stubs_LIBS})
     target_link_libraries(playarrayresmp ${teensy_x86_sd_stubs_LIBS})
 else()
-
     include(../examples.cmake.in)
     teensy_add_executable(playarrayresmp playarrayresmp.cpp)
-
 endif()
 
 

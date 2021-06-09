@@ -48,7 +48,7 @@ bool AudioPlaySdWavResmp::play(char *filename)
         Serial.printf("play(%d mS)\n", stopMicros - startMicros);
         return playing;
     } else {
-        sdReader.play();
+        return sdReader.play();
     }
 }
 

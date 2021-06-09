@@ -12,7 +12,6 @@ if (NOT DEFINED OPT_BUILD_FOR_LINUX_IS_DEFINED)
     endif()
 endif()
 
-
 set(SOURCE_FILES
         playsdrawresmp.cpp
         playsdwavresmp.cpp
@@ -29,8 +28,7 @@ set(HEADER_FILES
         waveheaderparser.h
         ResamplingArrayReader.h
         playarrayresmp.h
-        interpolation.h
-)
+        interpolation.h)
 
 cmake_minimum_required(VERSION 3.5)
 project(teensy_variable_playback C CXX)
@@ -40,6 +38,12 @@ set(CMAKE_VERBOSE_MAKEFILE 1)
 if (DEFINED BUILD_FOR_LINUX)
     include(CMakeLists.linux.cmake.in)
 else()
+    teensy_add_library(
+            teensy_variable_playback
+            ${HEADER_FILES}
+            ${SOURCE_FILES}
+    )
+
     add_custom_target(installarduino
             "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/install_arduino_library.cmake")
 endif()

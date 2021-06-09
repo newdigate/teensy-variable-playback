@@ -13,8 +13,6 @@ if (NOT DEFINED OPT_BUILD_FOR_LINUX_IS_DEFINED)
 endif()
 
 cmake_minimum_required(VERSION 3.5)
-project(teensy-variable-playback-examples)
-
 add_subdirectory(array)
 add_subdirectory(playarrayresmp)
 add_subdirectory(sd_raw)

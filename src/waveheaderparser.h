@@ -8,9 +8,6 @@
 #include <cstdint>
 #include <SD.h>
 #include "spi_interrupt.h"
-#ifndef ARDUINO
-#define AUDIO_BLOCK_SAMPLES 256
-#endif
 
 using namespace std;
 

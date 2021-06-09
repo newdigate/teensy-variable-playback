@@ -1,3 +1,4 @@
+message(STATUS "teensy.build.cmake.in:")
 find_package(teensy_cmake_macros)
 # import common libraries
 import_arduino_library(${DEPSPATH} SPI)

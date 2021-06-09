@@ -39,11 +39,8 @@ if (DEFINED BUILD_FOR_LINUX)
     target_link_libraries(basic ${teensy_x86_sd_stubs_LIBS})
     set(CMAKE_VERBOSE_MAKEFILE  1)
 else()
-
     include(../examples.cmake.in)
-
     teensy_add_executable(basic sd_raw.cpp)
-
 endif()
 
 
