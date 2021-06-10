@@ -101,7 +101,7 @@ You don't need to download or install Teensyduino or Arduino to build the librar
  > git clone https://github.com/PaulStoffregen/arm_math.git
  > git clone https://github.com/greiman/SdFat.git
 ```
-* update COMPILERPATH and DEPSPATH in ```cmake/toolchains/teensy41.cmake```:
+* update COMPILERPATH and DEPSPATH in ```cmake/toolchains/teensy41.cmake```
 ``` cmake
 set(COMPILERPATH "/Applications/Arm/bin/")
 set(DEPSPATH "/home/nic/teensy_libraries")
@@ -109,6 +109,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 ```
 
 * build hex file
+
 If you run the commands below from the root repository directory, it will build the teensy-variable-playback library and all the examples. If you run then from any sub-directory it will build everything under the sub-directory. (You might need to adjust relative path in ```-DCMAKE_TOOLCHAIN_FILE:FILEPATH``` below)
 ``` sh
 > mkdir cmake-build-debug
