@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 3.5)
+project(teensy_variable_playback C CXX)
+set(teensy_variable_playback_VERSION 1.0.0)
+
 set(SOURCE_FILES
         playsdrawresmp.cpp
         playsdwavresmp.cpp
@@ -15,10 +19,6 @@ set(HEADER_FILES
         ResamplingArrayReader.h
         playarrayresmp.h
         interpolation.h)
-
-cmake_minimum_required(VERSION 3.5)
-project(teensy_variable_playback C CXX)
-set(teensy_variable_playback_VERSION 1.0.0)
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 if (DEFINED BUILD_FOR_LINUX)
