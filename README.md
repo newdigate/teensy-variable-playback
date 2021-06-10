@@ -6,10 +6,9 @@
 [![CMake](https://img.shields.io/badge/project-CMake-brightgreen.svg?label=built%20with&colorA=555555&colorB=8a8fff&logo=)](CMakelists.txt)
 [![made-for-VSCode](https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg)](https://code.visualstudio.com/)
 
-A classes to play 16-bit raw mono audio at variable playback rates on teensy
-* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
-  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
+## contents
 * [requirements](#requirements)
 * [code structure](#code-structure)
 * [download](#download)
@@ -99,6 +98,9 @@ set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/co
 > cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE:FILEPATH="../cmake/toolchains/teensy41.cmake" ..
 > make
 ```
+
+* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
+  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## linux build
 ### build tests on linux
