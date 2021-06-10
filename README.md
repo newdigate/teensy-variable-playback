@@ -141,11 +141,17 @@ If you run the commands below from the root repository directory, it will build 
 
 ## visual studio code
   * download vs code
-    * install plug-in ms-vscode.cpptools
+    * required extensions
+      * ms-vscode.cpptools
+    * optional extensions
+      * ms-vscode.cmake-tools
+      * hbenl.vscode-test-explorer
+      * ms-vscode.test-adapter-converter
+      * zcoinofficial.boost-test-adapter (or with debugging https://github.com/newdigate/vscode-boost-test-adapter)
   * open root folder of repository in visual studio code
   * open terminal in visual studio code build, build as above
   * (add breakpoint)
   * launch
 
 ## todo
-* stereo  
+* stereo
