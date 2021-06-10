@@ -77,7 +77,7 @@ graph G {
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
 | ```examples```    | ```teensy/linux``` | basic example how to use  |
-| ```src```    | ```teensy/linux``` / <br/>```test``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
+| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
 | ```test```   | ```linux```          | unit tests that run on linux |
   
 ## download 
