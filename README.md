@@ -149,7 +149,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
       * ms-vscode.cmake-tools
       * hbenl.vscode-test-explorer
       * ms-vscode.test-adapter-converter
-      * zcoinofficial.boost-test-adapter (or with debugging https://github.com/newdigate/vscode-boost-test-adapter)
+      * nicnewdigate.boost-test-adapter-debug
   * open root folder of repository in visual studio code
   * open terminal in visual studio code build, build as above
   * (add breakpoint)
