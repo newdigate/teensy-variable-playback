@@ -5,7 +5,6 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CMake](https://img.shields.io/badge/project-CMake-brightgreen.svg?label=built%20with&colorA=555555&colorB=8a8fff&logo=)](CMakelists.txt)
 [![made-for-VSCode](https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg)](https://code.visualstudio.com/)
-[![made with JetBrains Clion](https://img.shields.io/badge/project-Clion-brightgreen.svg?label=Made%20for&colorA=555555&colorB=ff8a2c&
 
 A classes to play 16-bit raw mono audio at variable playback rates on teensy
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
