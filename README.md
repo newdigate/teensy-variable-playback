@@ -17,43 +17,44 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * [visual studio code](#visual-studio-code)
 * [todo](#todo)
 
-## requirements
-  * linux 
-    * cmake
-    * gcc or llvm: c++ standard library (using std::vector, std::function)
-    * [newdigate](https://github.com/newdigate)
-      * [teensy-x86-stubs](https://github.com/newdigate/teensy-x86-stubs)
-      * [teensy-audio-x86-stubs](https://github.com/newdigate/teensy-audio-x86-stubs)
-      * [teensy-x86-sd-stubs](https://github.com/newdigate/teensy-x86-sd-stubs)
-    * boost unit-test library: 
-      * linux: ```sudo apt-get install -yq libboost-test-dev```
-      * macos: ```brew install boost```
-    
-  * teensy   
-    * cmake
-    * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1)
-    * github
-      * newdigate
-        * [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros)
-        ```shell
-        > git clone https://github.com/newdigate/teensy-cmake-macros.git
-        > cd teensy-cmake-macros
-        > mkdir cmake-build-debug
-        > cd cmake-build-debug
-        > cmake ..
-        > sudo make install        
-        ```
+## requirements  
+### teensy   
+  * cmake
+  * [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1)
+  * github
+    * newdigate
+      * [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros)
+      ```shell
+      > git clone https://github.com/newdigate/teensy-cmake-macros.git
+      > cd teensy-cmake-macros
+      > mkdir cmake-build-debug
+      > cd cmake-build-debug
+      > cmake ..
+      > sudo make install        
+      ```
 
-      * PaulStoffregen
-        * [cores.git](https://github.com/PaulStoffregen/cores)
-        * [Audio.git](https://github.com/PaulStoffregen/Audio)
-        * [SD.git @ Juse_Use_SdFat](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat)
-        * [Wire.git](https://github.com/PaulStoffregen/Wire)
-        * [SPI.git](https://github.com/PaulStoffregen/SPI)
-        * [SerialFlash.git](https://github.com/PaulStoffregen/SerialFlash)
-        * [arm_math.git](https://github.com/PaulStoffregen/arm_math)
-      * greiman
-        * [SdFat.git](https://github.com/greiman/SdFat)
+    * PaulStoffregen
+      * [cores.git](https://github.com/PaulStoffregen/cores)
+      * [Audio.git](https://github.com/PaulStoffregen/Audio)
+      * [SD.git @ Juse_Use_SdFat](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat)
+      * [Wire.git](https://github.com/PaulStoffregen/Wire)
+      * [SPI.git](https://github.com/PaulStoffregen/SPI)
+      * [SerialFlash.git](https://github.com/PaulStoffregen/SerialFlash)
+      * [arm_math.git](https://github.com/PaulStoffregen/arm_math)
+    * greiman
+      * [SdFat.git](https://github.com/greiman/SdFat)
+
+### linux 
+By using stub libraries, we can compile teensy code to native desktop architecture. To a certain extent, this allows sketches to be developed, debugged and unit-tested using linux, on your locol device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
+  * cmake
+  * gcc or llvm: c++ standard library (using std::vector, std::function)
+  * [newdigate](https://github.com/newdigate)
+    * [teensy-x86-stubs](https://github.com/newdigate/teensy-x86-stubs)
+    * [teensy-audio-x86-stubs](https://github.com/newdigate/teensy-audio-x86-stubs)
+    * [teensy-x86-sd-stubs](https://github.com/newdigate/teensy-x86-sd-stubs)
+  * boost unit-test library: 
+    * linux: ```sudo apt-get install -yq libboost-test-dev```
+    * macos: ```brew install boost```
 
 ![dependencies](docs/dependencies.png)
 ```dot
