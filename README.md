@@ -25,7 +25,9 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
       * [teensy-x86-stubs](https://github.com/newdigate/teensy-x86-stubs)
       * [teensy-audio-x86-stubs](https://github.com/newdigate/teensy-audio-x86-stubs)
       * [teensy-x86-sd-stubs](https://github.com/newdigate/teensy-x86-sd-stubs)
-    * boost unit-test library: ```sudo apt-get install -yq libboost-test-dev```
+    * boost unit-test library: 
+      * linux: ```sudo apt-get install -yq libboost-test-dev```
+      * macos: ```brew install boost```
     
   * teensy   
     * cmake
