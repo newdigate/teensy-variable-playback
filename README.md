@@ -86,15 +86,30 @@ graph G {
 > git clone https://github.com/newdigate/teensy-variable-playback.git
 > cd teensy-variable-playback
 ```
+
 ## teensy build
-* manual configuration steps required:
-  * update ```cmake/toolchains/teensy41.cmake```:
- ``` cmake
-set(COMPILERPATH "/Applications/Arm/bin/")
-set(DEPSPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/libraries")
-set(COREPATH "/Applications/Teensyduino.app/Contents/Java/hardware/teensy/avr/cores/teensy4/")
+You don't need to download or install Teensyduino or Arduino to build the library or examples. Just clone the cores library and any dependencies to a common folder, denoted by ```DEPSPATH``` (in this case ```/home/nic/teensy_libraries```). 
+* clone dependencies
+``` sh
+ > cd /home/nic/teensy_libraries
+ > git clone https://github.com/PaulStoffregen/cores.git
+ > git clone https://github.com/PaulStoffregen/Audio.git
+ > git clone -b Juse_Use_SdFat https://github.com/PaulStoffregen/SD.git 
+ > git clone https://github.com/PaulStoffregen/Wire.git
+ > git clone https://github.com/PaulStoffregen/SPI.git
+ > git clone https://github.com/PaulStoffregen/SerialFlash.git
+ > git clone https://github.com/PaulStoffregen/arm_math.git
+ > git clone https://github.com/greiman/SdFat.git
 ```
-* 
+* update COMPILERPATH and DEPSPATH in ```cmake/toolchains/teensy41.cmake```:
+``` cmake
+set(COMPILERPATH "/Applications/Arm/bin/")
+set(DEPSPATH "/home/nic/teensy_libraries")
+set(COREPATH "${DEPSPATH}/cores/teensy4/")
+```
+
+* build hex file
+If you run the commands below from the root repository directory, it will build the teensy-variable-playback library and all the examples. If you run then from any sub-directory it will build everything under the sub-directory. (You might need to adjust relative path in ```-DCMAKE_TOOLCHAIN_FILE:FILEPATH``` below)
 ``` sh
 > mkdir cmake-build-debug
 > cd cmake-build-debug
