@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(test_resampling_sdreader C CXX)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set (Boost_USE_STATIC_LIBS OFF)
 find_package (Boost REQUIRED COMPONENTS unit_test_framework)
@@ -36,4 +36,4 @@ target_link_libraries(test_suite1 ${teensy_x86_stubs_LIBS})
 target_link_libraries(test_suite1 ${teensy_audio_x86_stubs_LIBS})
 target_link_libraries(test_suite1 ${teensy_x86_sd_stubs_LIBS})
 message(STATUS ${teensy_x86_stubs_LIBS})
-set(CMAKE_VERBOSE_MAKEFILE 1)
+#set(CMAKE_VERBOSE_MAKEFILE 1)
