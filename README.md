@@ -112,6 +112,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
   * If you run the commands below from the root repository directory, it will build the teensy-variable-playback library and all the examples. 
   * If you run them from a sub-directory, it will build everything under the sub-directory. (You might need to adjust relative path in ```-DCMAKE_TOOLCHAIN_FILE:FILEPATH``` below)
 ``` sh
+> cd /home/nic/teensy-variable-playback
 > mkdir cmake-build-debug
 > cd cmake-build-debug
 > cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE:FILEPATH="../cmake/toolchains/teensy41.cmake" ..
