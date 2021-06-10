@@ -45,7 +45,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
       * [SdFat.git](https://github.com/greiman/SdFat)
 
 ### linux 
-By using stub libraries, we can compile teensy code to native desktop architecture. To a certain extent, this allows sketches to be developed, debugged and unit-tested using linux, on your locol device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
+By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
   * cmake
   * gcc or llvm: c++ standard library (using std::vector, std::function)
   * [newdigate](https://github.com/newdigate)
