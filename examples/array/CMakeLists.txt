@@ -18,12 +18,12 @@ if (DEFINED BUILD_FOR_LINUX)
             ../../src/ResamplingSdReader.cpp
             ../../src/playsdwavresmp.cpp
             ../../src/playsdrawresmp.cpp
+            ../../src/playarrayresmp.cpp
             ../../src/interpolation.cpp)
 
     target_link_libraries(array ${teensy_x86_stubs_LIBS})
     target_link_libraries(array ${teensy_audio_x86_stubs_LIBS})
     target_link_libraries(array ${teensy_x86_sd_stubs_LIBS})
-    set(CMAKE_VERBOSE_MAKEFILE  1)
 else()
     include(../examples.cmake.in)
     teensy_add_executable(array array.cpp)
