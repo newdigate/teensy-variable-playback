@@ -77,7 +77,7 @@ private:
 
     bool _enable_interpolation = false;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData _interpolationPoints[4] = { 0.0f, 0.0f };
+    IntepolationData _interpolationPoints[4] = { IntepolationData(),IntepolationData(),IntepolationData(),IntepolationData() };
 };
 
 

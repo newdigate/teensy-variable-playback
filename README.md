@@ -157,3 +157,39 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 
 ## todo
 * stereo
+
+## example usage
+```c++
+#include <Arduino.h>
+#include <Audio.h>
+#include "playarrayresmp.h"
+
+// GUItool: begin automatically generated code
+AudioPlayArrayResmp      rraw_a1;        //xy=321,513
+AudioOutputI2S           i2s1;           //xy=675,518
+AudioConnection          patchCord1(rraw_a1, 0, i2s1, 0);
+AudioConnection          patchCord2(rraw_a1, 0, i2s1, 1);
+AudioControlSGTL5000     sgtl5000_1;     //xy=521,588
+// GUItool: end automatically generated code
+
+unsigned char kick_raw[] = {
+  0x99, 0x02, 0xd7, 0x02, 0xfa, 0x02, 0x5f, 0x03, 0xc1, 0x03, 0x2a, 0x04,
+  0xad, 0x04, 0xa5, 0x05, 0x76, 0x06, 0x2f, 0x07, 0x9e, 0x07, 0xe2, 0x07,
+  0x43, 0x08, 0x92, 0x08, 0xb2, 0x08, 0xe8, 0x08, 0x16, 0x09, 0xda, 0x08,
+};
+unsigned int kick_raw_len = 6350;
+
+void setup() {
+    AudioMemory(20);
+    sgtl5000_1.enable();
+    sgtl5000_1.volume(0.5f, 0.5f);
+    rraw_a1.setPlaybackRate(0.5);
+}
+
+void loop() {
+    if (!rraw_a1.isPlaying()) {
+        delay(1000);
+        rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
+    }
+}
+```
