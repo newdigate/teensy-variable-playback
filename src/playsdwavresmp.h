@@ -38,7 +38,10 @@ public:
     void setLoopType(loop_type t) {
         sdReader.setLoopType(t);
     }
-
+    
+    void enableInterpolation(bool enable) {
+        sdReader.enableInterpolation(enable);
+    }
 private:
     wav_header wave_header = wav_header();
     char *_filename = (char*)"";

@@ -36,6 +36,10 @@ public:
         arrayReader.setLoopType(t);
     }
 
+    void enableInterpolation(bool enable) {
+        arrayReader.enableInterpolation(enable);
+    }
+
 private:
 
     uint32_t file_size;

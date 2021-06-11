@@ -38,6 +38,9 @@ public:
         sdReader.setLoopType(t);
     }
 
+    void enableInterpolation(bool enable) {
+        sdReader.enableInterpolation(enable);
+    }
 private:
 
     uint32_t file_size;
