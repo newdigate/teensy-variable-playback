@@ -182,7 +182,7 @@ unsigned int kick_raw_len = 6350;
 void setup() {
     AudioMemory(20);
     sgtl5000_1.enable();
-    sgtl5000_1.volume(05f, 0.5f);
+    sgtl5000_1.volume(0.5f, 0.5f);
     rraw_a1.setPlaybackRate(0.5);
 }
 

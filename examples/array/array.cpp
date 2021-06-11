@@ -19,7 +19,7 @@ void setup() {
     Serial.begin(9600);
     AudioMemory(20);
     sgtl5000_1.enable();
-    sgtl5000_1.volume(05f, 0.5f);
+    sgtl5000_1.volume(0.5f, 0.5f);
     
     rraw_a1.setPlaybackRate(0.5);
     rraw_a1.play((int16_t*)kick_raw, kick_raw_len/2);    
