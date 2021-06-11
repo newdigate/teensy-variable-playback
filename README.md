@@ -19,7 +19,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
 ## requirements  
 ### teensy   
-```cmake```, ```gcc-arm-none-eabi``` [^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1), ```teensy-cmake-macros```, [^](https://github.com/newdigate/teensy-cmake-macros), ```cores``` [^](https://github.com/PaulStoffregen/cores), ```Audio``` [^](https://github.com/PaulStoffregen/Audio), ```SD``` [^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat), ```Wire``` [^](https://github.com/PaulStoffregen/Wire), ```SPI``` [^](https://github.com/PaulStoffregen/SPI), ```SerialFlash``` [^](https://github.com/PaulStoffregen/SerialFlash), ```arm_math```[^](https://github.com/PaulStoffregen/arm_math), ```SDFat``` [^](https://github.com/greiman/SdFat)
+```cmake```, ```gcc-arm-none-eabi``` [^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1), ```teensy-cmake-macros``` [^](https://github.com/newdigate/teensy-cmake-macros), ```cores``` [^](https://github.com/PaulStoffregen/cores), ```Audio``` [^](https://github.com/PaulStoffregen/Audio), ```SD``` [^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat), ```Wire``` [^](https://github.com/PaulStoffregen/Wire), ```SPI``` [^](https://github.com/PaulStoffregen/SPI), ```SerialFlash``` [^](https://github.com/PaulStoffregen/SerialFlash), ```arm_math```[^](https://github.com/PaulStoffregen/arm_math), ```SDFat``` [^](https://github.com/greiman/SdFat)
 
 ![dependencies](docs/dependencies.png)
 ```dot
