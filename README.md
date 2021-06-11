@@ -19,15 +19,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
 ## requirements  
 ### teensy   
-```cmake```, ```gcc-arm-none-eabi``` [^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1), ```teensy-cmake-macros```, [^](https://github.com/newdigate/teensy-cmake-macros), ```cores``` [^](https://github.com/PaulStoffregen/cores), ```Audio``` [^](https://github.com/PaulStoffregen/Audio), ```SD @ Juse_Use_SdFat``` [^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat), ```Wire``` [^](https://github.com/PaulStoffregen/Wire), ```SPI``` [^](https://github.com/PaulStoffregen/SPI), ```SerialFlash``` [^](https://github.com/PaulStoffregen/SerialFlash), ```arm_math```[^](https://github.com/PaulStoffregen/arm_math), ```SDFat``` [^](https://github.com/greiman/SdFat)
-
-### linux 
-```cmake```, ```gcc or llvm```, ```teensy-x86-stubs``` [^](https://github.com/newdigate/teensy-x86-stubs), ```teensy-audio-x86-stubs``` [^](https://github.com/newdigate/teensy-audio-x86-stubs), ```teensy-x86-sd-stubs``` [^](https://github.com/newdigate/teensy-x86-sd-stubs), ```boost-test``` 
-
-By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
-  * install boost unit-test library: 
-    * linux: ```sudo apt-get install -yq libboost-test-dev```
-    * macos: ```brew install boost```
+```cmake```, ```gcc-arm-none-eabi``` [^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1), ```teensy-cmake-macros```, [^](https://github.com/newdigate/teensy-cmake-macros), ```cores``` [^](https://github.com/PaulStoffregen/cores), ```Audio``` [^](https://github.com/PaulStoffregen/Audio), ```SD``` [^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat), ```Wire``` [^](https://github.com/PaulStoffregen/Wire), ```SPI``` [^](https://github.com/PaulStoffregen/SPI), ```SerialFlash``` [^](https://github.com/PaulStoffregen/SerialFlash), ```arm_math```[^](https://github.com/PaulStoffregen/arm_math), ```SDFat``` [^](https://github.com/greiman/SdFat)
 
 ![dependencies](docs/dependencies.png)
 ```dot
@@ -45,7 +37,15 @@ graph G {
   "PaulStoffregen/Audio.git" -- "PaulStoffregen/arm_math.git"
 }
 ```
-        
+
+### linux 
+```cmake```, ```gcc or llvm```, ```teensy-x86-stubs``` [^](https://github.com/newdigate/teensy-x86-stubs), ```teensy-audio-x86-stubs``` [^](https://github.com/newdigate/teensy-audio-x86-stubs), ```teensy-x86-sd-stubs``` [^](https://github.com/newdigate/teensy-x86-sd-stubs), ```boost-test``` 
+
+By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
+  * install boost unit-test library: 
+    * linux: ```sudo apt-get install -yq libboost-test-dev```
+    * macos: ```brew install boost```
+
 ## code structure
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
