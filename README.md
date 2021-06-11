@@ -16,6 +16,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * [linux build](#linux-build)
 * [visual studio code](#visual-studio-code)
 * [todo](#todo)
+* [example usage](#example-usage)
 
 ## requirements  
 ### teensy   
