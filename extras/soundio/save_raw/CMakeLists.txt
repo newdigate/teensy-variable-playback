@@ -14,12 +14,6 @@ include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
 find_package(teensy_audio_x86_stubs_soundio)
 include_directories(${teensy_audio_x86_stubs_soundio_INCLUDE_DIR})
 
-find_package(teensy_st7735_linux_stubs)
-include_directories(${teensy_st7735_linux_stubs_INCLUDE_DIR})
-
-find_package(teensy_st7735_linux_opengl)
-include_directories(${teensy_st7735_linux_extras_opengl_INCLUDE_DIR})
-
 add_executable(save_raw
         save_raw.cpp
         ../../../src/playarrayresmp.cpp
