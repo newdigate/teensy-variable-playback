@@ -50,3 +50,4 @@ elseif(APPLE)
 endif()
 
 target_link_libraries(save_raw ${LIBS} ${teensy_x86_stubs_LIBS} ${teensy_x86_sd_stubs_LIBS} ${teensy_audio_x86_stubs_LIBS} ${teensy_audio_x86_stubs_soundio_LIBS} ${teensy_st7735_linux_stubs_LIBS} ${teensy_st7735_linux_extras_opengl_LIBS})
+set(CMAKE_VERBOSE_MAKEFILE 1)
