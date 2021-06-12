@@ -4,6 +4,7 @@
 #include <Audio.h>
 #include "../../../src/playarrayresmp.h"
 #include "output_soundio.h"
+#include <soundio/soundio.h>
 // GUItool: begin automatically generated code
 AudioPlayArrayResmp      rraw_a1;        //xy=306,225
 AudioRecordQueue         queue1;         //xy=609,267
