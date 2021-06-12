@@ -1,0 +1,30 @@
+name: Ubuntu-x64
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'examples/**'
+      - '.github/workflows/teensy*.yml'
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+      - name: download dependencies
+        run: sudo apt-get update && sudo apt-get install -yq libsoundio-dev
+      
+      - name: where are my libs folders
+        # Some projects don't allow in-source building, so create a separate build directory
+        # We'll use this as our working directory for all subsequent commands
+        run: ls /lib && ls /usr/lib && ls /usr/local/lib
+
+      - name: where is soundio
+        # Some projects don't allow in-source building, so create a separate build directory
+        # We'll use this as our working directory for all subsequent commands
+        run: dpkg -L libsoundio-dev
