@@ -19,18 +19,16 @@ add_executable(save_raw
         ../../../src/playarrayresmp.cpp
         ../../../src/interpolation.cpp
         ../../../src/ResamplingArrayReader.cpp
-        
-    )
 
+)
 
-#soundio
-include_directories(/usr/local/include)
+include_directories(/usr/local/include) #soundio
 
 if(WIN32)
-
 elseif(UNIX AND NOT APPLE)
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall") 
-elseif(APPLE)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+    target_link_libraries(save_raw libsoundio)
+elseif(APPLE) 
     INCLUDE_DIRECTORIES(/System/Library/Frameworks)
     FIND_LIBRARY(glfw3_LIBRARY glfw)
     FIND_LIBRARY(COCOA_LIBRARY Cocoa)
@@ -48,9 +46,7 @@ elseif(APPLE)
         "-framework CoreAudio"
         "-framework Foundation"
         "-framework AudioUnit")
+    target_link_libraries(save_raw /usr/local/lib/libsoundio.a)
 endif()
 
 target_link_libraries(save_raw ${LIBS} ${teensy_x86_stubs_LIBS} ${teensy_x86_sd_stubs_LIBS} ${teensy_audio_x86_stubs_LIBS} ${teensy_audio_x86_stubs_soundio_LIBS} ${teensy_st7735_linux_stubs_LIBS} ${teensy_st7735_linux_extras_opengl_LIBS})
-target_link_libraries(save_raw /usr/local/lib/libsoundio.a)
-
-message(STATUS ${LIBS})
