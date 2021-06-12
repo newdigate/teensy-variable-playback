@@ -27,7 +27,7 @@ include_directories(/usr/local/include) #soundio
 if(WIN32)
 elseif(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-    target_link_libraries(save_raw libsoundio)
+    target_link_libraries(save_raw /usr/local/lib/libsoundio)
 elseif(APPLE) 
     INCLUDE_DIRECTORIES(/System/Library/Frameworks)
     FIND_LIBRARY(glfw3_LIBRARY glfw)
