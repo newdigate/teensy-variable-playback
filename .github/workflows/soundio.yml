@@ -15,7 +15,9 @@ env:
 
 jobs:
   build:
-      # The CMake configure and build commands are platform agnostic and should work equally
+    runs-on: ubuntu-latest
+
+    steps:
       - name: download dependencies
         run: sudo apt-get update && sudo apt-get install -yq libsoundio-dev
       
