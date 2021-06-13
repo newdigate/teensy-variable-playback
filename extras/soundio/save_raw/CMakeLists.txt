@@ -27,7 +27,7 @@ include_directories(/usr/local/include) #soundio
 if(WIN32)
 elseif(UNIX AND NOT APPLE)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-    target_link_libraries(save_raw /usr/lib/x86_64-linux-gnu/libsoundio.a)
+    SET(SOUNDIO_LIBS /usr/lib/x86_64-linux-gnu/libsoundio.a)
 elseif(APPLE) 
     INCLUDE_DIRECTORIES(/System/Library/Frameworks)
     FIND_LIBRARY(glfw3_LIBRARY glfw)
@@ -46,8 +46,8 @@ elseif(APPLE)
         "-framework CoreAudio"
         "-framework Foundation"
         "-framework AudioUnit")
-    target_link_libraries(save_raw /usr/local/lib/libsoundio.a)
+    SET(SOUNDIO_LIBS /usr/local/lib/libsoundio.a)
 endif()
 
-target_link_libraries(save_raw ${LIBS} ${teensy_x86_stubs_LIBS} ${teensy_x86_sd_stubs_LIBS} ${teensy_audio_x86_stubs_LIBS} ${teensy_audio_x86_stubs_soundio_LIBS} ${teensy_st7735_linux_stubs_LIBS} ${teensy_st7735_linux_extras_opengl_LIBS})
-set(CMAKE_VERBOSE_MAKEFILE 1)
+target_link_libraries(save_raw ${LIBS} ${teensy_x86_stubs_LIBS} ${teensy_x86_sd_stubs_LIBS} ${teensy_audio_x86_stubs_LIBS} ${teensy_audio_x86_stubs_soundio_LIBS} ${teensy_st7735_linux_stubs_LIBS} ${teensy_st7735_linux_extras_opengl_LIBS} ${SOUNDIO_LIBS})
+#set(CMAKE_VERBOSE_MAKEFILE 1)
