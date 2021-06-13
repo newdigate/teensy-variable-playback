@@ -15,6 +15,19 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
+        },        
+        {
+            "name": "(lldb) Launch save_raw",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/save_raw/save_raw",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
         },
+    ]
     ]
 }

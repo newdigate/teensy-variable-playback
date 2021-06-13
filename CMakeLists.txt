@@ -5,4 +5,5 @@ add_subdirectory(examples)
 
 if (DEFINED BUILD_FOR_LINUX)
     add_subdirectory(test)
+    add_subdirectory(extras/soundio/save_raw)
 endif()
