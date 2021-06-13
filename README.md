@@ -22,7 +22,14 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 ### teensy   
 ```cmake```, ```gcc-arm-none-eabi``` [^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1), ```teensy-cmake-macros``` [^](https://github.com/newdigate/teensy-cmake-macros), ```cores``` [^](https://github.com/PaulStoffregen/cores), ```Audio``` [^](https://github.com/PaulStoffregen/Audio), ```SD``` [^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat), ```Wire``` [^](https://github.com/PaulStoffregen/Wire), ```SPI``` [^](https://github.com/PaulStoffregen/SPI), ```SerialFlash``` [^](https://github.com/PaulStoffregen/SerialFlash), ```arm_math```[^](https://github.com/PaulStoffregen/arm_math), ```SDFat``` [^](https://github.com/greiman/SdFat)
 
+<details>
+  <summary>dependencies (click to expand image) </summary>
+  
 ![dependencies](docs/dependencies.png)
+  
+<details>
+  <summary>graphvis (click to expand) </summary>
+  
 ```dot
 graph G {
   graph[rankdir="LR"]
@@ -38,6 +45,9 @@ graph G {
   "PaulStoffregen/Audio.git" -- "PaulStoffregen/arm_math.git"
 }
 ```
+</details>
+  
+</details>
 
 ### linux 
 ```cmake```, ```gcc or llvm```, ```teensy-x86-stubs``` [^](https://github.com/newdigate/teensy-x86-stubs), ```teensy-audio-x86-stubs``` [^](https://github.com/newdigate/teensy-audio-x86-stubs), ```teensy-x86-sd-stubs``` [^](https://github.com/newdigate/teensy-x86-sd-stubs), ```boost-test``` 
@@ -62,8 +72,13 @@ By using stub libraries, we can compile teensy code to native device architectur
 ```
 
 ## teensy build
+* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
+  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+
 You don't need to download or install Teensyduino or Arduino to build the library or examples. Just clone the cores library and any dependencies to a common folder, denoted by ```DEPSPATH``` (in this case ```/home/nic/teensy_libraries```). 
-* clone dependencies
+<details>
+  <summary>clone dependencies (click to expand) </summary>
+  
 ``` sh
  > cd /home/nic/teensy_libraries
  > git clone https://github.com/PaulStoffregen/cores.git
@@ -75,14 +90,23 @@ You don't need to download or install Teensyduino or Arduino to build the librar
  > git clone https://github.com/PaulStoffregen/arm_math.git
  > git clone https://github.com/greiman/SdFat.git
 ```
-* update COMPILERPATH and DEPSPATH in ```cmake/toolchains/teensy41.cmake```
+  
+</details>
+
+<details>
+  <summary>update COMPILERPATH and DEPSPATH in cmake/toolchains/teensy41.cmake</summary>
+  
 ``` cmake
 set(COMPILERPATH "/Applications/Arm/bin/")
 set(DEPSPATH "/home/nic/teensy_libraries")
 set(COREPATH "${DEPSPATH}/cores/teensy4/")
 ```
 
-* build hex file
+</details>
+
+<details>
+  <summary>build hex file</summary>
+
   * If you run the commands below from the root repository directory, it will build the teensy-variable-playback library and all the examples. 
   * If you run them from a sub-directory, it will build everything under the sub-directory. (You might need to adjust relative path in ```-DCMAKE_TOOLCHAIN_FILE:FILEPATH``` below)
 ``` sh
@@ -93,8 +117,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 > make
 ```
 
-* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
-  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+</details>
 
 ## linux build
 ### build tests on linux
@@ -133,6 +156,10 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 * stereo
 
 ## example usage
+
+<details>
+  <summary>example (click to expand) </summary>
+  
 ```c++
 #include <Arduino.h>
 #include <Audio.h>
@@ -167,3 +194,5 @@ void loop() {
     }
 }
 ```
+  
+</details>  
