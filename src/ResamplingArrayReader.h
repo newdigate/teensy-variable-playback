@@ -72,7 +72,6 @@ private:
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
 
-    int16_t _destinationBuffer[AUDIO_BLOCK_SAMPLES];
     int16_t *_sourceBuffer;
 
     bool _enable_interpolation = false;
