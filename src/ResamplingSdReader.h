@@ -12,10 +12,6 @@
 #include "interpolation.h"
 #include <list>
 
-#ifndef AUDIO_BLOCK_SAMPLES
-#define AUDIO_BLOCK_SAMPLES 256
-#endif
-
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 256
 
 class ResamplingSdReader {
