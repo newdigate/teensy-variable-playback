@@ -154,6 +154,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 
 ## todo
 * stereo
+* interpolation is not currently working and is switched off by default... I'm working on it...
 
 ## example usage
 
