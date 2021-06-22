@@ -8,6 +8,8 @@
 
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
+* Note: Interpolation is not currently working - enabling it will make lots of noise!!! Please bare with me - I'm working on it.... 
+
 ## contents
 * [requirements](#requirements)
 * [code structure](#code-structure)
