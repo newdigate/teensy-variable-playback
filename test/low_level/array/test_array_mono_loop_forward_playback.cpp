@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
     unsigned int kick_raw_len = 6350;
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayFixture) {
 
-        const uint32_t expectedDataSize = 28; // 32 16bit samples = 64 bytes of space
+        const uint32_t expectedDataSize = kick_raw_len; // 32 16bit samples = 64 bytes of space
         printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t expected[expectedDataSize];
         for (int16_t i = 0; i < expectedDataSize; i++) {
@@ -32,20 +32,7 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
         do {
             bytesRead = resamplingArrayReader->read(actual, 512 ); // 256 samples
             total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d \n", j, bytesRead);
-
-            for (int i=0; i < bytesRead/2; i++) {
-                printf("\t\t[%x]:%x", currentExpected, actual[i]);
-
-                if (currentExpected != actual[i]) {
-                    assertionsPass = false;
-                    //BOOST_FAIL("Value not as expected!!!");
-                }
-
-                currentExpected++;
-                currentExpected %= expectedDataSize;
-            }
-
+            printf("j:%d bytesRead: %d \n", j, bytesRead);           
             printf("\n");
             j++;
         } while (j < 3);
