@@ -30,7 +30,8 @@ void loop() {
     if (!rraw_a1.isPlaying()) {
         delay(1000);
         rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
-    }
+    } else
+    delay(100);
 }
 
 #ifdef BUILD_FOR_LINUX
