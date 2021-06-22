@@ -72,36 +72,25 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
     double result = _sourceBuffer[_bufferPosition];
     if (_enable_interpolation) {
-        double pos =  _remainder + _bufferPosition;
-        if (_remainder > 0.01f) {
+        if (-0.01 > _remainder > 0.01) {
             if (_numInterpolationPoints < 4) {
-                if (_numInterpolationPoints > 0) {
-                    double lastX = _interpolationPoints[3].x - _bufferPosition;
-                    if (lastX >= 0) {
-                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
-                        double linearInterpolation =
-                                (_interpolationPoints[3].y * (total)) + (_sourceBuffer[_bufferPosition + 1] * (1 - total));
-                        result = linearInterpolation;
-                    } else {
-                        result = _sourceBuffer[_bufferPosition];
-                    }
-
-                }
+                result = _sourceBuffer[_bufferPosition];
             } else {
-                double interpolation = interpolate(_interpolationPoints, pos, 4);
+                double interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
                 result = interpolation;
+                //Serial.printf("[%f]\n", interpolation);
             }
         } else {
-            //Serial.printf("[%i, %f]\n", samplePosition, result);
-            _interpolationPoints[0] = _interpolationPoints[1];
-            _interpolationPoints[1] = _interpolationPoints[2];
-            _interpolationPoints[2] = _interpolationPoints[3];
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = _interpolationPoints[2].y;
+            _interpolationPoints[2].y = _interpolationPoints[3].y;
             _interpolationPoints[3].y = result;
-            _interpolationPoints[3].x = pos;
             if (_numInterpolationPoints < 4)
                 _numInterpolationPoints++;
-        }
 
+            result = _interpolationPoints[1].y;
+            //Serial.printf("%f\n", result);
+        }
     }
 
     _remainder += _playbackRate;
@@ -145,18 +134,19 @@ bool ResamplingArrayReader::play()
 }
 
 void ResamplingArrayReader::reset(){
+    _numInterpolationPoints = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _bufferPosition = 0;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _bufferPosition = _file_size;
+        _bufferPosition = _file_size - 1;
     }
 }
 
 void ResamplingArrayReader::stop()
 {
-    if (_playing) {
+    if (_playing) {   
         _playing = false;
     }
 }
