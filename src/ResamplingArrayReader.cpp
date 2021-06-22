@@ -75,24 +75,13 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
         double pos =  _remainder + _bufferPosition;
         if (_remainder > 0.01f) {
             if (_numInterpolationPoints < 4) {
-                if (_numInterpolationPoints > 0) {
-                    double lastX = _interpolationPoints[3].x - _bufferPosition;
-                    if (lastX >= 0) {
-                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
-                        double linearInterpolation =
-                                (_interpolationPoints[3].y * (total)) + (_sourceBuffer[_bufferPosition + 1] * (1 - total));
-                        result = linearInterpolation;
-                    } else {
-                        result = _sourceBuffer[_bufferPosition];
-                    }
-
-                }
+                result = _sourceBuffer[_bufferPosition];
             } else {
-                double interpolation = interpolate(_interpolationPoints, pos, 4);
+                double interpolation = interpolate(_interpolationPoints, pos-2.0, 4);
                 result = interpolation;
+                //Serial.printf("[%f, %f]\n", pos-2.0, interpolation);
             }
         } else {
-            //Serial.printf("[%i, %f]\n", samplePosition, result);
             _interpolationPoints[0] = _interpolationPoints[1];
             _interpolationPoints[1] = _interpolationPoints[2];
             _interpolationPoints[2] = _interpolationPoints[3];
@@ -100,6 +89,9 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             _interpolationPoints[3].x = pos;
             if (_numInterpolationPoints < 4)
                 _numInterpolationPoints++;
+
+            result = _interpolationPoints[1].y;
+            //Serial.printf("[%f, %f]\n", _interpolationPoints[1].x, _interpolationPoints[1].y);
         }
 
     }
