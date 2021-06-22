@@ -78,7 +78,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             } else {
                 double interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
                 result = interpolation;
-                //Serial.printf("[%f, %f]\n", 1.0 + _remainder, interpolation);
+                //Serial.printf("[%f]\n", interpolation);
             }
         } else {
             _interpolationPoints[0].y = _interpolationPoints[1].y;
@@ -89,7 +89,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
                 _numInterpolationPoints++;
 
             result = _interpolationPoints[1].y;
-            //Serial.printf("[%f, %f]\n", _interpolationPoints[1].x, _interpolationPoints[1].y);
+            //Serial.printf("%f\n", result);
         }
     }
 
@@ -134,18 +134,19 @@ bool ResamplingArrayReader::play()
 }
 
 void ResamplingArrayReader::reset(){
+    _numInterpolationPoints = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _bufferPosition = 0;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _bufferPosition = _file_size;
+        _bufferPosition = _file_size - 1;
     }
 }
 
 void ResamplingArrayReader::stop()
 {
-    if (_playing) {
+    if (_playing) {   
         _playing = false;
     }
 }
