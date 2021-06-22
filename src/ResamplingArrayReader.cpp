@@ -72,28 +72,25 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
     double result = _sourceBuffer[_bufferPosition];
     if (_enable_interpolation) {
-        double pos =  _remainder + _bufferPosition;
-        if (_remainder > 0.01f) {
+        if (-0.01 > _remainder > 0.01) {
             if (_numInterpolationPoints < 4) {
                 result = _sourceBuffer[_bufferPosition];
             } else {
-                double interpolation = interpolate(_interpolationPoints, pos-2.0, 4);
+                double interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
                 result = interpolation;
-                //Serial.printf("[%f, %f]\n", pos-2.0, interpolation);
+                //Serial.printf("[%f, %f]\n", 1.0 + _remainder, interpolation);
             }
         } else {
-            _interpolationPoints[0] = _interpolationPoints[1];
-            _interpolationPoints[1] = _interpolationPoints[2];
-            _interpolationPoints[2] = _interpolationPoints[3];
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = _interpolationPoints[2].y;
+            _interpolationPoints[2].y = _interpolationPoints[3].y;
             _interpolationPoints[3].y = result;
-            _interpolationPoints[3].x = pos;
             if (_numInterpolationPoints < 4)
                 _numInterpolationPoints++;
 
             result = _interpolationPoints[1].y;
             //Serial.printf("[%f, %f]\n", _interpolationPoints[1].x, _interpolationPoints[1].y);
         }
-
     }
 
     _remainder += _playbackRate;

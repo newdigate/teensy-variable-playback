@@ -9,6 +9,14 @@
 class ResamplingArrayReader {
 public:
     ResamplingArrayReader() {
+        _interpolationPoints[0].y = 0.0;
+        _interpolationPoints[0].x = 0.0;
+        _interpolationPoints[1].y = 0.0;
+        _interpolationPoints[1].x = 1.0;
+        _interpolationPoints[2].y = 0.0;
+        _interpolationPoints[2].x = 2.0;
+        _interpolationPoints[3].y = 0.0;
+        _interpolationPoints[3].x = 3.0;
     }
 
     void begin(void);
@@ -72,7 +80,7 @@ private:
 
     bool _enable_interpolation = false;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData _interpolationPoints[4] = { IntepolationData(),IntepolationData(),IntepolationData(),IntepolationData() };
+    IntepolationData _interpolationPoints[4];
 };
 
 
