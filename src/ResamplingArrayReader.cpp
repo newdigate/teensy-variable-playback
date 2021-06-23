@@ -91,7 +91,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             else if (_playbackRate < 0) {
                 if (_remainder - _playbackRate > 0.0){
                     // we crossed over a whole number, make sure we update the samples for interpolation
-                    
+
                     if (_playbackRate < -1.0) {
                         // need to update last sample
                         _interpolationPoints[1].y = _sourceBuffer[_bufferPosition+1];
@@ -121,10 +121,44 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
     else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
         double abs_remainder = abs(_remainder);
         if (abs_remainder > 0.0) {
-            if (_numInterpolationPoints < 4) {
-                result = _sourceBuffer[_bufferPosition];
-            } else {
-                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+            
+            if (_playbackRate > 0) {                
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    int playBackRateWholeNumber = _playbackRate + 1;
+                    if (playBackRateWholeNumber > 4) 
+                        playBackRateWholeNumber = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    for (int i=0; i < playBackRateWholeNumber; i++) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        _interpolationPoints[3].y =  _sourceBuffer[_bufferPosition-i];
+                        if (_numInterpolationPoints < 4)
+                            _numInterpolationPoints++;
+                        }
+                    }
+            } else if (_playbackRate < 0) {                
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    int playBackRateWholeNumber = -_playbackRate + 1;
+                    if (playBackRateWholeNumber > 4) 
+                        playBackRateWholeNumber = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    for (int i=0; i < playBackRateWholeNumber; i++) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        _interpolationPoints[3].y =  _sourceBuffer[_bufferPosition+i];
+                        if (_numInterpolationPoints < 4)
+                            _numInterpolationPoints++;
+                        }
+                    }
+            }
+            
+            if (_numInterpolationPoints >= 4) {
+                int abs_playBackRateWholeNumber = abs(_playbackRate) + 1;
+                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder/double(abs_playBackRateWholeNumber), 4);
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             }
