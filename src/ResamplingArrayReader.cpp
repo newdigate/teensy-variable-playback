@@ -56,14 +56,11 @@ unsigned int ResamplingArrayReader::read(void *buf, uint16_t nbyte) {
 
 bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
-    if (_playbackRate > 0 ) {
+    if (_playbackRate >= 0 ) {
         //forward playback
-        if (_bufferPosition >= _file_size) {
+        if (_bufferPosition >=  _loop_finish )
+            return false;
 
-            if (_bufferPosition >=  _loop_finish )
-                return false;
-
-        }
     } else if (_playbackRate < 0) {
         // reverse playback    
         if (_bufferPosition < 0)
@@ -72,11 +69,43 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
 
     int16_t result = _sourceBuffer[_bufferPosition];
     if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
-        if (abs(_remainder) > 0.0) {
-            if (_numInterpolationPoints < 2) {
-                result = _sourceBuffer[_bufferPosition];
-            } else {
-                    result = abs(_remainder) * _interpolationPoints[1].y + (1.0 - abs(_remainder)) * _interpolationPoints[0].y;
+
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
+
+            if (_playbackRate > 0) {
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    if (_playbackRate > 1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _sourceBuffer[_bufferPosition-1];
+                    }
+
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
+                }
+            } 
+            else if (_playbackRate < 0) {
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+                    
+                    if (_playbackRate < -1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _sourceBuffer[_bufferPosition+1];
+                    }
+
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
+                }
+            }
+
+            if (_numInterpolationPoints > 1) {
+                result = abs_remainder * _interpolationPoints[1].y + (1.0 - abs_remainder) * _interpolationPoints[0].y;
                 //Serial.printf("[%f]\n", interpolation);
             }
         } else {
@@ -90,11 +119,12 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
         }
     } 
     else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
-        if (-0.01 > _remainder > 0.01) {
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
             if (_numInterpolationPoints < 4) {
                 result = _sourceBuffer[_bufferPosition];
             } else {
-                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
+                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             }
