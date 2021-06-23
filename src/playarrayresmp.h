@@ -38,7 +38,7 @@ public:
 
     void enableInterpolation(bool enable) {
         if (enable)
-            arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
+            arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
         else 
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
