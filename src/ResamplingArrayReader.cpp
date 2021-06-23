@@ -70,13 +70,31 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             return false;
     }
 
-    double result = _sourceBuffer[_bufferPosition];
-    if (_enable_interpolation) {
+    int16_t result = _sourceBuffer[_bufferPosition];
+    if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
+        if (abs(_remainder) > 0.0) {
+            if (_numInterpolationPoints < 2) {
+                result = _sourceBuffer[_bufferPosition];
+            } else {
+                    result = abs(_remainder) * _interpolationPoints[1].y + (1.0 - abs(_remainder)) * _interpolationPoints[0].y;
+                //Serial.printf("[%f]\n", interpolation);
+            }
+        } else {
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = result;
+            if (_numInterpolationPoints < 2)
+                _numInterpolationPoints++;
+
+            result =_interpolationPoints[0].y;
+            //Serial.printf("%f\n", result);
+        }
+    } 
+    else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
         if (-0.01 > _remainder > 0.01) {
             if (_numInterpolationPoints < 4) {
                 result = _sourceBuffer[_bufferPosition];
             } else {
-                double interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
+                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs(_remainder), 4);
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             }
@@ -99,7 +117,7 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
     _remainder -= static_cast<double>(delta);
 
     _bufferPosition +=  delta;
-    *value = round(result);
+    *value = result;
     return true;
 }
 

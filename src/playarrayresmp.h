@@ -37,7 +37,10 @@ public:
     }
 
     void enableInterpolation(bool enable) {
-        arrayReader.enableInterpolation(enable);
+        if (enable)
+            arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
+        else 
+            arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
 
 private:

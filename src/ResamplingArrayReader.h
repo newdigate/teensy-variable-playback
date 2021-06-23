@@ -62,8 +62,8 @@ public:
         _loop_finish = loop_finish;
     }
 
-    void enableInterpolation(bool enabled) {
-        _enable_interpolation = enabled;
+    void setInterpolationType(ResampleInterpolationType interpolationType) {
+        _interpolationType = interpolationType;
     }
 private:
     volatile bool _playing = false;
@@ -78,7 +78,7 @@ private:
 
     int16_t *_sourceBuffer;
 
-    bool _enable_interpolation = false;
+    ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
     IntepolationData _interpolationPoints[4];
 };
