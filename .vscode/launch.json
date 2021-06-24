@@ -28,6 +28,17 @@
             "externalConsole": false,
             "MIMode": "lldb"
         },
-    ]
-    ]
+        {
+            "name": "(lldb) Launch save_raw_sd",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/save_raw_sd/save_raw_sd",
+            "args": ["/Users/nicholasnewdigate/Desktop"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+    ] 
 }

@@ -89,40 +89,113 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
     }
 
     int samplePosition = _bufferPosition/2;
-    double result = _buffer[samplePosition];
+    int16_t result = _buffer[samplePosition];
     //Serial.printf("r: %d,", result);
 
-    if (_enable_interpolation) {
-        double pos =  _remainder + samplePosition;
-        if (_remainder > 0.01f) {
-            if (_numInterpolationPoints < 4) {
-                if (_numInterpolationPoints > 0) {
-                    double lastX = _interpolationPoints[3].x - samplePosition;
-                    if (lastX >= 0) {
-                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
-                        double linearInterpolation =
-                                (_interpolationPoints[3].y * (total)) + (_buffer[samplePosition + 1] * (1 - total));
-                        result = linearInterpolation;
-                    } else {
-                        result = _buffer[samplePosition];
+    if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
+
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
+
+            if (_playbackRate > 0) {
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    if (_playbackRate > 1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _buffer[samplePosition-1];
                     }
 
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
                 }
-            } else {
-                double interpolation = interpolate(_interpolationPoints, pos, 4);
-                result = interpolation;
+            } 
+            else if (_playbackRate < 0) {
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    if (_playbackRate < -1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _buffer[samplePosition+1];
+                    }
+
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
+                }
+            }
+
+            if (_numInterpolationPoints > 1) {
+                result = abs_remainder * _interpolationPoints[1].y + (1.0 - abs_remainder) * _interpolationPoints[0].y;
+                //Serial.printf("[%f]\n", interpolation);
             }
         } else {
-            //Serial.printf("[%i, %f]\n", samplePosition, result);
-            _interpolationPoints[0] = _interpolationPoints[1];
-            _interpolationPoints[1] = _interpolationPoints[2];
-            _interpolationPoints[2] = _interpolationPoints[3];
-            _interpolationPoints[3].y = result;
-            _interpolationPoints[3].x = pos;
-            if (_numInterpolationPoints < 4)
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = result;
+            if (_numInterpolationPoints < 2)
                 _numInterpolationPoints++;
-        }
 
+            result =_interpolationPoints[0].y;
+            //Serial.printf("%f\n", result);
+        }
+    } 
+    else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
+            if (_playbackRate > 0) {                
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+                    int numberOfSamplesToUpdate = - ceil(_remainder - _playbackRate);
+                    if (numberOfSamplesToUpdate > 4) 
+                        numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    if (numberOfSamplesToUpdate + samplePosition >= _bufferLength/2 - 1)
+                        numberOfSamplesToUpdate =_bufferLength/2 - samplePosition - 1;
+                    for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
+                        if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                    }
+                }
+            } 
+            else if (_playbackRate < 0) {                
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+                    int numberOfSamplesToUpdate =  ceil(_remainder - _playbackRate);
+                    if (numberOfSamplesToUpdate > 4) 
+                        numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        _interpolationPoints[3].y =  _buffer[samplePosition+i-1];
+                        if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                    }
+                }
+            }
+            
+            if (_numInterpolationPoints >= 4) {
+                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+                result = interpolation;
+                //Serial.printf("[%f]\n", interpolation);
+            } else 
+                result = 0;
+        } else {
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = _interpolationPoints[2].y;
+            _interpolationPoints[2].y = _interpolationPoints[3].y;
+            _interpolationPoints[3].y = result;
+            if (_numInterpolationPoints < 4) {
+                _numInterpolationPoints++;
+                result = 0;
+            } else 
+                result = _interpolationPoints[1].y;
+            //Serial.printf("%f\n", result);
+        }
     }
 
     _remainder += _playbackRate;
@@ -130,7 +203,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
     _remainder -= static_cast<double>(delta);
     _bufferPosition += 2 * delta;
 
-    *value = round(result);
+    *value = result;
     return true;
 }
 
@@ -196,6 +269,7 @@ bool ResamplingSdReader::play()
 
 void ResamplingSdReader::reset(){
     _bufferLength = 0;
+    _numInterpolationPoints = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _file_offset = _header_size;

@@ -17,6 +17,14 @@
 class ResamplingSdReader {
 public:
     ResamplingSdReader() {
+        _interpolationPoints[0].y = 0.0;
+        _interpolationPoints[0].x = 0.0;
+        _interpolationPoints[1].y = 0.0;
+        _interpolationPoints[1].x = 1.0;
+        _interpolationPoints[2].y = 0.0;
+        _interpolationPoints[2].x = 2.0;
+        _interpolationPoints[3].y = 0.0;
+        _interpolationPoints[3].x = 3.0;
     }
 
     void begin(void);
@@ -66,8 +74,8 @@ public:
         _loop_finish = loop_finish;
     }
 
-    void enableInterpolation(bool enabled) {
-        _enable_interpolation = enabled;
+    void setInterpolationType(ResampleInterpolationType interpolationType) {
+        _interpolationType = interpolationType;
     }
 
 private:
@@ -90,7 +98,7 @@ private:
 
     File _file;
 
-    bool _enable_interpolation = false;
+    ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
     IntepolationData _interpolationPoints[4] = { IntepolationData(),IntepolationData(),IntepolationData(),IntepolationData() };
 
