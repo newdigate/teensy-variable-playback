@@ -184,21 +184,21 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                         if (currBuffPos < 0) {
                             if (_numBuffers > 0) {
                                 int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
+                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + currBuffPos;
                                 _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
-                                //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], samplePosition-i+1, _bufferPosition);
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, prevBufferOffset + prevSamplePos, _bufferPosition);
                             }
                         } else 
                         if (currBuffPos >= (_bufferLength / 2) ) {
                             if (_numBuffers > 1) {
                                 int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int nextSamplePos = (samplePosition-i+1-currentBufferOffset) % (_bufferLength / 2);
-                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + (nextSamplePos)];
-                                //Serial.printf("---[%i] %i: %i\n",  _buffer[samplePosition-i+1], samplePosition-i+1, _bufferPosition);
+                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
+                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
                             }
                         } else {
                             _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
-                            //Serial.printf("---[%i] %i: %i\n",  _buffer[samplePosition-i+1], samplePosition-i+1, _bufferPosition);
+                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition-i+1, _bufferPosition);
                         }
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
@@ -210,11 +210,32 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                     int numberOfSamplesToUpdate =  ceil(_remainder - _playbackRate);
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
                         _interpolationPoints[0].y = _interpolationPoints[1].y;
                         _interpolationPoints[1].y = _interpolationPoints[2].y;
                         _interpolationPoints[2].y = _interpolationPoints[3].y;
-                        _interpolationPoints[3].y =  _buffer[samplePosition+i-1];
+                        long currBuffPos = samplePosition + i -1 - currentBufferOffset;
+                        if (currBuffPos < 0) {
+                            if (_numBuffers > 0) {
+                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
+                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], prevBufferOffset + prevSamplePos, _bufferPosition);
+                            }
+                        } else 
+                        if (currBuffPos >= (_bufferLength / 2) ) {
+                            if (_numBuffers >= 1) {
+                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
+                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
+                            }
+                        }
+                        else {
+                            _interpolationPoints[3].y =  _buffer[samplePosition+i-1];
+                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition+i-1, _bufferPosition);
+                        }
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
