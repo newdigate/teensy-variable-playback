@@ -172,16 +172,34 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
             if (_playbackRate > 0) {                
                 if (_remainder - _playbackRate < 0.0){
                     // we crossed over a whole number, make sure we update the samples for interpolation
-                    int numberOfSamplesToUpdate = - ceil(_remainder - _playbackRate);
+                    int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
-                    if (numberOfSamplesToUpdate + samplePosition >= _bufferLength/2 - 1)
-                        numberOfSamplesToUpdate =_bufferLength/2 - samplePosition - 1;
+                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
                         _interpolationPoints[0].y = _interpolationPoints[1].y;
                         _interpolationPoints[1].y = _interpolationPoints[2].y;
                         _interpolationPoints[2].y = _interpolationPoints[3].y;
-                        _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
+                        long currBuffPos = samplePosition - i + 1 - currentBufferOffset;
+                        if (currBuffPos < 0) {
+                            if (_numBuffers > 0) {
+                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
+                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], samplePosition-i+1, _bufferPosition);
+                            }
+                        } else 
+                        if (currBuffPos >= (_bufferLength / 2) ) {
+                            if (_numBuffers > 1) {
+                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int nextSamplePos = (samplePosition-i+1-currentBufferOffset) % (_bufferLength / 2);
+                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + (nextSamplePos)];
+                                //Serial.printf("---[%i] %i: %i\n",  _buffer[samplePosition-i+1], samplePosition-i+1, _bufferPosition);
+                            }
+                        } else {
+                            _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
+                            //Serial.printf("---[%i] %i: %i\n",  _buffer[samplePosition-i+1], samplePosition-i+1, _bufferPosition);
+                        }
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
@@ -295,6 +313,9 @@ void ResamplingSdReader::reset(){
     _bufferLength = 0;
     _numBuffers = 0;
     _numInterpolationPoints = 0;
+    _noMoreBuffersToRead = false;
+    _last_read_offset = 0;
+    _remainder = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _file_offset = _header_size;
@@ -305,9 +326,7 @@ void ResamplingSdReader::reset(){
         else
             _file_offset = _header_size;
     }
-    __disable_irq();
     _file.seek(_file_offset);
-    __enable_irq();
     //_playing = true;
 }
 
