@@ -99,7 +99,6 @@ private:
     unsigned int _currentBuffer = 0;
     bool _noMoreBuffersToRead = false;
     unsigned int _nextBufferLength = 0;
-
     File _file;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;

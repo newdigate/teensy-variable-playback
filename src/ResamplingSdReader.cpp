@@ -88,14 +88,27 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         }
     } else if (_playbackRate < 0) {
         // reverse playback    
-        if (_last_read_offset < _header_size)
+        if (_last_read_offset < _header_size && _numBuffers==1)
         {  
             if (_bufferPosition < 0)
                 return false;
         }
+
+        if (_numBuffers < 2 // only if we need another buffer
+            && _file_offset < _file_size // don't try to load past the end of the file
+            && _bufferPosition < _bufferLength/2) {
+            // double buffered: we've reached halfway through the current buffer, load the next buffer 
+            updateBuffers();
+        }
+
         if (_bufferPosition < 0) {
-            if (!updateBuffers()) 
+            if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size < 0)
                 return false;
+
+            _currentBuffer = (_currentBuffer + 1) % 2;
+            _bufferLength = _nextBufferLength;
+            _bufferPosition = (_nextBufferLength + _bufferPosition); 
+            _numBuffers--;
         }
     }
 
@@ -280,6 +293,7 @@ bool ResamplingSdReader::play()
 
 void ResamplingSdReader::reset(){
     _bufferLength = 0;
+    _numBuffers = 0;
     _numInterpolationPoints = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
@@ -342,7 +356,9 @@ bool ResamplingSdReader::updateBuffers() {
             _file.seek(_file_offset);
             //__enable_irq();
         }
-        _bufferPosition = numberOfBytesToRead - 2;
+        if (_numBuffers == 0) {
+            _bufferPosition = numberOfBytesToRead - 2;
+        }
     } else 
     {
         int final_file_offset = _header_size + (_loop_finish * 2) - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2);
