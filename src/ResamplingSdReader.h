@@ -93,8 +93,12 @@ private:
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
 
-    int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE];
+    int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE * 2]; // two buffers
     unsigned int _bufferLength = 0;
+    unsigned int _numBuffers = 0;
+    unsigned int _currentBuffer = 0;
+    bool _noMoreBuffersToRead = false;
+    unsigned int _nextBufferLength = 0;
 
     File _file;
 
