@@ -11,14 +11,21 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * **Note**: Interpolation is working now, but disabled by default
 
 ## contents
-* [requirements](#requirements)
 * [code structure](#code-structure)
+* [requirements](#requirements)
 * [download](#download)
 * [teensy build](#teensy-build)
 * [linux build](#linux-build)
 * [visual studio code](#visual-studio-code)
 * [todo](#todo)
 * [example usage](#example-usage)
+
+## code structure
+| folder | target             | description                                                                                                            |
+|--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
+| ```examples```    | ```teensy/linux``` | basic example how to use  |
+| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
+| ```test```   | ```linux```          | unit tests that run on linux |
 
 ## requirements
 <details>
@@ -74,13 +81,7 @@ By using stub libraries, we can compile teensy code to native device architectur
 
 </details>  
   
-## code structure
-| folder | target             | description                                                                                                            |
-|--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| ```examples```    | ```teensy/linux``` | basic example how to use  |
-| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
-| ```test```   | ```linux```          | unit tests that run on linux |
-  
+
 ## download 
 ### clone repo
 ``` sh
