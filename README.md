@@ -25,7 +25,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
 | ```examples```    | ```teensy``` | basic example how to use  |
 | ```extras```    | ```linux``` | some utils to make life easier  |
-| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp``` <br/> * adds ```AudioPlaySdWavResmp``` <br/> * adds ```AudioPlayArrayResmp```   |
+| ```src```    | ```teensy``` / ```linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp``` <br/> * adds ```AudioPlaySdWavResmp``` <br/> * adds ```AudioPlayArrayResmp```   |
 | ```test```   | ```linux```          | unit tests that run on linux |
 
 ## requirements
