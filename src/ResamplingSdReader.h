@@ -12,7 +12,7 @@
 #include "interpolation.h"
 #include <list>
 
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 256
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
 class ResamplingSdReader {
 public:
