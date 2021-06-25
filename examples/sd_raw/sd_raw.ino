@@ -4,7 +4,7 @@
 #include <AudioStream.h>
 #include <Audio.h>
 #include "SD.h"
-#include "../../src/playsdrawresmp.h"
+#include "playsdrawresmp.h"
 
 // GUItool: begin automatically generated code
 AudioControlSGTL5000 audioShield;
