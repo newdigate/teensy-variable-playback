@@ -8,6 +8,9 @@
 
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
+* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
+  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+
 ## updates
 * 25/06/2021: Quadratic interpolation is now working, but is disabled by default
 
@@ -117,9 +120,6 @@ By using stub libraries, we can compile teensy code to native device architectur
 ```
 
 ## teensy build
-* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
-  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
-
 You don't need to download or install Teensyduino or Arduino to build the library or examples. Just clone the cores library and any dependencies to a common folder, denoted by ```DEPSPATH``` (in this case ```/home/nic/teensy_libraries```). 
 <details>
   <summary>clone dependencies (click to expand) </summary>
