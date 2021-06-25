@@ -67,7 +67,7 @@ graph G {
   
 ```cmake``` ```gcc or llvm``` ```teensy-x86-stubs```[^](https://github.com/newdigate/teensy-x86-stubs) ```teensy-audio-x86-stubs```[^](https://github.com/newdigate/teensy-audio-x86-stubs) ```teensy-x86-sd-stubs```[^](https://github.com/newdigate/teensy-x86-sd-stubs) ```boost-test``` 
 
-By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
+By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, emulated, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
   * install boost unit-test library: 
     * linux: ```sudo apt-get install -yq libboost-test-dev```
     * macos: ```brew install boost```
