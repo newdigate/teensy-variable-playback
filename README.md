@@ -8,38 +8,49 @@
 
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
-* **Note**: Interpolation is working now, but disabled by default
+* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
+  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+
+## updates
+* 25/06/2021: Quadratic interpolation is now working, but is disabled by default
 
 ## contents
 * [code structure](#code-structure)
 * [requirements](#requirements)
-* [download](#download)
-* [teensy build](#teensy-build)
-* [linux build](#linux-build)
-* [visual studio code](#visual-studio-code)
+* [usage](#usage)
 * [todo](#todo)
 * [example usage](#example-usage)
 
 ## code structure
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| ```examples```    | ```teensy/linux``` | basic example how to use  |
-| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp``` <br/> * adds ```AudioPlaySdWavResmp``` <br/> * adds ```AudioPlayArrayResmp```   |
+| ```examples```    | ```teensy``` | basic example how to use  |
+| ```extras```    | ```linux``` | some utils to make life easier  |
+| ```src```    | ```teensy``` / ```linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp``` <br/> * adds ```AudioPlaySdWavResmp``` <br/> * adds ```AudioPlayArrayResmp```   |
 | ```test```   | ```linux```          | unit tests that run on linux |
 
 ## requirements
 <details>
   <summary>teensy 3.x & 4.x boards</summary>
  
-#### with Teensyduino  
+  
+<details>
+  <summary>with Teensyduino</summary>  
+
 ```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
 * This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
 * Install using arduino/teensyduino library manager gui - search TeensyVariablePlayback (**CAUTION:** haven't tested this yet...)
 
-#### without Teensyduino  
-```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
-* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to varify that there are no compile errors. 
+</details>
+    
+  
+<details>
+  <summary>without Teensyduino (for development)</summary>  
 
+```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
+* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to verify there are no compile errors. 
+  
+  
 <details>
   <summary>dependencies (click to expand image) </summary>
   
@@ -65,7 +76,14 @@ graph G {
 ```
 </details>
   
+</details>  
+  
+  
+  
 </details>
+  
+  
+
   
 </details>
 
@@ -82,7 +100,19 @@ By using stub libraries, we can compile teensy code to native device architectur
 </details>  
   
 
-## download 
+## usage 
+<details>
+  <summary>Using with Teensyduino</summary>
+  
+* To install the library, use the library manager in Teensyduino (search for ```TeensyVariablePlayback```). Teensyduino should already have all the necessary libraries pre-installed. 
+* Have a look at the examples in the file menu to get started...
+</details>
+
+<details>
+  <summary>Developing with vscode</summary>
+
+  * [Visual Studio Code](https://code.visualstudio.com)
+  
 ### clone repo
 ``` sh
 > git clone https://github.com/newdigate/teensy-variable-playback.git
@@ -90,9 +120,6 @@ By using stub libraries, we can compile teensy code to native device architectur
 ```
 
 ## teensy build
-* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
-  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
-
 You don't need to download or install Teensyduino or Arduino to build the library or examples. Just clone the cores library and any dependencies to a common folder, denoted by ```DEPSPATH``` (in this case ```/home/nic/teensy_libraries```). 
 <details>
   <summary>clone dependencies (click to expand) </summary>
@@ -170,10 +197,11 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
   * (add breakpoint)
   * launch
 
+</details>
+  
 ## todo
 * stereo
-* interpolation is not currently working and is switched off by default... I'm working on it...
-
+  
 ## example usage
 
 <details>
