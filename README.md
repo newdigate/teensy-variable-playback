@@ -13,10 +13,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 ## contents
 * [code structure](#code-structure)
 * [requirements](#requirements)
-* [download](#download)
-* [teensy build](#teensy-build)
-* [linux build](#linux-build)
-* [visual studio code](#visual-studio-code)
+* [usage](#usage)
 * [todo](#todo)
 * [example usage](#example-usage)
 
@@ -32,15 +29,24 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 <details>
   <summary>teensy 3.x & 4.x boards</summary>
  
-#### with Teensyduino  
+  
+<details>
+  <summary>with Teensyduino</summary>  
+
 ```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
 * This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
 * Install using arduino/teensyduino library manager gui - search TeensyVariablePlayback (**CAUTION:** haven't tested this yet...)
 
-#### without Teensyduino  
-```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
-* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to varify that there are no compile errors. 
+</details>
+    
+  
+<details>
+  <summary>without Teensyduino (for development)</summary>  
 
+```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
+* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to verify there are no compile errors. 
+  
+  
 <details>
   <summary>dependencies (click to expand image) </summary>
   
@@ -66,7 +72,14 @@ graph G {
 ```
 </details>
   
+</details>  
+  
+  
+  
 </details>
+  
+  
+
   
 </details>
 
@@ -83,7 +96,19 @@ By using stub libraries, we can compile teensy code to native device architectur
 </details>  
   
 
-## download 
+## usage 
+<details>
+  <summary>Using with Teensyduino</summary>
+  
+* To install the library, use the library manager in Teensyduino (search for ```TeensyVariablePlayback```). Teensyduino should already have all the necessary libraries pre-installed. 
+* Have a look at the examples in the file menu to get started...
+</details>
+
+<details>
+  <summary>Developing with vscode</summary>
+
+  * [Visual Studio Code](https://code.visualstudio.com)
+  
 ### clone repo
 ``` sh
 > git clone https://github.com/newdigate/teensy-variable-playback.git
@@ -171,10 +196,11 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
   * (add breakpoint)
   * launch
 
+</details>
+  
 ## todo
 * stereo
-* interpolation is not currently working and is switched off by default... I'm working on it...
-
+  
 ## example usage
 
 <details>
