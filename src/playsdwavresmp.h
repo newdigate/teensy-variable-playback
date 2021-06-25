@@ -40,7 +40,10 @@ public:
     }
     
     void enableInterpolation(bool enable) {
-        sdReader.enableInterpolation(enable);
+        if (enable)
+            sdReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
+        else 
+            sdReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
 private:
     wav_header wave_header = wav_header();

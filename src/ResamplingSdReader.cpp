@@ -24,6 +24,8 @@ unsigned int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
                         _file_offset = _header_size + (_loop_finish * 2) - 512;
 
                     _bufferLength = 0;
+                    _bufferPosition = 0;
+                    _numBuffers = 0;
                     _file.seek(_file_offset);
                     break;
                 }
@@ -61,68 +63,204 @@ unsigned int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
 
 bool ResamplingSdReader::readNextValue(int16_t *value) {
 
-    if (_bufferLength == 0)
+    if (_numBuffers == 0)
         if (!updateBuffers()) 
             return false;
 
     if (_playbackRate > 0 ) {
         //forward playback
+        
+        if (_numBuffers < 2 // only if we need another buffer
+            && _file_offset < _file_size // don't try to load past the end of the file
+            && _bufferPosition > _bufferLength/2) {
+            // double buffered: we've reached halfway through the current buffer, load the next buffer 
+            updateBuffers();
+        }
+
         if (_bufferPosition >= _bufferLength) {
-
-            if (_last_read_offset + _bufferPosition >= _header_size + (_loop_finish * 2))
+            if (_numBuffers <= 1 && _noMoreBuffersToRead && _nextBufferLength == 0)
+                return false;
+            if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size >= _file_size)
                 return false;
 
-            if (!updateBuffers()) 
-                return false;
+            _currentBuffer = (_currentBuffer + 1) % 2;
+            _bufferLength = _nextBufferLength;
+            _bufferPosition = _bufferPosition % RESAMPLE_BUFFER_SAMPLE_SIZE; 
+            _numBuffers--;
         }
     } else if (_playbackRate < 0) {
         // reverse playback    
-        if (_last_read_offset < _header_size)
+        if (_last_read_offset < _header_size && _numBuffers==1)
         {  
             if (_bufferPosition < 0)
                 return false;
         }
+
+        if (_numBuffers < 2 // only if we need another buffer
+            && _file_offset < _file_size // don't try to load past the end of the file
+            && _bufferPosition < _bufferLength/2) {
+            // double buffered: we've reached halfway through the current buffer, load the next buffer 
+            updateBuffers();
+        }
+
         if (_bufferPosition < 0) {
-            if (!updateBuffers()) 
+            if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size < 0)
                 return false;
+
+            _currentBuffer = (_currentBuffer + 1) % 2;
+            _bufferLength = _nextBufferLength;
+            _bufferPosition = (_nextBufferLength + _bufferPosition); 
+            _numBuffers--;
         }
     }
 
-    int samplePosition = _bufferPosition/2;
-    double result = _buffer[samplePosition];
+    int samplePosition = (_bufferPosition/2) + (_currentBuffer * RESAMPLE_BUFFER_SAMPLE_SIZE);
+    int16_t result = _buffer[samplePosition];
     //Serial.printf("r: %d,", result);
 
-    if (_enable_interpolation) {
-        double pos =  _remainder + samplePosition;
-        if (_remainder > 0.01f) {
-            if (_numInterpolationPoints < 4) {
-                if (_numInterpolationPoints > 0) {
-                    double lastX = _interpolationPoints[3].x - samplePosition;
-                    if (lastX >= 0) {
-                        double total = 1.0 - ((_remainder - lastX) / (1.0 - lastX));
-                        double linearInterpolation =
-                                (_interpolationPoints[3].y * (total)) + (_buffer[samplePosition + 1] * (1 - total));
-                        result = linearInterpolation;
-                    } else {
-                        result = _buffer[samplePosition];
+    if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
+
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
+
+            if (_playbackRate > 0) {
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    if (_playbackRate > 1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _buffer[samplePosition-1];
                     }
 
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
                 }
-            } else {
-                double interpolation = interpolate(_interpolationPoints, pos, 4);
-                result = interpolation;
+            } 
+            else if (_playbackRate < 0) {
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+
+                    if (_playbackRate < -1.0) {
+                        // need to update last sample
+                        _interpolationPoints[1].y = _buffer[samplePosition+1];
+                    }
+
+                    _interpolationPoints[0].y = _interpolationPoints[1].y;
+                    _interpolationPoints[1].y = result;
+                    if (_numInterpolationPoints < 2)
+                        _numInterpolationPoints++;
+                }
+            }
+
+            if (_numInterpolationPoints > 1) {
+                result = abs_remainder * _interpolationPoints[1].y + (1.0 - abs_remainder) * _interpolationPoints[0].y;
+                //Serial.printf("[%f]\n", interpolation);
             }
         } else {
-            //Serial.printf("[%i, %f]\n", samplePosition, result);
-            _interpolationPoints[0] = _interpolationPoints[1];
-            _interpolationPoints[1] = _interpolationPoints[2];
-            _interpolationPoints[2] = _interpolationPoints[3];
-            _interpolationPoints[3].y = result;
-            _interpolationPoints[3].x = pos;
-            if (_numInterpolationPoints < 4)
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = result;
+            if (_numInterpolationPoints < 2)
                 _numInterpolationPoints++;
-        }
 
+            result =_interpolationPoints[0].y;
+            //Serial.printf("%f\n", result);
+        }
+    } 
+    else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
+        double abs_remainder = abs(_remainder);
+        if (abs_remainder > 0.0) {
+            if (_playbackRate > 0) {                
+                if (_remainder - _playbackRate < 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+                    int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
+                    if (numberOfSamplesToUpdate > 4) 
+                        numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
+                    for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        long currBuffPos = samplePosition - i + 1 - currentBufferOffset;
+                        if (currBuffPos < 0) {
+                            if (_numBuffers > 0) {
+                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + currBuffPos;
+                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, prevBufferOffset + prevSamplePos, _bufferPosition);
+                            }
+                        } else 
+                        if (currBuffPos >= (_bufferLength / 2) ) {
+                            if (_numBuffers > 1) {
+                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
+                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
+                            }
+                        } else {
+                            _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
+                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition-i+1, _bufferPosition);
+                        }
+                        if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                    }
+                }
+            } 
+            else if (_playbackRate < 0) {                
+                if (_remainder - _playbackRate > 0.0){
+                    // we crossed over a whole number, make sure we update the samples for interpolation
+                    int numberOfSamplesToUpdate =  ceil(_remainder - _playbackRate);
+                    if (numberOfSamplesToUpdate > 4) 
+                        numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
+                    for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+                        _interpolationPoints[0].y = _interpolationPoints[1].y;
+                        _interpolationPoints[1].y = _interpolationPoints[2].y;
+                        _interpolationPoints[2].y = _interpolationPoints[3].y;
+                        long currBuffPos = samplePosition + i -1 - currentBufferOffset;
+                        if (currBuffPos < 0) {
+                            if (_numBuffers > 0) {
+                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
+                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], prevBufferOffset + prevSamplePos, _bufferPosition);
+                            }
+                        } else 
+                        if (currBuffPos >= (_bufferLength / 2) ) {
+                            if (_numBuffers >= 1) {
+                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
+                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
+                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
+                            }
+                        }
+                        else {
+                            _interpolationPoints[3].y =  _buffer[samplePosition+i-1];
+                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition+i-1, _bufferPosition);
+                        }
+                        if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                    }
+                }
+            }
+            
+            if (_numInterpolationPoints >= 4) {
+                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+                result = interpolation;
+                //Serial.printf("[%f]\n", interpolation);
+            } else 
+                result = 0;
+        } else {
+            _interpolationPoints[0].y = _interpolationPoints[1].y;
+            _interpolationPoints[1].y = _interpolationPoints[2].y;
+            _interpolationPoints[2].y = _interpolationPoints[3].y;
+            _interpolationPoints[3].y = result;
+            if (_numInterpolationPoints < 4) {
+                _numInterpolationPoints++;
+                result = 0;
+            } else 
+                result = _interpolationPoints[1].y;
+            //Serial.printf("%f\n", result);
+        }
     }
 
     _remainder += _playbackRate;
@@ -130,7 +268,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
     _remainder -= static_cast<double>(delta);
     _bufferPosition += 2 * delta;
 
-    *value = round(result);
+    *value = result;
     return true;
 }
 
@@ -196,6 +334,11 @@ bool ResamplingSdReader::play()
 
 void ResamplingSdReader::reset(){
     _bufferLength = 0;
+    _numBuffers = 0;
+    _numInterpolationPoints = 0;
+    _noMoreBuffersToRead = false;
+    _last_read_offset = 0;
+    _remainder = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
         _file_offset = _header_size;
@@ -206,9 +349,7 @@ void ResamplingSdReader::reset(){
         else
             _file_offset = _header_size;
     }
-    __disable_irq();
     _file.seek(_file_offset);
-    __enable_irq();
     //_playing = true;
 }
 
@@ -237,6 +378,8 @@ bool ResamplingSdReader::updateBuffers() {
     //printf("begin: file_offset: %d\n", _file_offset);
     if (!_file) return false;
 
+    if (_numBuffers > 1) return true; // we've already got enough buffers ?
+
     bool forward = (_playbackRate >= 0.0);
 
     uint16_t numberOfBytesToRead = RESAMPLE_BUFFER_SAMPLE_SIZE * 2;
@@ -255,25 +398,44 @@ bool ResamplingSdReader::updateBuffers() {
             _file.seek(_file_offset);
             //__enable_irq();
         }
-        _bufferPosition = numberOfBytesToRead - 2;
+        if (_numBuffers == 0) {
+            _bufferPosition = numberOfBytesToRead - 2;
+        }
     } else 
     {
         int final_file_offset = _header_size + (_loop_finish * 2) - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2);
         if (_file_offset > final_file_offset) {
             numberOfBytesToRead = _header_size + (_loop_finish * 2) - _file_offset;
         }
-        _bufferPosition = 0;
+        if (_numBuffers == 0)
+            _bufferPosition = 0;
     }
     if (numberOfBytesToRead == 0) return false;
+
+    unsigned int bufferOffset = 0;
+    if (_numBuffers == 1){
+        bufferOffset = (_currentBuffer == 0)? RESAMPLE_BUFFER_SAMPLE_SIZE : 0;
+    }
 
     //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
     _last_read_offset = _file_offset;
     //__disable_irq();
-    int numRead = _file.read(_buffer, numberOfBytesToRead);
-    if (numRead == 0) return false;
+    int numRead = _file.read(_buffer + bufferOffset, numberOfBytesToRead);
+    if (numRead == 0) {
+        _noMoreBuffersToRead = true;
+        return false;
+    }
+
+    if (numRead < RESAMPLE_BUFFER_SAMPLE_SIZE * 2)
+        _noMoreBuffersToRead = true;        
     //__enable_irq();
-    _bufferLength = numRead;
+    if (_numBuffers == 0)
+        _bufferLength = numRead;
+    else
+        _nextBufferLength = numRead;
     //Serial.printf("read %d bytes\n", numRead);
+
+    _numBuffers++;
 
     if (_playbackRate < 0) {
         _file_offset -= numRead;     
