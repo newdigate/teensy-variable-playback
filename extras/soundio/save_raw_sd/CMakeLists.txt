@@ -15,15 +15,10 @@ find_package(teensy_audio_x86_stubs_soundio)
 include_directories(${teensy_audio_x86_stubs_soundio_INCLUDE_DIR})
 
 include_directories(../../../src)
-
-add_executable(save_raw_sd
-        save_raw_sd.cpp
-        ../../../src/playsdrawresmp.cpp
-        ../../../src/interpolation.cpp
-        ../../../src/ResamplingSdReader.cpp
-)
-
 include_directories(/usr/local/include) #soundio
+
+add_executable(save_raw_sd save_raw_sd.cpp)
+target_link_libraries(save_raw_sd teensy_variable_playback)
 
 if(WIN32)
 elseif(UNIX AND NOT APPLE)
