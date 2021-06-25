@@ -8,7 +8,8 @@
 
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
-* **Note**: Interpolation is working now, but disabled by default
+## updates
+* 25/06/2021: Quadratic interpolation is now working, but is disabled by default
 
 ## contents
 * [code structure](#code-structure)
