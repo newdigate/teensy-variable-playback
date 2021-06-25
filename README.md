@@ -8,11 +8,11 @@
 
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
-* **Note: Interpolation is not currently working** - enabling it will make lots of noise!!! Please bare with me - I'm working on it.... 
+* **Note**: Interpolation is working now, but disabled by default
 
 ## contents
-* [requirements](#requirements)
 * [code structure](#code-structure)
+* [requirements](#requirements)
 * [download](#download)
 * [teensy build](#teensy-build)
 * [linux build](#linux-build)
@@ -20,13 +20,21 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * [todo](#todo)
 * [example usage](#example-usage)
 
+## code structure
+| folder | target             | description                                                                                                            |
+|--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
+| ```examples```    | ```teensy/linux``` | basic example how to use  |
+| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp``` <br/> * adds ```AudioPlaySdWavResmp``` <br/> * adds ```AudioPlayArrayResmp```   |
+| ```test```   | ```linux```          | unit tests that run on linux |
+
 ## requirements
 <details>
   <summary>teensy 3.x & 4.x boards</summary>
  
 #### with Teensyduino  
 ```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
-* This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.  
+* This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
+* Install using arduino/teensyduino library manager gui - search TeensyVariablePlayback (**CAUTION:** haven't tested this yet...)
 
 #### without Teensyduino  
 ```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
@@ -66,20 +74,14 @@ graph G {
   
 ```cmake``` ```gcc or llvm``` ```teensy-x86-stubs```[^](https://github.com/newdigate/teensy-x86-stubs) ```teensy-audio-x86-stubs```[^](https://github.com/newdigate/teensy-audio-x86-stubs) ```teensy-x86-sd-stubs```[^](https://github.com/newdigate/teensy-x86-sd-stubs) ```boost-test``` 
 
-By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
+By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, emulated, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
   * install boost unit-test library: 
     * linux: ```sudo apt-get install -yq libboost-test-dev```
     * macos: ```brew install boost```
 
 </details>  
   
-## code structure
-| folder | target             | description                                                                                                            |
-|--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
-| ```examples```    | ```teensy/linux``` | basic example how to use  |
-| ```src```    | ```teensy/linux``` | extends teensy audio library<br/> * adds ```AudioPlaySdRawResmp```<br/> * play raw audio at variable forward and backward playback rates     |
-| ```test```   | ```linux```          | unit tests that run on linux |
-  
+
 ## download 
 ### clone repo
 ``` sh
