@@ -20,9 +20,17 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * [todo](#todo)
 * [example usage](#example-usage)
 
-## requirements  
-### teensy   
+## requirements
+<details>
+  <summary>teensy 3.x & 4.x boards</summary>
+ 
+#### with Teensyduino  
+```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
+* This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.  
+
+#### without Teensyduino  
 ```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
+* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to varify that there are no compile errors. 
 
 <details>
   <summary>dependencies (click to expand image) </summary>
@@ -50,8 +58,12 @@ graph G {
 </details>
   
 </details>
+  
+</details>
 
-### linux 
+<details>
+  <summary>linux</summary>
+  
 ```cmake``` ```gcc or llvm``` ```teensy-x86-stubs```[^](https://github.com/newdigate/teensy-x86-stubs) ```teensy-audio-x86-stubs```[^](https://github.com/newdigate/teensy-audio-x86-stubs) ```teensy-x86-sd-stubs```[^](https://github.com/newdigate/teensy-x86-sd-stubs) ```boost-test``` 
 
 By using stub libraries, we can compile teensy code to native device architecture. To a certain extent, this allows sketches and libraries to be developed, debugged and unit-tested using linux, on your local device or a build server. In this case I have a few basic tests for the ResamplingSdReader class.
@@ -59,6 +71,8 @@ By using stub libraries, we can compile teensy code to native device architectur
     * linux: ```sudo apt-get install -yq libboost-test-dev```
     * macos: ```brew install boost```
 
+</details>  
+  
 ## code structure
 | folder | target             | description                                                                                                            |
 |--------|--------------------|------------------------------------------------------------------------------------------------------------------------|
