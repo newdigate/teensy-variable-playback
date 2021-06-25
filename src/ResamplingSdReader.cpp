@@ -24,6 +24,8 @@ unsigned int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
                         _file_offset = _header_size + (_loop_finish * 2) - 512;
 
                     _bufferLength = 0;
+                    _bufferPosition = 0;
+                    _numBuffers = 0;
                     _file.seek(_file_offset);
                     break;
                 }
@@ -76,8 +78,8 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         }
 
         if (_bufferPosition >= _bufferLength) {
-            //if ((_numBuffers <= 1 && _noMoreBuffersToRead) || (_numBuffers==1 && _nextBufferLength == 0))
-            //    return false;
+            if (_numBuffers <= 1 && _noMoreBuffersToRead && _nextBufferLength == 0)
+                return false;
             if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size >= _file_size)
                 return false;
 
