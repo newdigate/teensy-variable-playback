@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(array)
+project(sd_wav)
 set(CMAKE_CXX_STANDARD 14)
 include(../examples.cmake.in)
-teensy_add_executable(array array.ino)
+teensy_add_executable(sd_wav sd_wav.ino)
