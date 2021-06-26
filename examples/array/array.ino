@@ -2,7 +2,7 @@
 // this example plays a sample stored in an array
 #include <Arduino.h>
 #include <Audio.h>
-#include "playarrayresmp.h"
+#include <TeensyVariablePlayback.h>
 
 // GUItool: begin automatically generated code
 AudioPlayArrayResmp      rraw_a1;        //xy=321,513

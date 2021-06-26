@@ -18,7 +18,8 @@ set(HEADER_FILES
         waveheaderparser.h
         ResamplingArrayReader.h
         playarrayresmp.h
-        interpolation.h)
+        interpolation.h
+        TeensyVariablePlayback.h)
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 if (DEFINED BUILD_FOR_LINUX)

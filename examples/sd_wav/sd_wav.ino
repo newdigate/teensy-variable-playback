@@ -4,7 +4,7 @@
 #include <AudioStream.h>
 #include <Audio.h>
 #include "SD.h"
-#include "playsdwavresmp.h"
+#include <TeensyVariablePlayback.h>
 
 // GUItool: begin automatically generated code
 AudioControlSGTL5000     audioShield;
