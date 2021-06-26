@@ -8,7 +8,7 @@ set(DEPSPATH "/home/runner/work/teensy-variable-playback/teensy-variable-playbac
 #set(DEPSPATH "/Users/nicholasnewdigate/Development/github/newdigate/temp_dep")
 set(COREPATH "${DEPSPATH}/cores/teensy4/")
 
-find_package(teensy_cmake_macros)
+find_package(teensy_cmake_macros 1.0.1 REQUIRED)
 import_arduino_library(${DEPSPATH} SPI)
 import_arduino_library(${DEPSPATH} SdFat/src)
 import_arduino_library(${DEPSPATH} SdFat/src/common)

@@ -91,7 +91,7 @@ jobs:
       run: cd deps/teensy-cmake-macros && mkdir cmake-build-debug && cd cmake-build-debug && cmake -DCMAKE_BUILD_TYPE=Debug .. && sudo make install
 
     - name: build
-      run: cd examples/array && mkdir cmake-build-debug && cd cmake-build-debug && cmake .. -DCMAKE_TOOLCHAIN_FILE:FILEPATH="${{github.workspace}}/cmake/toolchains/teensy41.cmake" && make
+      run: mkdir cmake-build-debug && cd cmake-build-debug && cmake .. -DCMAKE_TOOLCHAIN_FILE:FILEPATH="${{github.workspace}}/cmake/toolchains/teensy41.cmake" && make array_hex
 
     - uses: actions/upload-artifact@v2
       with:

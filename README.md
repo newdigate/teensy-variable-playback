@@ -39,8 +39,8 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
 ```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
 * This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
-* Install using arduino/teensyduino library manager gui - search TeensyVariablePlayback (**CAUTION:** haven't tested this yet...)
-
+* Install using arduino/teensyduino library manager gui - search ```TeensyVariablePlayback```
+  * ![install using arduino library manager](docs/InstallArduino.gif)
 </details>
     
   
@@ -104,7 +104,8 @@ By using stub libraries, we can compile teensy code to native device architectur
 <details>
   <summary>Using with Teensyduino</summary>
   
-* To install the library, use the library manager in Teensyduino (search for ```TeensyVariablePlayback```). Teensyduino should already have all the necessary libraries pre-installed. 
+* To install the library, use the library manager in Teensyduino (search for ```TeensyVariablePlayback```). Teensyduino should already have all the necessary dependencies pre-installed. 
+
 * Have a look at the examples in the file menu to get started...
 </details>
 
@@ -210,7 +211,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 ```c++
 #include <Arduino.h>
 #include <Audio.h>
-#include "playarrayresmp.h"
+#include <TeensyVariablePlayback.h>
 
 // GUItool: begin automatically generated code
 AudioPlayArrayResmp      rraw_a1;        //xy=321,513
@@ -221,11 +222,13 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=521,588
 // GUItool: end automatically generated code
 
 unsigned char kick_raw[] = {
+  // ... little-endian 16-bit mono 44100 raw data
   0x99, 0x02, 0xd7, 0x02, 0xfa, 0x02, 0x5f, 0x03, 0xc1, 0x03, 0x2a, 0x04,
   0xad, 0x04, 0xa5, 0x05, 0x76, 0x06, 0x2f, 0x07, 0x9e, 0x07, 0xe2, 0x07,
   0x43, 0x08, 0x92, 0x08, 0xb2, 0x08, 0xe8, 0x08, 0x16, 0x09, 0xda, 0x08,
+  // ... continued ... 
 };
-unsigned int kick_raw_len = 6350;
+unsigned int kick_raw_len = 6350; // length in bytes == numsamples * 2
 
 void setup() {
     AudioMemory(20);
@@ -237,7 +240,7 @@ void setup() {
 void loop() {
     if (!rraw_a1.isPlaying()) {
         delay(1000);
-        rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
+        rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);  //note: we give number of samples - NOT number of bytes!!!!
     }
 }
 ```

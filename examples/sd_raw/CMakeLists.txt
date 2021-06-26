@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(sd_raw)
 set(CMAKE_CXX_STANDARD 14)
-include(../examples.cmake.in)
+teensy_include_directories(../../src)
 teensy_add_executable(sd_raw sd_raw.ino)
+teensy_target_link_libraries(sd_raw teensy_variable_playback)
