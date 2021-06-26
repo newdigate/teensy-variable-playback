@@ -19,12 +19,15 @@ AudioConnection          patchCord2(playSdWav1, 0, i2s2, 1);
 
 const char* _filename = "DEMO.WAV";
 const int analogInPin = A14;
+unsigned long lastSamplePlayed = 0;
 
-int sensorValue = 0;
+double getPlaybackRate(int16_t analog) { //analog: 0..1023
+    return  (analog - 512.0) / 512.0;
+}
 
 void setup() {
     analogReference(0);
-    pinMode(analogInPin, INPUT);
+    pinMode(analogInPin, INPUT_DISABLE);   // i.e. Analog
 
     Serial.begin(57600);
 
@@ -41,23 +44,30 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSdWav1.play(_filename);
-    playSdWav1.setPlaybackRate(1.0);
+    playSdWav1.enableInterpolation(true);
+    playSdWav1.enableInterpolation(true);
+    int newsensorValue = analogRead(analogInPin);
+    playSdWav1.setPlaybackRate(getPlaybackRate(newsensorValue));
+
     Serial.println("playing...");
 }
 
 void loop() {
-
     int newsensorValue = analogRead(analogInPin);
-    if (newsensorValue / 64 != sensorValue / 64) {
-        sensorValue = newsensorValue;
-        float rate = (sensorValue - 512.0) / 512.0;
-        playSdWav1.setPlaybackRate(rate);
-        Serial.printf("rate: %f %x\n", rate, sensorValue);
-    }
+    playSdWav1.setPlaybackRate(getPlaybackRate(newsensorValue));
 
-    if (!playSdWav1.isPlaying()) {
-        Serial.println("playing...");
-        playSdWav1.play(_filename);
+    unsigned currentMillis = millis();
+    if (currentMillis > lastSamplePlayed + 500) {
+        if (!playSdWav1.isPlaying()) {
+            playSdWav1.play(_filename);
+            lastSamplePlayed = currentMillis;
+
+            Serial.print("Memory: ");
+            Serial.print(AudioMemoryUsage());
+            Serial.print(",");
+            Serial.print(AudioMemoryUsageMax());
+            Serial.println();
+        }
     }
+    delay(10);
 }
