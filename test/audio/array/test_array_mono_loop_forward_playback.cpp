@@ -34,12 +34,14 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         // AudioConnection          patchCord3(memory, 0, queue1, 0);
         // GUItool: end automatically generated code
 
+        testout.saveOutputFile("arr_fwd_0_5_quadratic.wav");
         memory.enableInterpolation(true);
         memory.setPlaybackRate(0.5f);
         memory.play((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
+        testout.closeOutputfile();
         arduino_should_exit = true;
     }
 /*
