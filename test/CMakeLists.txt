@@ -20,12 +20,15 @@ if (DEFINED BUILD_FOR_LINUX)
     include_directories(../src)
     include_directories(../test/audio)
 
+    add_executable(embedfile embedfile.c)
+
+    add_custom_command(
+      OUTPUT kick_raw.c
+      COMMAND embedfile kick_raw ${CMAKE_SOURCE_DIR}/test/resources/input/kick.raw
+      )
+
     add_executable(tests
-            ../src/ResamplingSdReader.cpp
-            ../src/ResamplingArrayReader.cpp
-            ../src/interpolation.cpp
-            ../src/loop_type.h
-            ../src/playarrayresmp.cpp
+            kick_raw.c
             audio/output_test.cpp
 
             audio/array/AudioArrayFixture.h
@@ -39,7 +42,6 @@ if (DEFINED BUILD_FOR_LINUX)
             low_level/sd/test_wav_mono_loop_forward_playback.cpp
             low_level/sd/test_wav_mono_noloop_backward_playback.cpp
             
-            #low_level/wav_header/WaveHeaderParserFixture.h
             low_level/wav_header/test_parse_wave_header.cpp
             
             low_level/array/test_array_mono_loop_forward_playback.cpp
@@ -49,6 +51,6 @@ if (DEFINED BUILD_FOR_LINUX)
     target_link_libraries(tests ${teensy_x86_stubs_LIBS})
     target_link_libraries(tests ${teensy_audio_x86_stubs_LIBS})
     target_link_libraries(tests ${teensy_x86_sd_stubs_LIBS})
+    target_link_libraries(tests teensy_variable_playback)
     message(STATUS ${teensy_x86_stubs_LIBS})
-#set(CMAKE_VERBOSE_MAKEFILE 1)
 endif()
