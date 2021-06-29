@@ -80,3 +80,9 @@ jobs:
         shell: bash
         # Execute the build.  You can specify a specific target with "--target <NAME>"
         run: build/test/tests
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: test-audio-output
+          path: output
