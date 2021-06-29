@@ -27,7 +27,6 @@ if (DEFINED BUILD_FOR_LINUX)
 else()
     teensy_add_library(
             teensy_variable_playback
-            ${HEADER_FILES}
             ${SOURCE_FILES}
     )
 
