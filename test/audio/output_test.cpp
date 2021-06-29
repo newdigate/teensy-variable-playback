@@ -24,10 +24,10 @@ void TestAudioOutput::update(void)
 	if (block) {
 
 		if (_saveToFile) {
-			if (num_inputs == 1){
+			if (numConnections == 1){
 				_outputFile.write((char*)block->data, 256);
 				_dataSize += 256;
-			} else if (num_inputs == 2) {
+			} else if (numConnections == 2) {
 
 				int16_t interleaved[256];
 
