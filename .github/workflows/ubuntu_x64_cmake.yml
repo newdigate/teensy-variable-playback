@@ -82,6 +82,7 @@ jobs:
         run: build/test/tests
 
       - name: upload artifacts
+        if: always()      
         uses: actions/upload-artifact@v1
         with:
           name: test-audio-output
