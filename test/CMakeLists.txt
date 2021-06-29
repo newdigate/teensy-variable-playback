@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(tests)
 if (DEFINED BUILD_FOR_LINUX)
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 
     set (Boost_USE_STATIC_LIBS OFF)
     find_package (Boost REQUIRED COMPONENTS unit_test_framework)
