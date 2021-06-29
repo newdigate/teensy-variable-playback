@@ -1,3 +1,0 @@
-message("building for teensy...")
-include(../teensy.options.cmake.in)
-include(../teensy.build.cmake.in)
