@@ -11,38 +11,52 @@ AudioConnection          patchCord1(rraw_a1, 0, i2s1, 0);
 AudioConnection          patchCord2(rraw_a1, 0, i2s1, 1);
 AudioControlSGTL5000     sgtl5000_1;     //xy=521,588
 // GUItool: end automatically generated code
+#define A14 10
 
 extern unsigned int kick_raw_len;
 extern unsigned char kick_raw[];
+unsigned long lastSamplePlayed = 0;
+const int analogInPin = A14;
+
+double getPlaybackRate(int16_t analog) { //analog: 0..1023
+    return  (analog - 512.0) / 512.0;
+}
 
 void setup() {
+    analogReference(0);
+    pinMode(analogInPin, INPUT_DISABLE);   // i.e. Analog
+
     Serial.begin(9600);
-    AudioMemory(20);
     sgtl5000_1.enable();
     sgtl5000_1.volume(0.5f, 0.5f);
     
-    rraw_a1.setPlaybackRate(0.5);
-    rraw_a1.play((int16_t*)kick_raw, kick_raw_len/2);    
+    rraw_a1.enableInterpolation(true);
+    int newsensorValue = analogRead(analogInPin);
+    rraw_a1.setPlaybackRate(getPlaybackRate(newsensorValue));
+    
+    AudioMemory(20);
     Serial.println("setup done");
 }
 
 void loop() {
-    if (!rraw_a1.isPlaying()) {
-        delay(1000);
-        rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
-    } else
-    delay(100);
-}
+    int newsensorValue = analogRead(analogInPin);
+    rraw_a1.setPlaybackRate(getPlaybackRate(newsensorValue));
+    
+    unsigned currentMillis = millis();
+    if (currentMillis > lastSamplePlayed + 500) {
+        if (!rraw_a1.isPlaying()) {
+            rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
+            lastSamplePlayed = currentMillis;
 
-#ifdef BUILD_FOR_LINUX
-int main() {
-    initialize_mock_arduino();
-    setup();
-    while(true){
-        loop();
+            Serial.print("Memory: ");
+            Serial.print(AudioMemoryUsage());
+            Serial.print(",");
+            Serial.print(AudioMemoryUsageMax());
+            Serial.println();
+        }
     }
+    delay(10);
 }
-#endif
 
 unsigned char kick_raw[] = {
   0x99, 0x02, 0xd7, 0x02, 0xfa, 0x02, 0x5f, 0x03, 0xc1, 0x03, 0x2a, 0x04,

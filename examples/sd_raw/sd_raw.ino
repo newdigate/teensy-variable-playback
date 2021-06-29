@@ -19,12 +19,15 @@ AudioConnection          patchCord2(playSdRaw1, 0, i2s2, 1);
 
 const char* _filename = "DEMO.RAW";
 const int analogInPin = A14;
+unsigned long lastSamplePlayed = 0;
 
-int sensorValue = 0;
+double getPlaybackRate(int16_t analog) { //analog: 0..1023
+    return  (analog - 512.0) / 512.0;
+}
 
 void setup() {
     analogReference(0);
-    pinMode(analogInPin, INPUT);
+    pinMode(analogInPin, INPUT_DISABLE);   // i.e. Analog
 
     Serial.begin(57600);
 
@@ -35,40 +38,33 @@ void setup() {
             delay(500);
         }
     }
-
-    AudioMemory(24);
-
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSdRaw1.play(_filename);
-    playSdRaw1.setPlaybackRate(-1);
-    Serial.println("playing...");
+    playSdRaw1.enableInterpolation(true);
+    int newsensorValue = analogRead(analogInPin);
+    playSdRaw1.setPlaybackRate(getPlaybackRate(newsensorValue));
+
+    AudioMemory(24);
 }
 
 void loop() {
 
     int newsensorValue = analogRead(analogInPin);
-    if (newsensorValue / 64 != sensorValue / 64) {
-        sensorValue = newsensorValue;
-        float rate = (sensorValue - 512.0) / 512.0;
-        playSdRaw1.setPlaybackRate(rate);
-        Serial.printf("rate: %f %x\n", rate, sensorValue);
-    }
+    playSdRaw1.setPlaybackRate(getPlaybackRate(newsensorValue));
+    
+    unsigned currentMillis = millis();
+    if (currentMillis > lastSamplePlayed + 500) {
+        if (!playSdRaw1.isPlaying()) {
+            playSdRaw1.play(_filename);
+            lastSamplePlayed = currentMillis;
 
-    if (!playSdRaw1.isPlaying()) {
-        Serial.println("playing...");
-        playSdRaw1.play(_filename);
+            Serial.print("Memory: ");
+            Serial.print(AudioMemoryUsage());
+            Serial.print(",");
+            Serial.print(AudioMemoryUsageMax());
+            Serial.println();
+        }
     }
+    delay(10);
 }
-
-#ifdef BUILD_FOR_LINUX
-int main() {
-    initialize_mock_arduino();
-    SD.setSDCardFileData("234234234", 5);
-    setup();
-    while(true){
-        loop();
-    }
-}
-#endif
