@@ -8,6 +8,12 @@
 #include <fstream>
 #include <filesystem>
 #include <unistd.h>
+
+#ifdef __APPLE__ 
+#define __filesystem std::__fs::filesystem
+#else
+#define __filesystem std::filesystem
+#endif
 class TestAudioOutput : public AudioStream
 {
 public:
@@ -24,9 +30,9 @@ public:
 			perror("getcwd() error");
 		}
 		string outputPath = string(cwd) + "/output/";
-		std::__fs::filesystem::path p(outputPath);
-		if (! std::__fs::filesystem::exists(p) )
-			std::__fs::filesystem::create_directories(outputPath);
+		__filesystem::path p(outputPath);
+		if (! __filesystem::exists(p) )
+			__filesystem::create_directories(outputPath);
 		
 		string filePath =  outputPath +  string(filename);
 		std::cout << "saving output audio .wav file to " << filePath << std::endl;
