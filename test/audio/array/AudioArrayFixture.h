@@ -6,6 +6,7 @@
 
 #include <Arduino.h>
 #include <Audio.h>
+#include <iterator>
 #include "output_test.h"
 #include "playarrayresmp.h"
 
