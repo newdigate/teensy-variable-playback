@@ -1,9 +1,5 @@
 [
     {
-        "name": "Linux",
-        "toolchainFile": "${workspaceFolder}/cmake/toolchains/linux.cmake"
-    },
-    {
         "name": "Teensy-4.1",
         "toolchainFile": "${workspaceFolder}/cmake/toolchains/teensy41.cmake"
     }
