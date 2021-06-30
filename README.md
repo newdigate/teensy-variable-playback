@@ -238,6 +238,7 @@ void setup() {
     sgtl5000_1.enable();
     sgtl5000_1.volume(0.5f, 0.5f);
     rraw_a1.setPlaybackRate(0.5);
+    rraw_a1.enableInterpolation(true);  
 }
 
 void loop() {
