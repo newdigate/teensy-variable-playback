@@ -5,14 +5,15 @@
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CMake](https://img.shields.io/badge/project-CMake-brightgreen.svg?label=built%20with&colorA=555555&colorB=8a8fff&logo=)](CMakelists.txt)
 [![made-for-VSCode](https://img.shields.io/badge/Made%20for-VSCode-1f425f.svg)](https://code.visualstudio.com/)
-
+[![Contributors](https://img.shields.io/github/contributors/newdigate/teensy-variable-playback)](https://github.com/newdigate/teensy-variable-playback/graphs/contributors) 
+[![Commits](https://img.shields.io/github/commit-activity/m/newdigate/teensy-variable-playback)](https://github.com/newdigate/teensy-variable-playback/graphs/contributors)
 play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
-* 30/06/2021: v1.0.5: Optimised quadratic function to use fixed pipeline of 4 samples and use integers instead of floating point
+* 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
 * 25/06/2021: Quadratic interpolation is now working, but is disabled by default
 
 ## contents
@@ -223,7 +224,7 @@ AudioControlSGTL5000     sgtl5000_1;     //xy=521,588
 // GUItool: end automatically generated code
 
 unsigned char kick_raw[] = {
-  // ... little-endian 16-bit mono 44100 raw data
+  // ... little-endian 16-bit mono 44100 raw data, generated using linux cmd 'xxd -i kick.raw', raw file saved in Audacity
   0x99, 0x02, 0xd7, 0x02, 0xfa, 0x02, 0x5f, 0x03, 0xc1, 0x03, 0x2a, 0x04,
   0xad, 0x04, 0xa5, 0x05, 0x76, 0x06, 0x2f, 0x07, 0x9e, 0x07, 0xe2, 0x07,
   0x43, 0x08, 0x92, 0x08, 0xb2, 0x08, 0xe8, 0x08, 0x16, 0x09, 0xda, 0x08,
