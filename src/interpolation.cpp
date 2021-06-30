@@ -31,3 +31,26 @@ int16_t interpolate(IntepolationData *f, double xi, int n) {
       return 32767;
     return untruncated;
 }
+
+
+int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, float x) {
+    long x_1 = x * 100.0;
+    long x_2 = x_1 * x_1;
+    long x_3 = x_2 * x_1;
+
+    //Serial.printf("%i,%i,%i,%i @ x=%f \n", d1,d2,d3,d4,x);
+
+    return d1 * (x_3  - 600 * x_2   + 110000  * x_1  - 6000000 ) / - 6000000
+         + d2 * (x_3  - 500 * x_2   +  60000  * x_1        )     /   2000000
+         + d3 * (x_3  - 400 * x_2   +  30000  * x_1        )     / - 2000000
+         + d4 * (x_3  - 300 * x_2   +  20000  * x_1        )     /   6000000;
+    
+/*
+    int32_t untruncated = result;
+    if (untruncated < -32768)
+      return -32768;
+    if (untruncated > 32767)
+      return 32767;
+    return result;
+    */
+}
