@@ -5,7 +5,7 @@
     "keywords": "sound, audio, sample, resample, pitch, interpolation, legrange, sampler, playback, speed",
     "description": "Teensy Variable Playback",
     "url": "https://github.com/newdigate/teensy-variable-playback",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "export": {
       "exclude": [
         ".vscode",
