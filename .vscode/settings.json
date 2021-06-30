@@ -4,7 +4,8 @@
     "boost-test-adapter.testExecutable": "cmake-build-debug/test/tests",
     "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${variant:buildType}",
     "cmake.configureSettings": {
-        "CMAKE_BUILD_TYPE": "${buildType}",
-        "OPT_BUILD_FOR_LINUX":"ON"
-    }
+        "CMAKE_BUILD_TYPE": "${buildType}"        
+    },
+    "boost-test-adapter.cwd": "${workspaceFolder}",
+    "cmake.generator": "Unix Makefiles"
 }
