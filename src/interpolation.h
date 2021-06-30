@@ -25,4 +25,5 @@ struct IntepolationData
 // xi corresponds to the new data point whose value is to be obtained
 // n represents the number of known data points
 int16_t interpolate(IntepolationData *f, double xi, int n);
+int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, float x);
 #endif //TEENSY_RESAMPLING_SDREADER_INTERPOLATION_H

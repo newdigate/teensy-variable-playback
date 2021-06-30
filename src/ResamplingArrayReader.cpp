@@ -153,7 +153,14 @@ bool ResamplingArrayReader::readNextValue(int16_t *value) {
             }
             
             if (_numInterpolationPoints >= 4) {
-                int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+                //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+                int16_t interpolation 
+                    = fastinterpolate(
+                        _interpolationPoints[0].y, 
+                        _interpolationPoints[1].y, 
+                        _interpolationPoints[2].y, 
+                        _interpolationPoints[3].y, 
+                        1.0 + abs_remainder); 
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             } else 
