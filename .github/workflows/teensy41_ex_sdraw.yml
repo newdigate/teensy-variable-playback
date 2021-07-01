@@ -1,4 +1,4 @@
-name: example-sdraw-teensy41
+name: example-sdraw-t41
 
 on:
   push:

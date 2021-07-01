@@ -1,4 +1,4 @@
-name: example-array-teensy41
+name: example-array-t41
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         repository: newdigate/teensy-cmake-macros
         path: deps/teensy-cmake-macros
         ref: feature/shared_libraries
-        
+
     - uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/cores.git
