@@ -22,6 +22,7 @@ jobs:
       with:
         repository: newdigate/teensy-cmake-macros
         path: deps/teensy-cmake-macros
+        ref: feature/shared_libraries
 
     - uses: actions/checkout@v2
       with:
