@@ -1,4 +1,4 @@
-name: example-array-teensy41
+name: example-array-t41
 
 on:
   push:
