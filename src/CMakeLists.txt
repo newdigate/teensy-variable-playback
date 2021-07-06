@@ -22,7 +22,7 @@ set(HEADER_FILES
         TeensyVariablePlayback.h)
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
-if (DEFINED BUILD_FOR_LINUX)
+if (NOT DEFINED TEENSY_VERSION)
     include(CMakeLists.linux.cmake.in)
 else()
     teensy_add_library(
