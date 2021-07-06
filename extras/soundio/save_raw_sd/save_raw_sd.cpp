@@ -99,7 +99,7 @@ void loop() {
 
 int main(int numArgs, char **args) {
 
-    if (numArgs < 1)
+    if (numArgs < 2)
     {
         std::cout << "usage: " << args[0] << " <path-to-SDCard>";
         exit(0);
