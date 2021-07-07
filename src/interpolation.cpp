@@ -34,9 +34,9 @@ int16_t interpolate(IntepolationData *f, double xi, int n) {
 
 
 int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, float x) {
-    long x_1 = x * 1000.0;
-    long x_2 = x_1 * x_1;
-    long x_3 = x_2 * x_1;
+    float x_1 = x * 1000.0;
+    float x_2 = x_1 * x_1;
+    float x_3 = x_2 * x_1;
 
     //Serial.printf("%i,%i,%i,%i @ x=%f \n", d1,d2,d3,d4,x);
 
