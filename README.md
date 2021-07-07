@@ -15,6 +15,7 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 07/07/2021: v1.0.6: changed to using optimised floating point interpolation, sounds much better
 * 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
 * 25/06/2021: Quadratic interpolation is now working, but is disabled by default
 
