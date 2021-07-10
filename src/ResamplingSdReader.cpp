@@ -310,6 +310,10 @@ void ResamplingSdReader::begin(void)
     _playing = false;
     _file_offset = _header_size;
     _file_size = 0;
+    
+    if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
+        initializeInterpolationPoints();
+    }
 }
 
 bool ResamplingSdReader::play(const char *filename)
@@ -404,7 +408,7 @@ int ResamplingSdReader::available(void) {
 void ResamplingSdReader::close(void) {
     if (_playing)
         stop();
-    //_file.close();
+    deleteInterpolationPoints();
 }
 
 bool ResamplingSdReader::updateBuffers() {

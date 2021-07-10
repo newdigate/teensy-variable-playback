@@ -67,8 +67,7 @@ public:
         _loop_finish = loop_finish;
     }
 
-    void setInterpolationType(ResampleInterpolationType interpolationType) {
-        _interpolationType = interpolationType;
+    void setInterpolationType(ResampleInterpolationType interpolationType) {        
         if (interpolationType != _interpolationType) {            
             _interpolationType = interpolationType;
             initializeInterpolationPoints();
