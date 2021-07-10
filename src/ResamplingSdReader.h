@@ -7,11 +7,9 @@
 
 #include "SD.h"
 #include <cstdint>
-#include <vector>
 #include "spi_interrupt.h"
 #include "loop_type.h"
 #include "interpolation.h"
-#include <list>
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
@@ -107,7 +105,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    std::vector<IntepolationData *> _interpolationPoints;
+    IntepolationData **_interpolationPoints = nullptr;
     bool updateBuffers(void);
     void StartUsingSPI(){
         //Serial.printf("start spi: %s\n", _filename);

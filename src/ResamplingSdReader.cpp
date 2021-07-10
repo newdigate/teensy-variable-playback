@@ -288,21 +288,24 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
 }
 void ResamplingSdReader::initializeInterpolationPoints(void) {
     deleteInterpolationPoints();
+    _interpolationPoints = new IntepolationData*[_numChannels];
     for (int channel=0; channel < _numChannels; channel++) {        
         IntepolationData *interpolation = new IntepolationData[4];
         interpolation[0].y = 0.0;
         interpolation[1].y = 0.0;    
         interpolation[2].y = 0.0;    
         interpolation[3].y = 0.0;
-        _interpolationPoints.push_back(interpolation) ;
+        _interpolationPoints[channel] = interpolation ;
     }
 }
 
 void ResamplingSdReader::deleteInterpolationPoints(void) {
-    for (auto && interpolationPoints : _interpolationPoints) {
-        delete [] interpolationPoints;
+    if (!_interpolationPoints) return;
+    for (int i=0; i<_numChannels; i++) {
+        delete [] _interpolationPoints[i];
     }
-    _interpolationPoints.clear();
+     delete [] _interpolationPoints;
+     _interpolationPoints = nullptr;
 }
 
 void ResamplingSdReader::begin(void)
