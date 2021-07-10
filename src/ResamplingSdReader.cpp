@@ -280,7 +280,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
         _remainder += _playbackRate;
         auto delta = static_cast<signed int>(_remainder);
         _remainder -= static_cast<double>(delta);
-        _bufferPosition += 2 * delta;
+        _bufferPosition += 2 * delta * _numChannels;
     }
 
     *value = result;
