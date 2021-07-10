@@ -74,7 +74,7 @@ public:
 
     void setNumChannels(uint16_t numChannels) {
         if (_numChannels != numChannels) {            
-            numChannels = numChannels;
+            _numChannels = numChannels;
             initializeInterpolationPoints();
         }
     }
