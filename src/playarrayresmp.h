@@ -43,12 +43,18 @@ public:
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
 
+    void setNumChannels(uint16_t numChannels) {
+        arrayReader.setNumChannels(numChannels);
+        _numChannels = numChannels;
+    }
+
 private:
 
     uint32_t file_size;
     volatile uint32_t file_offset;
     volatile bool playing;
     ResamplingArrayReader arrayReader;
+    uint16_t _numChannels = 1;
 };
 
 

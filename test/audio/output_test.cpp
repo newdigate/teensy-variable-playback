@@ -24,10 +24,10 @@ void TestAudioOutput::update(void)
 	if (block) {
 
 		if (_saveToFile) {
-			if (numConnections == 1){
+			if (!blockRight){
 				_outputFile.write((char*)block->data, 256);
 				_dataSize += 256;
-			} else if (numConnections == 2) {
+			} else {
 
 				int16_t interleaved[256];
 
@@ -43,6 +43,7 @@ void TestAudioOutput::update(void)
 		}
 
 		/*
+		Serial.print("Ch1:"); 
 	    for (int i=0; i<AUDIO_BLOCK_SAMPLES;i++) {			
 			if (block->data[i] < 0)
 				Serial.printf("-%04x ", -block->data[i]);
@@ -53,8 +54,19 @@ void TestAudioOutput::update(void)
 		*/
 		release(block);
 
-		if (blockRight)
+		if (blockRight) {
+			/*
+			Serial.print("Ch2:"); 
+			for (int i=0; i<AUDIO_BLOCK_SAMPLES;i++) {			
+				if (blockRight->data[i] < 0)
+					Serial.printf("-%04x ", -blockRight->data[i]);
+				else 
+					Serial.printf(" %04x ", blockRight->data[i]);
+			}
+			Serial.println(); 
+			*/
 			release(blockRight);
+		}
 	} else {        
 		Serial.print(" empty block \n");
 	}

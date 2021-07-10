@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(tests)
+project(tests C CXX)
 if (DEFINED BUILD_FOR_LINUX)
     set(CMAKE_CXX_STANDARD 17)
 
@@ -27,12 +27,18 @@ if (DEFINED BUILD_FOR_LINUX)
       COMMAND embedfile kick_raw ${CMAKE_SOURCE_DIR}/test/resources/input/kick.raw
       )
 
+    add_custom_command(
+      OUTPUT stereo_souljah_raw.c
+      COMMAND embedfile stereo_souljah_raw ${CMAKE_SOURCE_DIR}/test/resources/input/stereo_souljah.raw
+      )
     add_executable(tests
             kick_raw.c
+            stereo_souljah_raw.c
             audio/output_test.cpp
 
             audio/array/AudioArrayFixture.h
             audio/array/test_array_mono_loop_forward_playback.cpp
+            audio/array/test_array_stereo_loop_forward_playback.cpp
 
             low_level/sd/ResamplingReaderFixture.h
             low_level/sd/test_raw_mono_noloop_forward_playback.cpp
@@ -45,6 +51,7 @@ if (DEFINED BUILD_FOR_LINUX)
             low_level/wav_header/test_parse_wave_header.cpp
             
             low_level/array/test_array_mono_loop_forward_playback.cpp
+            low_level/array/test_array_stereo_loop_forward_playback.cpp
             )
 
     target_link_libraries(tests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

@@ -9,14 +9,7 @@
 class ResamplingArrayReader {
 public:
     ResamplingArrayReader() {
-        _interpolationPoints[0].y = 0.0;
-        _interpolationPoints[0].x = 0.0;
-        _interpolationPoints[1].y = 0.0;
-        _interpolationPoints[1].x = 1.0;
-        _interpolationPoints[2].y = 0.0;
-        _interpolationPoints[2].x = 2.0;
-        _interpolationPoints[3].y = 0.0;
-        _interpolationPoints[3].x = 3.0;
+
     }
 
     void begin(void);
@@ -25,8 +18,8 @@ public:
     void stop(void);
     bool isPlaying(void) { return _playing; }
 
-    unsigned int read(void *buf, uint16_t nbyte);
-    bool readNextValue(int16_t *value);
+    unsigned int read(void **buf, uint16_t nbyte);
+    bool readNextValue(int16_t *value, uint16_t channelNumber);
 
     void setPlaybackRate(double f) {
         _playbackRate = f;
@@ -63,8 +56,17 @@ public:
     }
 
     void setInterpolationType(ResampleInterpolationType interpolationType) {
-        _interpolationType = interpolationType;
+        if (interpolationType != _interpolationType) {
+            deleteInterpolationPoints();
+            _interpolationType = interpolationType;
+            initializeInterpolationPoints();
+        }
     }
+
+    void setNumChannels(uint16_t numChannels) {
+        _numChannels = numChannels;
+    }
+
 private:
     volatile bool _playing = false;
 
@@ -75,12 +77,14 @@ private:
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
-
+    uint16_t _numChannels = 1;
     int16_t *_sourceBuffer;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData _interpolationPoints[4];
+    IntepolationData **_channelinterpolationPoints;
+    void initializeInterpolationPoints(void);
+    void deleteInterpolationPoints(void);
 };
 
 
