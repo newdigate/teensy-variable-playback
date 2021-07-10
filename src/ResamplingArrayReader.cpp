@@ -201,26 +201,22 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
 }
 
 void ResamplingArrayReader::initializeInterpolationPoints(void) {
-    if (_channelinterpolationPoints) {
-        deleteInterpolationPoints();
-    }
-    _channelinterpolationPoints = new IntepolationData*[_numChannels];
-    for (int channel=0; channel < _numChannels; channel++) {
-        _channelinterpolationPoints[channel] = new IntepolationData[4];
-        _channelinterpolationPoints[channel][0].y = 0.0;
-        _channelinterpolationPoints[channel][1].y = 0.0;    
-        _channelinterpolationPoints[channel][2].y = 0.0;    
-        _channelinterpolationPoints[channel][3].y = 0.0;
+    deleteInterpolationPoints();
+    for (int channel=0; channel < _numChannels; channel++) {        
+        IntepolationData *interpolation = new IntepolationData[4];
+        interpolation[0].y = 0.0;
+        interpolation[1].y = 0.0;    
+        interpolation[2].y = 0.0;    
+        interpolation[3].y = 0.0;
+        _channelinterpolationPoints.push_back(interpolation) ;
     }
 }
 
 void ResamplingArrayReader::deleteInterpolationPoints(void) {
-    if (!_channelinterpolationPoints) return;
-    for (int channel=0; channel < _numChannels; channel++) {
-        delete [] _channelinterpolationPoints[channel];
+    for (auto && interpolationPoints : _channelinterpolationPoints) {
+        delete [] interpolationPoints;
     }
-    delete [] _channelinterpolationPoints;
-    _channelinterpolationPoints = nullptr;
+    _channelinterpolationPoints.clear();
 }
 
 void ResamplingArrayReader::begin(void)

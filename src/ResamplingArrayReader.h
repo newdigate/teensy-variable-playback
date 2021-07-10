@@ -3,6 +3,7 @@
 
 #include "SD.h"
 #include <cstdint>
+#include <vector>
 #include "loop_type.h"
 #include "interpolation.h"
 
@@ -57,14 +58,16 @@ public:
 
     void setInterpolationType(ResampleInterpolationType interpolationType) {
         if (interpolationType != _interpolationType) {
-            deleteInterpolationPoints();
             _interpolationType = interpolationType;
             initializeInterpolationPoints();
         }
     }
 
     void setNumChannels(uint16_t numChannels) {
-        _numChannels = numChannels;
+        if (numChannels != _numChannels) {
+            _numChannels = numChannels;
+            initializeInterpolationPoints();
+        }
     }
 
 private:
@@ -82,7 +85,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData **_channelinterpolationPoints;
+    std::vector<IntepolationData *> _channelinterpolationPoints;
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);
 };
