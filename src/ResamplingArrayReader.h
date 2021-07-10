@@ -84,7 +84,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData ** _interpolationPoints = nullptr;
+    IntepolationData **_interpolationPoints = nullptr;
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);
 };
