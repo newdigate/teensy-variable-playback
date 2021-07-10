@@ -3,7 +3,6 @@
 
 #include "SD.h"
 #include <cstdint>
-#include <vector>
 #include "loop_type.h"
 #include "interpolation.h"
 
@@ -85,7 +84,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    std::vector<IntepolationData *> _channelinterpolationPoints;
+    IntepolationData ** _interpolationPoints = nullptr;
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);
 };

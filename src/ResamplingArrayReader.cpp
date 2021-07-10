@@ -88,11 +88,11 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
 
                     if (_playbackRate > 1.0) {
                         // need to update last sample
-                        _channelinterpolationPoints[channel][1].y = _sourceBuffer[_bufferPosition-_numChannels];
+                        _interpolationPoints[channel][1].y = _sourceBuffer[_bufferPosition-_numChannels];
                     }
 
-                    _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-                    _channelinterpolationPoints[channel][1].y = result;
+                    _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                    _interpolationPoints[channel][1].y = result;
                     if (_numInterpolationPoints < 2)
                         _numInterpolationPoints++;
                 }
@@ -103,27 +103,27 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
 
                     if (_playbackRate < -1.0) {
                         // need to update last sample
-                        _channelinterpolationPoints[channel][1].y = _sourceBuffer[_bufferPosition+_numChannels];
+                        _interpolationPoints[channel][1].y = _sourceBuffer[_bufferPosition+_numChannels];
                     }
 
-                    _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-                    _channelinterpolationPoints[channel][1].y = result;
+                    _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                    _interpolationPoints[channel][1].y = result;
                     if (_numInterpolationPoints < 2)
                         _numInterpolationPoints++;
                 }
             }
 
             if (_numInterpolationPoints > 1) {
-                result = abs_remainder * _channelinterpolationPoints[channel][1].y + (1.0 - abs_remainder) * _channelinterpolationPoints[channel][0].y;
+                result = abs_remainder * _interpolationPoints[channel][1].y + (1.0 - abs_remainder) * _interpolationPoints[channel][0].y;
                 //Serial.printf("[%f]\n", interpolation);
             }
         } else {
-            _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-            _channelinterpolationPoints[channel][1].y = result;
+            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+            _interpolationPoints[channel][1].y = result;
             if (_numInterpolationPoints < 2)
                 _numInterpolationPoints++;
 
-            result =_channelinterpolationPoints[channel][0].y;
+            result =_interpolationPoints[channel][0].y;
             //Serial.printf("%f\n", result);
         }
     } 
@@ -137,10 +137,10 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                        _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-                        _channelinterpolationPoints[channel][1].y = _channelinterpolationPoints[channel][2].y;
-                        _channelinterpolationPoints[channel][2].y = _channelinterpolationPoints[channel][3].y;
-                        _channelinterpolationPoints[channel][3].y =  _sourceBuffer[_bufferPosition-(i*_numChannels)+1+channel];
+                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                        _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+                        _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+                        _interpolationPoints[channel][3].y =  _sourceBuffer[_bufferPosition-(i*_numChannels)+1+channel];
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
@@ -152,10 +152,10 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                        _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-                        _channelinterpolationPoints[channel][1].y = _channelinterpolationPoints[channel][2].y;
-                        _channelinterpolationPoints[channel][2].y = _channelinterpolationPoints[channel][3].y;
-                        _channelinterpolationPoints[channel][3].y =  _sourceBuffer[_bufferPosition+(i*_numChannels)-1+channel];
+                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                        _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+                        _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+                        _interpolationPoints[channel][3].y =  _sourceBuffer[_bufferPosition+(i*_numChannels)-1+channel];
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
@@ -165,25 +165,25 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
                 //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
                 int16_t interpolation 
                     = fastinterpolate(
-                        _channelinterpolationPoints[channel][0].y, 
-                        _channelinterpolationPoints[channel][1].y, 
-                        _channelinterpolationPoints[channel][2].y, 
-                        _channelinterpolationPoints[channel][3].y, 
+                        _interpolationPoints[channel][0].y, 
+                        _interpolationPoints[channel][1].y, 
+                        _interpolationPoints[channel][2].y, 
+                        _interpolationPoints[channel][3].y, 
                         1.0 + abs_remainder); 
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             } else 
                 result = 0;
         } else {
-            _channelinterpolationPoints[channel][0].y = _channelinterpolationPoints[channel][1].y;
-            _channelinterpolationPoints[channel][1].y = _channelinterpolationPoints[channel][2].y;
-            _channelinterpolationPoints[channel][2].y = _channelinterpolationPoints[channel][3].y;
-            _channelinterpolationPoints[channel][3].y = result;
+            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+            _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+            _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+            _interpolationPoints[channel][3].y = result;
             if (_numInterpolationPoints < 4) {
                 _numInterpolationPoints++;
                 result = 0;
             } else 
-                result = _channelinterpolationPoints[channel][1].y;
+                result = _interpolationPoints[channel][1].y;
             //Serial.printf("%f\n", result);
         }
     }
@@ -202,21 +202,24 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
 
 void ResamplingArrayReader::initializeInterpolationPoints(void) {
     deleteInterpolationPoints();
+    _interpolationPoints = new IntepolationData*[_numChannels];
     for (int channel=0; channel < _numChannels; channel++) {        
         IntepolationData *interpolation = new IntepolationData[4];
         interpolation[0].y = 0.0;
         interpolation[1].y = 0.0;    
         interpolation[2].y = 0.0;    
         interpolation[3].y = 0.0;
-        _channelinterpolationPoints.push_back(interpolation) ;
+        _interpolationPoints[channel] = interpolation ;
     }
 }
 
 void ResamplingArrayReader::deleteInterpolationPoints(void) {
-    for (auto && interpolationPoints : _channelinterpolationPoints) {
-        delete [] interpolationPoints;
+    if (!_interpolationPoints) return;
+    for (int i=0; i<_numChannels; i++) {
+        delete [] _interpolationPoints[i];
     }
-    _channelinterpolationPoints.clear();
+     delete [] _interpolationPoints;
+     _interpolationPoints = nullptr;
 }
 
 void ResamplingArrayReader::begin(void)
