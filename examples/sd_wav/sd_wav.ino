@@ -17,7 +17,7 @@ AudioConnection          patchCord2(playSdWav1, 0, i2s2, 1);
 #define A14 10
 #define BUILTIN_SDCARD 10
 
-const char* _filename = "DEMO.WAV";
+char* _filename = "DEMO.WAV";
 const int analogInPin = A14;
 unsigned long lastSamplePlayed = 0;
 
@@ -45,7 +45,6 @@ void setup() {
     audioShield.volume(0.5);
 
     playSdWav1.enableInterpolation(true);
-    playSdWav1.enableInterpolation(true);
     int newsensorValue = analogRead(analogInPin);
     playSdWav1.setPlaybackRate(getPlaybackRate(newsensorValue));
 
@@ -70,4 +69,8 @@ void loop() {
         }
     }
     delay(10);
+}
+
+void std::__throw_length_error(char const* message) {
+    Serial.printf("length error, %s\n", message);
 }

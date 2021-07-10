@@ -1,67 +1,74 @@
 #include "ResamplingSdReader.h"
 #include "interpolation.h"
-
-unsigned int ResamplingSdReader::read(void *buf, uint16_t nbyte) {
+// read nbytes into each buffer (1 buffer per channel)
+unsigned int ResamplingSdReader::read(void **buf, uint16_t nbyte) {
     if (!_playing) return 0;
 
+    int16_t *index[_numChannels];
     unsigned int count = 0;
-    int16_t *index = (int16_t*)buf;
+    for (int channel=0; channel < _numChannels; channel++) {
+        index[channel] = (int16_t*)buf[channel];
+    }
+
     while (count < nbyte) {
+        for (int channel=0; channel < _numChannels; channel++) {
+            if (readNextValue(index[channel], channel)){
+                if (channel == _numChannels - 1)
+                    count+=2;
+                index[channel]++;
+            }
+            else {
+                // we have reached the end of the file
 
-        if (readNextValue(index)){
-            count+=2;
-            index++;
-        }
-        else {
-            // we have reached the end of the file
+                switch (_loopType) {
+                    case looptype_repeat:
+                    {
+                        if (_playbackRate >= 0.0) 
+                            _file_offset = _header_size + (_loop_start * 2);
+                        else
+                            _file_offset = _header_size + (_loop_finish * 2) - 512;
 
-            switch (_loopType) {
-                case looptype_repeat:
-                {
-                    if (_playbackRate >= 0.0) 
-                        _file_offset = _header_size + (_loop_start * 2);
-                    else
-                        _file_offset = _header_size + (_loop_finish * 2) - 512;
-
-                    _bufferLength = 0;
-                    _bufferPosition = 0;
-                    _numBuffers = 0;
-                    _file.seek(_file_offset);
-                    break;
-                }
-
-                case looptype_pingpong:
-                {
-                    if (_playbackRate >= 0.0) {
-                        _file_offset = _file_size - 512;
-                        //printf("switching to reverse playback...\n");
-                    }
-                    else {
-                        _file_offset = 0;
+                        _bufferLength = 0;
                         _bufferPosition = 0;
-                        _file.seek(0);
-                        //printf("switching to forward playback...\n");
+                        _numBuffers = 0;
+                        _file.seek(_file_offset);
+                        break;
                     }
-                    _playbackRate = -_playbackRate;
-                    _bufferLength = 0;
-                    break;
-                }            
 
-                case looptype_none:            
-                default:
-                {
-                    //Serial.printf("end of loop...\n");
-                    /* no looping - return the number of (resampled) bytes returned... */
-                    _playing = false;
-                    return count;
-                }
-            }   
+                    case looptype_pingpong:
+                    {
+                        if (_playbackRate >= 0.0) {
+                            _file_offset = _file_size - 512;
+                            //printf("switching to reverse playback...\n");
+                        }
+                        else {
+                            _file_offset = 0;
+                            _bufferPosition = 0;
+                            _file.seek(0);
+                            //printf("switching to forward playback...\n");
+                        }
+                        _playbackRate = -_playbackRate;
+                        _bufferLength = 0;
+                        break;
+                    }            
+
+                    case looptype_none:            
+                    default:
+                    {
+                        //Serial.printf("end of loop...\n");
+                        /* no looping - return the number of (resampled) bytes returned... */
+                        _playing = false;
+                        return count;
+                    }
+                }   
+            }
         }
     }
     return count;
 }
 
-bool ResamplingSdReader::readNextValue(int16_t *value) {
+// read the sample value for given channel and store it at the location pointed to by the pointer 'value'
+bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
 
     if (_numBuffers == 0)
         if (!updateBuffers()) 
@@ -114,7 +121,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
         }
     }
 
-    int samplePosition = (_bufferPosition/2) + (_currentBuffer * RESAMPLE_BUFFER_SAMPLE_SIZE);
+    int samplePosition = (_bufferPosition/2) + (_currentBuffer * RESAMPLE_BUFFER_SAMPLE_SIZE) + channel;
     int16_t result = _buffer[samplePosition];
     //Serial.printf("r: %d,", result);
 
@@ -129,11 +136,11 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
 
                     if (_playbackRate > 1.0) {
                         // need to update last sample
-                        _interpolationPoints[1].y = _buffer[samplePosition-1];
+                        _interpolationPoints[channel][1].y = _buffer[samplePosition-_numChannels];
                     }
 
-                    _interpolationPoints[0].y = _interpolationPoints[1].y;
-                    _interpolationPoints[1].y = result;
+                    _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                    _interpolationPoints[channel][1].y = result;
                     if (_numInterpolationPoints < 2)
                         _numInterpolationPoints++;
                 }
@@ -144,27 +151,27 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
 
                     if (_playbackRate < -1.0) {
                         // need to update last sample
-                        _interpolationPoints[1].y = _buffer[samplePosition+1];
+                        _interpolationPoints[channel][1].y = _buffer[samplePosition+_numChannels];
                     }
 
-                    _interpolationPoints[0].y = _interpolationPoints[1].y;
-                    _interpolationPoints[1].y = result;
+                    _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                    _interpolationPoints[channel][1].y = result;
                     if (_numInterpolationPoints < 2)
                         _numInterpolationPoints++;
                 }
             }
 
             if (_numInterpolationPoints > 1) {
-                result = abs_remainder * _interpolationPoints[1].y + (1.0 - abs_remainder) * _interpolationPoints[0].y;
+                result = abs_remainder * _interpolationPoints[channel][1].y + (1.0 - abs_remainder) * _interpolationPoints[channel][0].y;
                 //Serial.printf("[%f]\n", interpolation);
             }
         } else {
-            _interpolationPoints[0].y = _interpolationPoints[1].y;
-            _interpolationPoints[1].y = result;
+            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+            _interpolationPoints[channel][1].y = result;
             if (_numInterpolationPoints < 2)
                 _numInterpolationPoints++;
 
-            result =_interpolationPoints[0].y;
+            result =_interpolationPoints[channel][0].y;
             //Serial.printf("%f\n", result);
         }
     } 
@@ -179,15 +186,15 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                     int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                        _interpolationPoints[0].y = _interpolationPoints[1].y;
-                        _interpolationPoints[1].y = _interpolationPoints[2].y;
-                        _interpolationPoints[2].y = _interpolationPoints[3].y;
-                        long currBuffPos = samplePosition - i + 1 - currentBufferOffset;
+                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                        _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+                        _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+                        long currBuffPos = samplePosition -(i*_numChannels)+1+channel - currentBufferOffset;
                         if (currBuffPos < 0) {
                             if (_numBuffers > 0) {
                                 int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
                                 int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + currBuffPos;
-                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                _interpolationPoints[channel][3].y =  _buffer[prevBufferOffset + prevSamplePos];
                                 //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, prevBufferOffset + prevSamplePos, _bufferPosition);
                             }
                         } else 
@@ -195,11 +202,11 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                             if (_numBuffers > 1) {
                                 int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
                                 int nextSamplePos = currBuffPos % (_bufferLength / 2);
-                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                _interpolationPoints[channel][3].y =  _buffer[nextBufferOffset + nextSamplePos];
                                 //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
                             }
                         } else {
-                            _interpolationPoints[3].y =  _buffer[samplePosition-i+1];
+                            _interpolationPoints[channel][3].y =  _buffer[samplePosition-(i*_numChannels)+1+channel];
                             //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition-i+1, _bufferPosition);
                         }
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
@@ -214,15 +221,15 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                     int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                        _interpolationPoints[0].y = _interpolationPoints[1].y;
-                        _interpolationPoints[1].y = _interpolationPoints[2].y;
-                        _interpolationPoints[2].y = _interpolationPoints[3].y;
-                        long currBuffPos = samplePosition + i -1 - currentBufferOffset;
+                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                        _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+                        _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+                        long currBuffPos = samplePosition +(i*_numChannels)-1+channel - currentBufferOffset;
                         if (currBuffPos < 0) {
                             if (_numBuffers > 0) {
                                 int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
                                 int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
-                                _interpolationPoints[3].y =  _buffer[prevBufferOffset + prevSamplePos];
+                                _interpolationPoints[channel][3].y =  _buffer[prevBufferOffset + prevSamplePos];
                                 //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], prevBufferOffset + prevSamplePos, _bufferPosition);
                             }
                         } else 
@@ -230,12 +237,12 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                             if (_numBuffers >= 1) {
                                 int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
                                 int nextSamplePos = currBuffPos % (_bufferLength / 2);
-                                _interpolationPoints[3].y =  _buffer[nextBufferOffset + nextSamplePos];
+                                _interpolationPoints[channel][3].y =  _buffer[nextBufferOffset + nextSamplePos];
                                 //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
                             }
                         }
                         else {
-                            _interpolationPoints[3].y =  _buffer[samplePosition+i-1];
+                            _interpolationPoints[channel][3].y =  _buffer[samplePosition+(i*_numChannels)-1+channel];
                             //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition+i-1, _bufferPosition);
                         }
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
@@ -247,36 +254,55 @@ bool ResamplingSdReader::readNextValue(int16_t *value) {
                 //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
                 int16_t interpolation 
                     = fastinterpolate(
-                        _interpolationPoints[0].y, 
-                        _interpolationPoints[1].y, 
-                        _interpolationPoints[2].y, 
-                        _interpolationPoints[3].y, 
+                        _interpolationPoints[channel][0].y, 
+                        _interpolationPoints[channel][1].y, 
+                        _interpolationPoints[channel][2].y, 
+                        _interpolationPoints[channel][3].y, 
                         1.0 + abs_remainder); 
                 result = interpolation;
                 //Serial.printf("[%f]\n", interpolation);
             } else 
                 result = 0;
         } else {
-            _interpolationPoints[0].y = _interpolationPoints[1].y;
-            _interpolationPoints[1].y = _interpolationPoints[2].y;
-            _interpolationPoints[2].y = _interpolationPoints[3].y;
-            _interpolationPoints[3].y = result;
+            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+            _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+            _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+            _interpolationPoints[channel][3].y = result;
             if (_numInterpolationPoints < 4) {
                 _numInterpolationPoints++;
                 result = 0;
             } else 
-                result = _interpolationPoints[1].y;
+                result = _interpolationPoints[channel][1].y;
             //Serial.printf("%f\n", result);
         }
     }
-
-    _remainder += _playbackRate;
-    auto delta = static_cast<signed int>(_remainder);
-    _remainder -= static_cast<double>(delta);
-    _bufferPosition += 2 * delta;
+    if (channel == _numChannels - 1) {
+        _remainder += _playbackRate;
+        auto delta = static_cast<signed int>(_remainder);
+        _remainder -= static_cast<double>(delta);
+        _bufferPosition += 2 * delta;
+    }
 
     *value = result;
     return true;
+}
+void ResamplingSdReader::initializeInterpolationPoints(void) {
+    deleteInterpolationPoints();
+    for (int channel=0; channel < _numChannels; channel++) {        
+        IntepolationData *interpolation = new IntepolationData[4];
+        interpolation[0].y = 0.0;
+        interpolation[1].y = 0.0;    
+        interpolation[2].y = 0.0;    
+        interpolation[3].y = 0.0;
+        _interpolationPoints.push_back(interpolation) ;
+    }
+}
+
+void ResamplingSdReader::deleteInterpolationPoints(void) {
+    for (auto && interpolationPoints : _interpolationPoints) {
+        delete [] interpolationPoints;
+    }
+    _interpolationPoints.clear();
 }
 
 void ResamplingSdReader::begin(void)

@@ -68,3 +68,7 @@ void loop() {
     }
     delay(10);
 }
+
+void std::__throw_length_error(char const* message) {
+    Serial.printf("length error, %s\n", message);
+}
