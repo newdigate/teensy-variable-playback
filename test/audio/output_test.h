@@ -45,37 +45,40 @@ public:
 			_saveToFile = true;			
 		}
     }
-	void closeOutputfile() {
-		if (!_saveToFile) return;		
-		_saveToFile = false;
-		char buf[4];
-		buf[1] = numConnections >> 8;
-		buf[0] = numConnections;
-		_outputFile.seekp(22, ios_base::beg);
-		_outputFile.write(buf, 2);
+	void closeOutputfile(uint16_t numChannels) {
+		if (!_saveToFile) return;
 
-		short bytespersecond = numConnections * 2 * 44100;
-		buf[3] = bytespersecond >> 24;
-		buf[2] = bytespersecond >> 16;
-		buf[1] = bytespersecond >> 8;
-		buf[0] = bytespersecond;
-		_outputFile.seekp(28, ios_base::beg);
-		_outputFile.write(buf, 4);
+		if (_outputFile.is_open()) {
+			_saveToFile = false;
+			char buf[4];
+			buf[1] = numChannels >> 8;
+			buf[0] = numChannels;
+			_outputFile.seekp(22, ios_base::beg);
+			_outputFile.write(buf, 2);
 
-		short bytespersampleframe = numConnections * 2;
-		buf[1] = bytespersampleframe >> 8;
-		buf[0] = bytespersampleframe;
-		_outputFile.seekp(32, ios_base::beg);
-		_outputFile.write(buf, 2);
+			long bytespersecond = numChannels * 2 * 44100;
+			buf[3] = bytespersecond >> 24;
+			buf[2] = bytespersecond >> 16;
+			buf[1] = bytespersecond >> 8;
+			buf[0] = bytespersecond;
+			_outputFile.seekp(28, ios_base::beg);
+			_outputFile.write(buf, 4);
 
-		buf[3] = _dataSize >> 24;
-		buf[2] = _dataSize >> 16;
-		buf[1] = _dataSize >> 8;
-		buf[0] = _dataSize;
-		_outputFile.seekp(40, ios_base::beg);
-		_outputFile.write(buf, 4);
-		_outputFile.close();
-		_filename = nullptr;
+			short bytespersampleframe = numChannels * 2;
+			buf[1] = bytespersampleframe >> 8;
+			buf[0] = bytespersampleframe;
+			_outputFile.seekp(32, ios_base::beg);
+			_outputFile.write(buf, 2);
+
+			buf[3] = _dataSize >> 24;
+			buf[2] = _dataSize >> 16;
+			buf[1] = _dataSize >> 8;
+			buf[0] = _dataSize;
+			_outputFile.seekp(40, ios_base::beg);
+			_outputFile.write(buf, 4);
+			_outputFile.close();
+			_filename = nullptr;
+		}
 	}
 protected:
 	std::ofstream _outputFile;

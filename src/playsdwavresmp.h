@@ -45,12 +45,19 @@ public:
         else 
             sdReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
+
+    void setNumChannels(uint16_t numChannels) {
+        sdReader.setNumChannels(numChannels);
+        _numChannels = numChannels;
+    }
 private:
     wav_header wave_header = wav_header();
     char *_filename = (char*)"";
     uint32_t file_size;
     volatile uint32_t file_offset;
     ResamplingSdReader sdReader;
+    volatile bool playing;
+    uint16_t _numChannels = 1;
 };
 
 

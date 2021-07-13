@@ -10,6 +10,7 @@ void AudioPlaySdRawResmp::begin()
     playing = false;
     file_offset = 0;
     file_size = 0;
+    sdReader.begin();
 }
 
 bool AudioPlaySdRawResmp::play(const char *filename)
@@ -27,33 +28,35 @@ void AudioPlaySdRawResmp::stop()
 void AudioPlaySdRawResmp::update()
 {
     unsigned int i, n;
-    audio_block_t *block;
-
+    audio_block_t *blocks[_numChannels];
+    int16_t *data[_numChannels];
     // only update if we're playing
-    if (!playing) return;
+    if (!sdReader.isPlaying()) return;
 
     // allocate the audio blocks to transmit
-    block = allocate();
-    if (block == NULL) return;
+    for (int i=0; i < _numChannels; i++) {
+        blocks[i] = allocate();
+        if (blocks[i] == nullptr) return;
+        data[i] = blocks[i]->data;
+    }
 
     if (sdReader.available()) {
         // we can read more data from the file...
-        n = sdReader.read(block->data, AUDIO_BLOCK_SAMPLES*2);
+        n = sdReader.read((void**)data, AUDIO_BLOCK_SAMPLES * 2);
         file_offset += n;
-        for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
-            block->data[i] = 0;
+        for (int channel=0; channel < _numChannels; channel++) {
+            for (i=n/2; i < AUDIO_BLOCK_SAMPLES; i++) {
+                blocks[channel]->data[i] = 0;
+            }
+            transmit(blocks[channel], channel);
         }
-        transmit(block);
     } else {
         sdReader.close();
-#if defined(HAS_KINETIS_SDHC)
-        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-#else
-        AudioStopUsingSPI();
-#endif
         playing = false;
     }
-    release(block);
+    for (int channel=0; channel < _numChannels; channel++) {
+        release(blocks[channel]);
+    }
 }
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592

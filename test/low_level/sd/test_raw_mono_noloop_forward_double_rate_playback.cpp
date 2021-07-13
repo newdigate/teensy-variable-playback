@@ -34,17 +34,20 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
         resamplingSdReader->setPlaybackRate(playBackRate);
         resamplingSdReader->play("test2.bin");
         resamplingSdReader->setLoopType(looptype_none);
-        int16_t actual[expectedSize];
+        int16_t actual[256];
+        int16_t *buffers[1] = { actual };
 
         int j = 0, bytesRead = 0, total_bytes_read = 0;
         do {
-            bytesRead = resamplingSdReader->read(&actual[j * 256], 512);
+            bytesRead = resamplingSdReader->read((void**)buffers, 512);
             total_bytes_read += bytesRead;
             printf("j:%d bytesRead: %d: ", j, bytesRead);
             for (int i = 0; i < bytesRead / 2; i++) {
-                printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j * 256 + i]);
+                printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");
+            if (bytesRead != 0)
+                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + (bytesRead / 2) - 1], &actual[0], &actual[(bytesRead / 2) - 1]);
             j++;
         } while (bytesRead > 0);
         printf("actual: bytes read: %d; samples read: %d \t\texpected: bytes read: %d; samples read:%d\n",
@@ -52,13 +55,6 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
         resamplingSdReader->close();
 
         BOOST_CHECK_EQUAL(expectedSize, total_bytes_read / 2);
-        if (total_bytes_read / 2 > 0) {
-            BOOST_CHECK_EQUAL_COLLECTIONS(
-                    &expected[0],
-                    &expected[expectedSize - 1],
-                    &actual[0],
-                    &actual[(total_bytes_read / 2) - 1]);
-        }
     }
 
     BOOST_FIXTURE_TEST_CASE(RawFileHas0Samples, ResamplingReaderFixture)

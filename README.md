@@ -9,12 +9,13 @@
 [![Commits](https://img.shields.io/github/commit-activity/m/newdigate/teensy-variable-playback)](https://github.com/newdigate/teensy-variable-playback/graphs/contributors)
 ![s](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4105381)
 
-play 16-bit mono .raw and .wav audio at variable playback rates on teensy
+play 16-bit audio samples at variable playback rates on teensy
 
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 13/07/2021: v1.0.7: added multi-channel resampling
 * 07/07/2021: v1.0.6: changed to using optimised floating point interpolation, sounds much better
 * 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
 * 25/06/2021: Quadratic interpolation is now working, but is disabled by default
@@ -23,7 +24,6 @@ play 16-bit mono .raw and .wav audio at variable playback rates on teensy
 * [code structure](#code-structure)
 * [requirements](#requirements)
 * [usage](#usage)
-* [todo](#todo)
 * [example usage](#example-usage)
 
 ## code structure
@@ -204,10 +204,7 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
   * launch
 
 </details>
-  
-## todo
-* stereo
-  
+
 ## example usage
 
 <details>

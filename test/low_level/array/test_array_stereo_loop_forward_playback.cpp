@@ -7,22 +7,35 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ResamplingArrayFixture.h"
-extern unsigned char kick_raw[];
-extern unsigned int kick_raw_len; // in bytes, divide by 2 to get samples
+#include "AudioStream.h"
 
-BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
+extern unsigned char stereo_souljah_raw[];
+extern unsigned int stereo_souljah_raw_len;
+BOOST_AUTO_TEST_SUITE(test_array_stereo_loop_forward_playback)
+
+    unsigned char stereo_raw[] = {
+    0x00, 0x00, 0x10, 0x00, 
+    0x01, 0x00, 0x11, 0x00, 
+    0x02, 0x00, 0x12, 0x00,
+    0x03, 0x00, 0x13, 0x00, 
+    0x04, 0x00, 0x14, 0x00, 
+    0x05, 0x00, 0x15, 0x00 };
+    
+    unsigned int stereo_raw_length = 24;
 
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayFixture) {
 
-        const uint32_t expectedDataSize = kick_raw_len; // 32 16bit samples = 64 bytes of space
+        const uint32_t expectedDataSize = stereo_souljah_raw_len; // 32 16bit samples = 64 bytes of space
         printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
+        resamplingArrayReader->setNumChannels(2);
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(0.5f);
-        resamplingArrayReader->play((int16_t*)kick_raw, kick_raw_len/2);
-        resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
-        int16_t actual[256];
-        int16_t *buffers[1] = { actual };
+        resamplingArrayReader->play((int16_t*)stereo_raw, stereo_raw_length/4);
+        resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
+        int16_t actual_left[256];
+        int16_t actual_right[256];
+        int16_t *buffers[2] = { actual_left, actual_right };
 
         int j = 0, bytesRead = 0, total_bytes_read = 0, currentExpected = 0;
         bool assertionsPass = true;
@@ -31,12 +44,33 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
             total_bytes_read += bytesRead;
             printf("j:%d bytesRead: %d \n", j, bytesRead);           
             printf("\n");
+            /*
+            Serial.print("Ch1:"); 
+            for (int i=0; i<bytesRead;i++) {			
+                if (actual_left[i] < 0)
+                    Serial.printf("-%04x ", -actual_left[i]);
+                else 
+                    Serial.printf(" %04x ", actual_left[i]);
+            }
+            Serial.println(); 	
+
+            Serial.print("Ch2:"); 
+            for (int i=0; i<bytesRead;i++) {			
+                if (actual_right[i] < 0)
+                    Serial.printf("-%04x ", -actual_right[i]);
+                else 
+                    Serial.printf(" %04x ", actual_right[i]);
+            }
+            */
             j++;
         } while (j < 3);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingArrayReader->close();
         BOOST_CHECK_EQUAL(true, true);
     }
+
+
+
 /*
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtHalfPlaybackRate, ResamplingArrayFixture) {
 
