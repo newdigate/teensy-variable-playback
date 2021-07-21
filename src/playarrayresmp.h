@@ -21,8 +21,8 @@ public:
     }
 
     void begin(void);
-    bool playRaw(int16_t *data, uint32_t numSamples);
-    bool playRaw(const unsigned int *data, uint32_t numSamples);
+    bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels);
+    bool playRaw(const unsigned int *data, uint32_t numSamples, uint16_t numChannels);
     
     bool playWav(int16_t *data, uint32_t fileSize);
     bool playWav(const unsigned int *data, uint32_t fileSize);
@@ -52,10 +52,7 @@ public:
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
 
-    void setNumChannels(uint16_t numChannels) {
-        arrayReader.setNumChannels(numChannels);
-        _numChannels = numChannels;
-    }
+
 
 private:
 
@@ -65,6 +62,11 @@ private:
     volatile bool playing;
     ResamplingArrayReader arrayReader;
     uint16_t _numChannels = 1;
+
+    void setNumChannels(uint16_t numChannels) {
+        arrayReader.setNumChannels(numChannels);
+        _numChannels = numChannels;
+    }
 };
 
 

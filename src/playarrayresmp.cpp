@@ -12,22 +12,24 @@ void AudioPlayArrayResmp::begin()
     arrayReader.begin();
 }
 
-bool AudioPlayArrayResmp::playRaw(int16_t *data, uint32_t numSamples)
+bool AudioPlayArrayResmp::playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
 {
     stop();
-    playing = arrayReader.playRaw(data, numSamples);
+    _numChannels = numChannels;
+    playing = arrayReader.playRaw(data, numSamples, _numChannels);
     return playing;
 }
 
-bool AudioPlayArrayResmp::playRaw(const unsigned int *data, uint32_t numSamples) 
+bool AudioPlayArrayResmp::playRaw(const unsigned int *data, uint32_t numSamples, uint16_t numChannels) 
 {
-    return playRaw((int16_t *) data, numSamples);
+    return playRaw((int16_t *) data, numSamples, numChannels);
 }
 
 bool AudioPlayArrayResmp::playWav(int16_t *data, uint32_t fileSize)
 {
     stop();
     playing = arrayReader.playWav(data, fileSize);
+    _numChannels = arrayReader.getNumChannels();
     return playing;
 }
 
