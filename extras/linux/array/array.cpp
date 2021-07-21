@@ -22,14 +22,14 @@ void setup() {
     sgtl5000_1.volume(0.5f, 0.5f);
     
     rraw_a1.setPlaybackRate(0.5);
-    rraw_a1.playRaw((int16_t*)kick_raw, kick_raw_len/2);    
+    rraw_a1.playRaw((int16_t*)kick_raw, kick_raw_len/2, 1);    
     Serial.println("setup done");
 }
 
 void loop() {
     if (!rraw_a1.isPlaying()) {
         delay(1000);
-        rraw_a1.playRaw((int16_t *)kick_raw, kick_raw_len/2);
+        rraw_a1.playRaw((int16_t*)kick_raw, kick_raw_len/2, 1);  
     } else
     delay(100);
 }
