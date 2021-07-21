@@ -8,8 +8,7 @@
 #include "waveheaderparser.h"
 #include "ResamplingSdReader.h"
 #include "ResamplingArrayReader.h"
-#include "playsdrawresmp.h"
-#include "playsdwavresmp.h"
+#include "playsdresmp.h"
 #include "playarrayresmp.h"
 
 #endif //TEENSY_RESAMPLING_ARDUINO_SAMPLER_H

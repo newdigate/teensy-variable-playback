@@ -2,27 +2,28 @@
 // Created by Nicholas Newdigate on 18/07/2020.
 //
 
-#ifndef TEENSY_RESAMPLING_SDREADER_ARRAY_READERTESTS_CPP
-#define TEENSY_RESAMPLING_SDREADER_ARRAY_READERTESTS_CPP
+#ifndef TEENSY_RESAMPLING_SDREADER_ARRAYWAV_STEREO_READERTESTS_CPP
+#define TEENSY_RESAMPLING_SDREADER_ARRAYWAV_STEREO_READERTESTS_CPP
 
 #include <boost/test/unit_test.hpp>
-#include "ResamplingArrayFixture.h"
-extern unsigned char kick_raw[];
-extern unsigned int kick_raw_len; // in bytes, divide by 2 to get samples
+#include "ResamplingArrayWavFixture.h"
 
-BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
+extern unsigned char stereo_souljah_wav[];
+extern unsigned int stereo_souljah_wav_len;
 
-    BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayFixture) {
+BOOST_AUTO_TEST_SUITE(test_array_stereo)
 
-        const uint32_t expectedDataSize = kick_raw_len; // 32 16bit samples = 64 bytes of space
+    BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayWavFixture) {
+
+        const uint32_t expectedDataSize = stereo_souljah_wav_len; // 32 16bit samples = 64 bytes of space
         printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(1.0f);
-        resamplingArrayReader->playRaw((int16_t*)kick_raw, kick_raw_len/2, 1);
+        resamplingArrayReader->playWav((int16_t*)stereo_souljah_wav, stereo_souljah_wav_len/2);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
-        int16_t actual[256];
-        int16_t *buffers[1] = { actual };
+        int16_t actualLeft[256], actualRight[256];
+        int16_t *buffers[2] = { actualLeft, actualRight };
 
         int j = 0, bytesRead = 0, total_bytes_read = 0, currentExpected = 0;
         bool assertionsPass = true;
@@ -32,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
             printf("j:%d bytesRead: %d \n", j, bytesRead);           
             printf("\n");
             j++;
-        } while (j < 3);
+        } while (bytesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingArrayReader->close();
         BOOST_CHECK_EQUAL(true, true);
@@ -40,4 +41,4 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif //TEENSY_RESAMPLING_SDREADER_READERTESTS_CPP
+#endif //TEENSY_RESAMPLING_SDREADER_ARRAYWAV_STEREO_READERTESTS_CPP

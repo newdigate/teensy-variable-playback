@@ -2,7 +2,7 @@
 // this example plays a sample stored in an array
 #include <Arduino.h>
 #include <Audio.h>
-#include "playsdrawresmp.h"
+#include "playsdresmp.h"
 #include "output_soundio.h"
 #include <soundio/soundio.h>
 #include <SD.h>
@@ -15,7 +15,7 @@
 #include <cassert>
 
 // GUItool: begin automatically generated code
-AudioPlaySdRawResmp      playSdRaw1;        //xy=306,225
+AudioPlaySdResmp         playSdRaw1;        //xy=306,225
 AudioRecordQueue         queue1;         //xy=609,267
 AudioOutputSoundIO       sio_out1;       //xy=612,224
 AudioConnection          patchCord1(playSdRaw1, 0, sio_out1, 0);
@@ -68,7 +68,7 @@ void loop() {
     unsigned currentMillis = millis();
     if (currentMillis > lastSamplePlayed + 1000) {
         if (!playSdRaw1.isPlaying()) {
-            playSdRaw1.play(_filename);
+            playSdRaw1.playRaw(_filename, 1);
             lastSamplePlayed = currentMillis;
 
             Serial.print("Memory: ");

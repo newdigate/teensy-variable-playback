@@ -45,7 +45,7 @@ void loop() {
     unsigned currentMillis = millis();
     if (currentMillis > lastSamplePlayed + 500) {
         if (!rraw_a1.isPlaying()) {
-            rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
+            rraw_a1.playRaw((int16_t *)kick_raw, kick_raw_len/2, 1);
             lastSamplePlayed = currentMillis;
 
             Serial.print("Memory: ");
@@ -58,6 +58,7 @@ void loop() {
     delay(10);
 }
 
+//created using linux command xxd -i kick.raw (44100Hz little-endian 16-bit/sample )
 unsigned char kick_raw[] = {
   0x99, 0x02, 0xd7, 0x02, 0xfa, 0x02, 0x5f, 0x03, 0xc1, 0x03, 0x2a, 0x04,
   0xad, 0x04, 0xa5, 0x05, 0x76, 0x06, 0x2f, 0x07, 0x9e, 0x07, 0xe2, 0x07,

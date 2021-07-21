@@ -10,7 +10,7 @@
 
 extern unsigned char stereo_souljah_raw[];
 extern unsigned int stereo_souljah_raw_len;
-    
+
 BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
 
     const uint16_t numberOfChannels = 2;
@@ -30,11 +30,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
         
         testout.saveOutputFile(outputFile.c_str());
-        memory.setNumChannels(numberOfChannels);
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -66,12 +65,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());
-        memory.setNumChannels(numberOfChannels);        
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
-        for (int i=0; i < ((stereo_souljah_raw_len/2)/128) + 20; i++) {
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
+        for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }
         testout.closeOutputfile(numberOfChannels);
@@ -103,11 +101,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());     
-        memory.setNumChannels(numberOfChannels);        
         memory.begin();           
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -140,11 +137,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());
-        memory.setNumChannels(numberOfChannels);        
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -178,11 +174,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());
-        memory.setNumChannels(numberOfChannels);
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -215,11 +210,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());
-        memory.setNumChannels(numberOfChannels);
         memory.begin();        
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2);
+        memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((stereo_souljah_raw_len)/128) + 20; i++) {
             testout.isr();
         }

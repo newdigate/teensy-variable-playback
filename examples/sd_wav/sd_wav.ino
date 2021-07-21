@@ -1,21 +1,19 @@
-// Plays a RAW (16-bit signed) PCM audio file at slower or faster rate
-// this example requires an uSD-card inserted to teensy 3.6 with a file called DEMO.RAW
+// Plays a Wav (16-bit signed) PCM audio file at slower or faster rate
+// this example requires an uSD-card inserted to teensy 3.6 with a file called DEMO.WAV
 #include <Arduino.h>
-#include <AudioStream.h>
 #include <Audio.h>
-#include "SD.h"
+#include <SD.h>
 #include <TeensyVariablePlayback.h>
 
 // GUItool: begin automatically generated code
-AudioControlSGTL5000     audioShield;
-AudioPlaySdWavResmp      playSdWav1;     //xy=324,457
+AudioPlaySdResmp         playSdWav1;     //xy=324,457
 AudioOutputI2S           i2s2;           //xy=840.8571472167969,445.5714416503906
 AudioConnection          patchCord1(playSdWav1, 0, i2s2, 0);
 AudioConnection          patchCord2(playSdWav1, 0, i2s2, 1);
+AudioControlSGTL5000     audioShield;
 // GUItool: end automatically generated code
 
 #define A14 10
-#define BUILTIN_SDCARD 10
 
 char* _filename = "DEMO.WAV";
 const int analogInPin = A14;
@@ -58,9 +56,14 @@ void loop() {
     unsigned currentMillis = millis();
     if (currentMillis > lastSamplePlayed + 500) {
         if (!playSdWav1.isPlaying()) {
-            playSdWav1.play(_filename);
+            playSdWav1.playWav(_filename);
             lastSamplePlayed = currentMillis;
-
+            
+            Serial.print("all=");
+            Serial.print(AudioProcessorUsage());
+            Serial.print(",");
+            Serial.print(AudioProcessorUsageMax());
+            Serial.print("    ");
             Serial.print("Memory: ");
             Serial.print(AudioMemoryUsage());
             Serial.print(",");

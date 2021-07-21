@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_0000_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_5000_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp        wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_2_0000_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp        wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();           
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_7437_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp        wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_7437_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp        wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_8_7437_quadratic_mono_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp        wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         // GUItool: end automatically generated code
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         wave.begin();        
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("kick.wav");
+        wave.playWav("kick.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }

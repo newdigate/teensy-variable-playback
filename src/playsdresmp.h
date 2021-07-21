@@ -12,10 +12,10 @@
 #include "stdint.h"
 #include "ResamplingSdReader.h"
 
-class AudioPlaySdRawResmp : public AudioStream
+class AudioPlaySdResmp : public AudioStream
 {
 public:
-    AudioPlaySdRawResmp(void) :
+    AudioPlaySdResmp(void) :
             AudioStream(0, NULL),
             sdReader()
     {
@@ -23,9 +23,10 @@ public:
     }
 
     void begin(void);
-    bool play(const char *filename);
+    bool playRaw(const char *filename, uint16_t numChannels);
+    bool playWav(const char *filename);
     void stop(void);
-    bool isPlaying(void) { return playing; }
+    bool isPlaying(void) { return sdReader.isPlaying(); }
     uint32_t positionMillis(void);
     uint32_t lengthMillis(void);
     virtual void update(void);
@@ -51,6 +52,7 @@ private:
     volatile bool playing;
     ResamplingSdReader sdReader;
     uint16_t _numChannels = 1;    
+    char *_filename = (char*)"";
 };
 
 

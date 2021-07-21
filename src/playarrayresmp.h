@@ -21,7 +21,12 @@ public:
     }
 
     void begin(void);
-    bool play(int16_t *data, uint32_t numSamples);
+    bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels);
+    bool playRaw(const unsigned int *data, uint32_t numSamples, uint16_t numChannels);
+    
+    bool playWav(int16_t *data, uint32_t fileSize);
+    bool playWav(const unsigned int *data, uint32_t fileSize);
+
     void stop(void);
     bool isPlaying(void) { return playing; }
     uint32_t positionMillis(void);
@@ -35,6 +40,10 @@ public:
     void setLoopType(loop_type t) {
         arrayReader.setLoopType(t);
     }
+    
+    void startLoop(uint32_t samples) {
+        arrayReader.loop(samples);
+    }
 
     void enableInterpolation(bool enable) {
         if (enable)
@@ -43,18 +52,21 @@ public:
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
 
-    void setNumChannels(uint16_t numChannels) {
-        arrayReader.setNumChannels(numChannels);
-        _numChannels = numChannels;
-    }
+
 
 private:
 
     uint32_t file_size;
+
     volatile uint32_t file_offset;
     volatile bool playing;
     ResamplingArrayReader arrayReader;
     uint16_t _numChannels = 1;
+
+    void setNumChannels(uint16_t numChannels) {
+        arrayReader.setNumChannels(numChannels);
+        _numChannels = numChannels;
+    }
 };
 
 
