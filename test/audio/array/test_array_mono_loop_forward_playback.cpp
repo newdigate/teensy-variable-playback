@@ -27,12 +27,12 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         const std::string outputFile = testName+".wav";
         const std::string outputFileName = "output/" + outputFile;
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
-        
+ 
         testout.saveOutputFile(outputFile.c_str());
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         memory.begin();           
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         memory.begin();
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
         memory.begin();        
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
-        memory.play((int16_t*)kick_raw, kick_raw_len / 2);
+        memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
             testout.isr();
         }

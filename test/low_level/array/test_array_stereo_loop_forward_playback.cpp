@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(test_array_stereo_loop_forward_playback)
         resamplingArrayReader->setNumChannels(2);
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(0.5f);
-        resamplingArrayReader->play((int16_t*)stereo_raw, stereo_raw_length/4);
+        resamplingArrayReader->playRaw((int16_t*)stereo_raw, stereo_raw_length/4);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
         int16_t actual_left[256];
         int16_t actual_right[256];

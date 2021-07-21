@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(0.5f);
-        resamplingArrayReader->play((int16_t*)kick_raw, kick_raw_len/2);
+        resamplingArrayReader->playRaw((int16_t*)kick_raw, kick_raw_len/2);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
         int16_t actual[256];
         int16_t *buffers[1] = { actual };

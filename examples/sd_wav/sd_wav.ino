@@ -60,7 +60,12 @@ void loop() {
         if (!playSdWav1.isPlaying()) {
             playSdWav1.play(_filename);
             lastSamplePlayed = currentMillis;
-
+            
+            Serial.print("all=");
+            Serial.print(AudioProcessorUsage());
+            Serial.print(",");
+            Serial.print(AudioProcessorUsageMax());
+            Serial.print("    ");
             Serial.print("Memory: ");
             Serial.print(AudioMemoryUsage());
             Serial.print(",");

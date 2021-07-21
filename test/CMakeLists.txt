@@ -22,18 +22,32 @@ if (DEFINED BUILD_FOR_LINUX)
 
     add_executable(embedfile embedfile.c)
 
-    add_custom_command(
-      OUTPUT kick_raw.c
+    add_custom_command(OUTPUT kick_raw.c
       COMMAND embedfile kick_raw ${CMAKE_SOURCE_DIR}/test/resources/input/kick.raw
-      )
+    )
 
-    add_custom_command(
-      OUTPUT stereo_souljah_raw.c
+    add_custom_command(OUTPUT stereo_souljah_raw.c
       COMMAND embedfile stereo_souljah_raw ${CMAKE_SOURCE_DIR}/test/resources/input/stereo_souljah.raw
-      )
+    )
+
+    add_custom_command(OUTPUT stereo_souljah_wav.c
+      COMMAND embedfile stereo_souljah_wav ${CMAKE_SOURCE_DIR}/test/resources/input/stereo_souljah.wav
+    )
+
+    add_custom_command(OUTPUT mono_souljah_wav.c
+      COMMAND embedfile mono_souljah_wav ${CMAKE_SOURCE_DIR}/test/resources/input/mono_souljah.wav
+    )
+
+    add_custom_command(OUTPUT PNO1C1_raw.c
+      COMMAND embedfile PNO1C1_raw ${CMAKE_SOURCE_DIR}/test/resources/input/PNO1C1.raw
+    )
+
     add_executable(tests
             kick_raw.c
             stereo_souljah_raw.c
+            stereo_souljah_wav.c
+            mono_souljah_wav.c
+            PNO1C1_raw.c
             audio/output_test.cpp
 
             audio/array/AudioArrayFixture.h
@@ -56,6 +70,9 @@ if (DEFINED BUILD_FOR_LINUX)
             
             low_level/array/test_array_mono_loop_forward_playback.cpp
             low_level/array/test_array_stereo_loop_forward_playback.cpp
+
+            low_level/arraywav/test_array_mono_loop_forward_playback.cpp
+            low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
             )
 
     target_link_libraries(tests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
