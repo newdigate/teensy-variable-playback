@@ -45,7 +45,7 @@ void loop() {
     unsigned currentMillis = millis();
     if (currentMillis > lastSamplePlayed + 500) {
         if (!rraw_a1.isPlaying()) {
-            rraw_a1.play((int16_t *)kick_raw, kick_raw_len/2);
+            rraw_a1.playRaw((int16_t *)kick_raw, kick_raw_len/2, 1);
             lastSamplePlayed = currentMillis;
 
             Serial.print("Memory: ");
