@@ -1,0 +1,12 @@
+AudioPlayArrayResmp	    KEYWORD2
+AudioPlaySdResmp        KEYWORD2
+playRaw                 KEYWORD2
+playWav                 KEYWORD2
+isPlaying               KEYWORD2
+setPlaybackRate         KEYWORD2
+setLoopType             KEYWORD2
+startLoop               KEYWORD2
+enableInterpolation     KEYWORD2
+looptype_none           LITERAL1
+looptype_repeat         LITERAL1
+looptype_pingpong       LITERAL1
