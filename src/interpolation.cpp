@@ -8,7 +8,7 @@
 // function to interpolate the given data points using Lagrange's formula
 // xi corresponds to the new data point whose value is to be obtained
 // n represents the number of known data points
-int16_t interpolate(IntepolationData *f, double xi, int n) {
+int16_t interpolate(InterpolationData *f, double xi, int n) {
     double result = 0.0; // Initialize result
     for (int i=0; i<n; i++)
     {

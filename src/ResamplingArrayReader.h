@@ -1,6 +1,7 @@
 #ifndef TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
 #define TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H
 
+#include <Arduino.h>
 #include "SD.h"
 #include <cstdint>
 #include "loop_type.h"
@@ -13,7 +14,8 @@ public:
     }
 
     void begin(void);
-    bool play(int16_t *array, uint32_t length);
+    bool playRaw(int16_t *array, uint32_t length);
+    bool playWav(int16_t *array, uint32_t length);
     bool play();
     void stop(void);
     bool isPlaying(void) { return _playing; }
@@ -25,12 +27,20 @@ public:
         _playbackRate = f;
         if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _bufferPosition = _file_size;
+            _bufferPosition = _file_size - _numChannels;
         }
     }
 
     float playbackRate() {
         return _playbackRate;
+    }
+
+    void loop(uint32_t numSamples) {
+        __disable_irq();
+        _loop_start = _bufferPosition;
+        _loop_finish = _bufferPosition + numSamples * _numChannels;
+        _loopType = loop_type::looptype_repeat;
+        __enable_irq();
     }
 
     void setLoopType(loop_type loopType)
@@ -69,10 +79,21 @@ public:
         }
     }
 
+    void setHeaderSizeInBytes(uint32_t headerSizeInBytes) {
+        _header_offset = headerSizeInBytes / 2;
+        if (_bufferPosition < _header_offset) {
+            if (_playbackRate >= 0) {
+                _bufferPosition = _header_offset;
+            } else
+                _bufferPosition = _loop_finish + _header_offset;
+        }
+    }
+
 private:
     volatile bool _playing = false;
 
     int32_t _file_size;
+    uint32_t _header_offset = 0; // == (header size in bytes ) / 2
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
@@ -84,7 +105,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData **_interpolationPoints = nullptr;
+    InterpolationData **_interpolationPoints = nullptr;
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);
 };

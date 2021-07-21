@@ -105,7 +105,7 @@ private:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
-    IntepolationData **_interpolationPoints = nullptr;
+    InterpolationData **_interpolationPoints = nullptr;
     bool updateBuffers(void);
     void StartUsingSPI(){
         //Serial.printf("start spi: %s\n", _filename);
