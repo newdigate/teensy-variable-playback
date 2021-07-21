@@ -15,7 +15,9 @@ play 16-bit audio samples at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
-* 21/07/2021: v1.0.8: play method changed to playRaw and playWav, specify number of channels in parameters of playRaw
+* 21/07/2021: v1.0.8: **Breaking changes** 
+  * ```AudioPlaySdRawResmp``` and ```AudioPlaySdWaveResmp``` merged into a single class ``AudioPlaySdResmp```
+  * ```play(...)``` method changed to ```playRaw(...)``` and ```playWav(...)```, specify number of channels in parameters of playRaw
 * 13/07/2021: v1.0.7: added multi-channel resampling
 * 07/07/2021: v1.0.6: changed to using optimised floating point interpolation, sounds much better
 * 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
