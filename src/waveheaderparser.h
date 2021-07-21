@@ -14,23 +14,23 @@ using namespace std;
 // from https://gist.github.com/Jon-Schneider/8b7c53d27a7a13346a643dac9c19d34f
 struct wav_header {
     // RIFF Header
-    char riff_header[4]; // Contains "RIFF"
-    int header_chunk_size; // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
-    char wave_header[4]; // Contains "WAVE"
+    char riff_header[4];    // 00 - 03 - Contains "RIFF"
+    int header_chunk_size;  // 04 - 07 - Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
+    char wave_header[4];    // 08 - 11 - Contains "WAVE"
 
     // Format Header
-    char fmt_header[4]; // Contains "fmt " (includes trailing space)
-    int fmt_chunk_size; // Should be 16 for PCM
-    short audio_format; // Should be 1 for PCM. 3 for IEEE Float
-    short num_channels;
-    int sample_rate;
-    int byte_rate;
-    short sample_alignment;
-    short bit_depth;
+    char fmt_header[4];     // 12 - 15 - Contains "fmt " (includes trailing space)
+    int fmt_chunk_size;     // 16 - 19 - Should be 16 for PCM
+    short audio_format;     // 20 - 21 - Should be 1 for PCM. 3 for IEEE Float
+    short num_channels;     // 22 - 23
+    int sample_rate;        // 24 - 27
+    int byte_rate;          // 28 - 31
+    short sample_alignment; // 32 - 33
+    short bit_depth;        // 34 - 35
 
     // Data
-    char data_header[4];
-    int data_bytes;
+    char data_header[4];    // 36 - 39
+    int data_bytes;         // 40 - 43
 };
 
 class WaveHeaderParser {
@@ -57,6 +57,10 @@ public:
             Serial.printf("expected 44 bytes (was %d)\n", bytesRead);
             return false;
         }
+        return readWaveHeaderFromBuffer(buffer, header);
+    }
+
+    bool readWaveHeaderFromBuffer(const char *buffer, wav_header &header) {
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
             Serial.printf("expected RIFF (was %s)\n", buffer);
             return false;
