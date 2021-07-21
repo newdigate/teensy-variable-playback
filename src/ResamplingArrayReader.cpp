@@ -212,11 +212,12 @@ void ResamplingArrayReader::initializeInterpolationPoints(void) {
         interpolation[3].y = 0.0;
         _interpolationPoints[channel] = interpolation ;
     }
+    _numInterpolationPointsChannels = _numChannels;
 }
 
 void ResamplingArrayReader::deleteInterpolationPoints(void) {
     if (!_interpolationPoints) return;
-    for (int i=0; i<_numChannels; i++) {
+    for (int i=0; i<_numInterpolationPointsChannels; i++) {
         delete [] _interpolationPoints[i];
     }
      delete [] _interpolationPoints;
@@ -233,7 +234,7 @@ void ResamplingArrayReader::begin(void)
     _file_size = 0;
 }
 
-bool ResamplingArrayReader::playRaw(int16_t *array, uint32_t length)
+bool ResamplingArrayReader::playRaw(int16_t *array, uint32_t length, uint16_t numChannels)
 {
     _sourceBuffer = array;
     stop();
@@ -241,7 +242,8 @@ bool ResamplingArrayReader::playRaw(int16_t *array, uint32_t length)
     _header_offset = 0;
     _file_size = length;
     _loop_start = 0;
-    _loop_finish = _file_size ;
+    _loop_finish = _file_size;
+    setNumChannels(numChannels);
 
     reset();
     //updateBuffers();
@@ -271,7 +273,6 @@ bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)
     _playing = true;
     return true;
 }
-
 
 bool ResamplingArrayReader::play()
 {

@@ -14,7 +14,7 @@ public:
     }
 
     void begin(void);
-    bool playRaw(int16_t *array, uint32_t length);
+    bool playRaw(int16_t *array, uint32_t length, uint16_t numChannels);
     bool playWav(int16_t *array, uint32_t length);
     bool play();
     void stop(void);
@@ -72,6 +72,10 @@ public:
         }
     }
 
+    int16_t getNumChannels() {
+        return _numChannels;
+    }
+
     void setNumChannels(uint16_t numChannels) {
         if (numChannels != _numChannels) {
             _numChannels = numChannels;
@@ -101,6 +105,7 @@ private:
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
     uint16_t _numChannels = 1;
+    uint16_t _numInterpolationPointsChannels = 0;
     int16_t *_sourceBuffer;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
