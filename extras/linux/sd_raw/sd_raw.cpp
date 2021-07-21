@@ -4,11 +4,11 @@
 #include <AudioStream.h>
 #include <Audio.h>
 #include "SD.h"
-#include "playsdrawresmp.h"
+#include "playsdresmp.h"
 
 // GUItool: begin automatically generated code
 AudioControlSGTL5000 audioShield;
-AudioPlaySdRawResmp  playSdRaw1;     //xy=324,457
+AudioPlaySdResmp  playSdRaw1;     //xy=324,457
 AudioOutputI2S           i2s2;           //xy=840.8571472167969,445.5714416503906
 AudioConnection          patchCord1(playSdRaw1, 0, i2s2, 0);
 AudioConnection          patchCord2(playSdRaw1, 0, i2s2, 1);
@@ -41,7 +41,7 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSdRaw1.play(_filename);
+    playSdRaw1.playRaw(_filename, 1);
     playSdRaw1.setPlaybackRate(-1);
     Serial.println("playing...");
 }
@@ -58,7 +58,7 @@ void loop() {
 
     if (!playSdRaw1.isPlaying()) {
         Serial.println("playing...");
-        playSdRaw1.play(_filename);
+        playSdRaw1.playRaw(_filename, 1);
     }
 }
 

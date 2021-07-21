@@ -2,25 +2,37 @@
 // Created by Nicholas Newdigate on 18/07/2020.
 //
 
-#include "playsdwavresmp.h"
+#include "playsdresmp.h"
 #include "spi_interrupt.h"
+#include "waveheaderparser.h"
 
-void AudioPlaySdWavResmp::begin()
+void AudioPlaySdResmp::begin()
 {
+    playing = false;
     file_offset = 0;
     file_size = 0;
     sdReader.begin();
 }
 
-bool AudioPlaySdWavResmp::play(char *filename)
+bool AudioPlaySdResmp::playRaw(const char *filename, uint16_t numChannels)
+{
+    stop();
+    _numChannels = numChannels;
+    sdReader.setNumChannels(numChannels);
+    playing = sdReader.play(filename);
+    return playing;
+}
+
+bool AudioPlaySdResmp::playWav(const char *filename)
 {
     long startMicros = micros();
     stop();
-    if (strcmp(_filename,filename) != 0) {
+    if (strcmp(_filename, filename) != 0) {
         _filename = new char[strlen(filename)];
         strcpy( _filename, filename);
 
         WaveHeaderParser waveHeaderParser;
+        wav_header wave_header;
         bool parseWavHeader = waveHeaderParser.readWaveHeader(filename, wave_header);
         if (parseWavHeader) {
             Serial.printf("parsed header...%s\n", _filename);
@@ -38,9 +50,8 @@ bool AudioPlaySdWavResmp::play(char *filename)
             Serial.printf("needs signed 16 bit audio format (1), got %d\n", wave_header.audio_format);
             return false;
         }
-
-        setNumChannels(wave_header.num_channels);
-
+        _numChannels = wave_header.num_channels;
+        sdReader.setNumChannels(_numChannels);
         bool playing = sdReader.play(filename);
         long stopMicros = micros();
         Serial.printf("play(%d mS)\n", stopMicros - startMicros);
@@ -50,13 +61,12 @@ bool AudioPlaySdWavResmp::play(char *filename)
     }
 }
 
-void AudioPlaySdWavResmp::stop()
+void AudioPlaySdResmp::stop()
 {
-    if (sdReader.isPlaying())
-        sdReader.stop();
+    sdReader.stop();
 }
 
-void AudioPlaySdWavResmp::update()
+void AudioPlaySdResmp::update()
 {
     unsigned int i, n;
     audio_block_t *blocks[_numChannels];
@@ -92,12 +102,12 @@ void AudioPlaySdWavResmp::update()
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
-uint32_t AudioPlaySdWavResmp::positionMillis()
+uint32_t AudioPlaySdResmp::positionMillis()
 {
     return ((uint64_t)file_offset * B2M) >> 32;
 }
 
-uint32_t AudioPlaySdWavResmp::lengthMillis()
+uint32_t AudioPlaySdResmp::lengthMillis()
 {
     return ((uint64_t)file_size * B2M) >> 32;
 }

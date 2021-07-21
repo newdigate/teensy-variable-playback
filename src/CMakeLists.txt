@@ -3,8 +3,7 @@ project(teensy_variable_playback C CXX)
 set(teensy_variable_playback_VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
-        playsdrawresmp.cpp
-        playsdwavresmp.cpp
+        playsdresmp.cpp
         ResamplingSdReader.cpp
         ResamplingArrayReader.cpp
         playarrayresmp.cpp
@@ -12,8 +11,7 @@ set(SOURCE_FILES
 
 set(HEADER_FILES
         loop_type.h
-        playsdrawresmp.h
-        playsdwavresmp.h
+        playsdresmp.h
         ResamplingSdReader.h
         waveheaderparser.h
         ResamplingArrayReader.h

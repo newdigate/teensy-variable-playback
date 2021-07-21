@@ -9,7 +9,7 @@
 #include <SD.h>
 #include <iterator>
 #include "output_test.h"
-#include "playsdwavresmp.h"
+#include "playsdresmp.h"
 
 struct AudioWavFixture {
 

@@ -73,7 +73,7 @@ public:
     }
 
     void setNumChannels(uint16_t numChannels) {
-        if (_numChannels != numChannels) {            
+        if (_numChannels != numChannels) {   
             _numChannels = numChannels;
             initializeInterpolationPoints();
         }
@@ -94,6 +94,7 @@ private:
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
     uint16_t _numChannels = 1;
+    uint16_t _numInterpolationPointsChannels = 0;
 
     int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE * 2]; // two buffers
     unsigned int _bufferLength = 0;

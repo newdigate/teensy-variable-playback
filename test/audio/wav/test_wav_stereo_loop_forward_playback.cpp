@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_0000_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -30,11 +30,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         SD.setSDCardFolderPath(referencePath);
         
         testout.saveOutputFile(outputFile.c_str());
-        wave.setNumChannels(numberOfChannels);
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -54,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_5000_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -67,11 +66,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         SD.setSDCardFolderPath(referencePath);
 
         testout.saveOutputFile(outputFile.c_str());
-        wave.setNumChannels(numberOfChannels);        
+    
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -91,7 +90,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_2_0000_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -104,11 +103,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
 
         testout.saveOutputFile(outputFile.c_str());     
-        wave.setNumChannels(numberOfChannels);        
         wave.begin();           
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -128,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_7437_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -142,11 +140,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         SD.setSDCardFolderPath(referencePath);
 
         testout.saveOutputFile(outputFile.c_str());
-        wave.setNumChannels(numberOfChannels);        
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -167,7 +164,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_7437_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -181,11 +178,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         SD.setSDCardFolderPath(referencePath);
 
         testout.saveOutputFile(outputFile.c_str());
-        wave.setNumChannels(numberOfChannels);
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
@@ -205,7 +201,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_8_7437_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
-        AudioPlaySdWavResmp      wave;        //xy=306,225
+        AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
         AudioConnection          patchCord1(wave, 0, testout, 0);
         AudioConnection          patchCord2(wave, 1, testout, 1);
@@ -219,11 +215,10 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         SD.setSDCardFolderPath(referencePath);
 
         testout.saveOutputFile(outputFile.c_str());
-        wave.setNumChannels(numberOfChannels);
         wave.begin();        
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
-        wave.play("stereo_souljah.wav");
+        wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
             testout.isr();
         }
