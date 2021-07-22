@@ -15,8 +15,9 @@ AudioControlSGTL5000     audioShield;
 
 #define A14 10
 
-const char* _filenames[] = {"CLAP.WAV", "CRASH.WAV", "FX04.WAV", "FX09.WAV"};
+char** _filenames  = nullptr;
 uint16_t _fileIndex = 0;
+uint16_t _numWaveFiles = 0;
 
 const int analogInPin = A14;
 unsigned long lastSamplePlayed = 0;
@@ -24,6 +25,9 @@ unsigned long lastSamplePlayed = 0;
 double getPlaybackRate(int16_t analog) { //analog: 0..1023
     return  (analog - 512.0) / 512.0;
 }
+
+uint16_t getNumWavFilesInDirectory(char *directory);
+void populateFilenames(char *directory, char **filenames);
 
 void setup() {
     analogReference(0);
@@ -45,6 +49,11 @@ void setup() {
     int newsensorValue = analogRead(analogInPin);
     playSd1.setPlaybackRate(getPlaybackRate(newsensorValue));
 
+    _numWaveFiles = getNumWavFilesInDirectory("/");
+    Serial.printf("Num wave files: %d\n", _numWaveFiles);
+    _filenames = new char*[_numWaveFiles];
+    populateFilenames("/", _filenames);
+
     AudioMemory(24);
 }
 
@@ -54,17 +63,15 @@ void loop() {
     playSd1.setPlaybackRate(getPlaybackRate(newsensorValue));
     
     unsigned currentMillis = millis();
-    if (currentMillis > lastSamplePlayed + 500) {
+    if (currentMillis > lastSamplePlayed + 1000) {
         if (!playSd1.isPlaying()) {
             
             if (playSd1.playWav(_filenames[_fileIndex])) {
               lastSamplePlayed = currentMillis;
               Serial.printf("playing %s\n", _filenames[_fileIndex]);
             }
-
-            int numFiles = sizeof(_filenames)/sizeof(char*);
             _fileIndex++;
-            _fileIndex %= numFiles;
+            _fileIndex %= _numWaveFiles;
             Serial.print("Memory: ");
             Serial.print(AudioMemoryUsage());
             Serial.print(",");
@@ -73,4 +80,63 @@ void loop() {
         }
     }
     delay(10);
+}
+
+uint16_t getNumWavFilesInDirectory(char *directory) {
+  File dir = SD.open(directory);
+  uint16_t numWaveFiles = 0;
+
+  while (true) { 
+
+    File files =  dir.openNextFile();
+    if (!files) {
+      //If no more files, break out.
+      break;
+    }
+
+    String curfile = files.name(); //put file in string
+    
+    int m = curfile.lastIndexOf(".WAV");
+    int a = curfile.lastIndexOf(".wav");
+    int underscore = curfile.indexOf("_");
+
+    // if returned results is more then 0 add them to the list.
+    if ((m > 0 || a > 0) && (underscore != 0)) {  
+        numWaveFiles++;
+    }
+    
+    files.close();
+  }
+  // close 
+  dir.close();
+  return numWaveFiles;
+}
+
+void populateFilenames(char *directory, char **filenames) {
+  File dir = SD.open(directory);
+  uint16_t index = 0;
+
+  while (true) { 
+
+    File files =  dir.openNextFile();
+    if (!files) {
+      //If no more files, break out.
+      break;
+    }
+
+    String curfile = files.name(); //put file in string
+    
+    int m = curfile.lastIndexOf(".WAV");
+    int a = curfile.lastIndexOf(".wav");
+    int underscore = curfile.indexOf("_");
+
+    // if returned results is more then 0 add them to the list.
+    if ((m > 0 || a > 0) && (underscore != 0)) {  
+        filenames[index] = new char[curfile.length()+1] {0};
+        memcpy(filenames[index], curfile.c_str(), curfile.length());
+    } 
+    files.close();
+  }
+  // close 
+  dir.close();
 }
