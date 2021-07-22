@@ -1,5 +1,4 @@
-// Plays a RAW (16-bit signed) PCM audio file at slower or faster rate
-// this example requires an uSD-card inserted to teensy 3.6 with a file called DEMO.RAW
+// Plays all WAV files from the root directory on the SD card 
 #include <Arduino.h>
 #include <Audio.h>
 #include <SD.h>
