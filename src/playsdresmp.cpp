@@ -28,8 +28,8 @@ bool AudioPlaySdResmp::playWav(const char *filename)
     long startMicros = micros();
     stop();
     if (strcmp(_filename, filename) != 0) {
-        _filename = new char[strlen(filename)];
-        strcpy( _filename, filename);
+        _filename = new char[strlen(filename)+1] {0};
+        memcpy( _filename, filename, strlen(filename)+1);
 
         WaveHeaderParser waveHeaderParser;
         wav_header wave_header;
@@ -52,7 +52,7 @@ bool AudioPlaySdResmp::playWav(const char *filename)
         }
         _numChannels = wave_header.num_channels;
         sdReader.setNumChannels(_numChannels);
-        bool playing = sdReader.play(filename);
+        bool playing = sdReader.play(_filename);
         long stopMicros = micros();
         Serial.printf("play(%d mS)\n", stopMicros - startMicros);
         return playing;
