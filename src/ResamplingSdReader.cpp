@@ -1,7 +1,9 @@
 #include "ResamplingSdReader.h"
 #include "interpolation.h"
-// read nbytes into each buffer (1 buffer per channel)
-unsigned int ResamplingSdReader::read(void **buf, uint16_t nbyte) {
+#include "waveheaderparser.h"
+
+// read n samples into each buffer (1 buffer per channel)
+unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
     if (!_playing) return 0;
 
     int16_t *index[_numChannels];
@@ -10,11 +12,12 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nbyte) {
         index[channel] = (int16_t*)buf[channel];
     }
 
-    while (count < nbyte) {
+    while (count < nsamples) {
+        
         for (int channel=0; channel < _numChannels; channel++) {
-            if (readNextValue(index[channel], channel)){
+            if (readNextValue(index[channel], channel)) {
                 if (channel == _numChannels - 1)
-                    count+=2;
+                    count++;
                 index[channel]++;
             }
             else {
@@ -24,31 +27,24 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nbyte) {
                     case looptype_repeat:
                     {
                         if (_playbackRate >= 0.0) 
-                            _file_offset = _header_size + (_loop_start * 2);
+                            _bufferPosition = _header_offset + _loop_start;
                         else
-                            _file_offset = _header_size + (_loop_finish * 2) - 512;
+                            _bufferPosition = _loop_finish;
 
-                        _bufferLength = 0;
-                        _bufferPosition = 0;
-                        _numBuffers = 0;
-                        _file.seek(_file_offset);
                         break;
                     }
 
                     case looptype_pingpong:
                     {
                         if (_playbackRate >= 0.0) {
-                            _file_offset = _file_size - 512;
+                            _bufferPosition = _file_size - _numChannels;
                             //printf("switching to reverse playback...\n");
                         }
                         else {
-                            _file_offset = 0;
-                            _bufferPosition = 0;
-                            _file.seek(0);
+                            _bufferPosition = _header_offset;
                             //printf("switching to forward playback...\n");
                         }
                         _playbackRate = -_playbackRate;
-                        _bufferLength = 0;
                         break;
                     }            
 
@@ -70,61 +66,20 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nbyte) {
 // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
 bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
 
-    if (_numBuffers == 0)
-        if (!updateBuffers()) 
+    if (_playbackRate >= 0 ) {
+        //forward playback
+        if (_bufferPosition >=  _loop_finish )
             return false;
 
-    if (_playbackRate > 0 ) {
-        //forward playback
-        
-        if (_numBuffers < 2 // only if we need another buffer
-            && _file_offset < _file_size // don't try to load past the end of the file
-            && _bufferPosition > _bufferLength/2) {
-            // double buffered: we've reached halfway through the current buffer, load the next buffer 
-            updateBuffers();
-        }
-
-        if (_bufferPosition >= _bufferLength) {
-            if (_numBuffers <= 1 && _noMoreBuffersToRead && _nextBufferLength == 0)
-                return false;
-            if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size >= _file_size)
-                return false;
-
-            _currentBuffer = (_currentBuffer + 1) % 2;
-            _bufferLength = _nextBufferLength;
-            _bufferPosition = _bufferPosition % RESAMPLE_BUFFER_SAMPLE_SIZE; 
-            _numBuffers--;
-        }
     } else if (_playbackRate < 0) {
         // reverse playback    
-        if (_last_read_offset < _header_size && _numBuffers==1)
-        {  
-            if (_bufferPosition < 0)
-                return false;
-        }
-
-        if (_numBuffers < 2 // only if we need another buffer
-            && _file_offset < _file_size // don't try to load past the end of the file
-            && _bufferPosition < _bufferLength/2) {
-            // double buffered: we've reached halfway through the current buffer, load the next buffer 
-            updateBuffers();
-        }
-
-        if (_bufferPosition < 0) {
-            if (_numBuffers <= 1 && _last_read_offset + _bufferPosition + _header_size < 0)
-                return false;
-
-            _currentBuffer = (_currentBuffer + 1) % 2;
-            _bufferLength = _nextBufferLength;
-            _bufferPosition = (_nextBufferLength + _bufferPosition); 
-            _numBuffers--;
-        }
+        if (_bufferPosition < _header_offset)
+            return false;
     }
+        
+    newdigate::IndexableFile<128, 2> &sourceBuffer = (*_sourceBuffer);
 
-    int samplePosition = (_bufferPosition/2) + (_currentBuffer * RESAMPLE_BUFFER_SAMPLE_SIZE) + channel;
-    int16_t result = _buffer[samplePosition];
-    //Serial.printf("r: %d,", result);
-
+    int16_t result = sourceBuffer[_bufferPosition + channel];
     if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
 
         double abs_remainder = abs(_remainder);
@@ -136,7 +91,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
 
                     if (_playbackRate > 1.0) {
                         // need to update last sample
-                        _interpolationPoints[channel][1].y = _buffer[samplePosition-_numChannels];
+                        _interpolationPoints[channel][1].y = sourceBuffer[_bufferPosition-_numChannels];
                     }
 
                     _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
@@ -151,7 +106,7 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
 
                     if (_playbackRate < -1.0) {
                         // need to update last sample
-                        _interpolationPoints[channel][1].y = _buffer[samplePosition+_numChannels];
+                        _interpolationPoints[channel][1].y = sourceBuffer[_bufferPosition+_numChannels];
                     }
 
                     _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
@@ -184,31 +139,11 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
                     int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
-                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
                         _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                         _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                         _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                        long currBuffPos = samplePosition -(i*_numChannels)+1+channel - currentBufferOffset;
-                        if (currBuffPos < 0) {
-                            if (_numBuffers > 0) {
-                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + currBuffPos;
-                                _interpolationPoints[channel][3].y =  _buffer[prevBufferOffset + prevSamplePos];
-                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, prevBufferOffset + prevSamplePos, _bufferPosition);
-                            }
-                        } else 
-                        if (currBuffPos >= (_bufferLength / 2) ) {
-                            if (_numBuffers > 1) {
-                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
-                                _interpolationPoints[channel][3].y =  _buffer[nextBufferOffset + nextSamplePos];
-                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
-                            }
-                        } else {
-                            _interpolationPoints[channel][3].y =  _buffer[samplePosition-(i*_numChannels)+1+channel];
-                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition-i+1, _bufferPosition);
-                        }
+                        _interpolationPoints[channel][3].y =  sourceBuffer[_bufferPosition-(i*_numChannels)+1+channel];
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
@@ -219,32 +154,11 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
                     int numberOfSamplesToUpdate =  ceil(_remainder - _playbackRate);
                     if (numberOfSamplesToUpdate > 4) 
                         numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
-                    int currentBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * _currentBuffer;
                     for (int i=numberOfSamplesToUpdate; i > 0; i--) {
                         _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                         _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                         _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                        long currBuffPos = samplePosition +(i*_numChannels)-1+channel - currentBufferOffset;
-                        if (currBuffPos < 0) {
-                            if (_numBuffers > 0) {
-                                int prevBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int prevSamplePos = RESAMPLE_BUFFER_SAMPLE_SIZE + (currBuffPos);
-                                _interpolationPoints[channel][3].y =  _buffer[prevBufferOffset + prevSamplePos];
-                                //Serial.printf("---[%i] %i: %i\n",  _buffer[prevBufferOffset + prevSamplePos], prevBufferOffset + prevSamplePos, _bufferPosition);
-                            }
-                        } else 
-                        if (currBuffPos >= (_bufferLength / 2) ) {
-                            if (_numBuffers >= 1) {
-                                int nextBufferOffset = RESAMPLE_BUFFER_SAMPLE_SIZE * ((_currentBuffer+1) % 2);
-                                int nextSamplePos = currBuffPos % (_bufferLength / 2);
-                                _interpolationPoints[channel][3].y =  _buffer[nextBufferOffset + nextSamplePos];
-                                //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, nextBufferOffset + nextSamplePos, _bufferPosition);
-                            }
-                        }
-                        else {
-                            _interpolationPoints[channel][3].y =  _buffer[samplePosition+(i*_numChannels)-1+channel];
-                            //Serial.printf("---[%i] %i: %i\n",  _interpolationPoints[3].y, samplePosition+i-1, _bufferPosition);
-                        }
+                        _interpolationPoints[channel][3].y =  sourceBuffer[_bufferPosition+(i*_numChannels)-1+channel];
                         if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                     }
                 }
@@ -276,16 +190,19 @@ bool ResamplingSdReader::readNextValue(int16_t *value, uint16_t channel) {
             //Serial.printf("%f\n", result);
         }
     }
+
     if (channel == _numChannels - 1) {
         _remainder += _playbackRate;
+
         auto delta = static_cast<signed int>(_remainder);
         _remainder -= static_cast<double>(delta);
-        _bufferPosition += 2 * delta * _numChannels;
+        _bufferPosition +=  (delta * _numChannels);
     }
 
     *value = result;
     return true;
 }
+
 void ResamplingSdReader::initializeInterpolationPoints(void) {
     deleteInterpolationPoints();
     _interpolationPoints = new InterpolationData*[_numChannels];
@@ -302,8 +219,7 @@ void ResamplingSdReader::initializeInterpolationPoints(void) {
 
 void ResamplingSdReader::deleteInterpolationPoints(void) {
     if (!_interpolationPoints) return;
-    for (int i=0; i < _numInterpolationPointsChannels; i++) {
-        if (_interpolationPoints[i])
+    for (int i=0; i<_numInterpolationPointsChannels; i++) {
             delete [] _interpolationPoints[i];
     }
     delete [] _interpolationPoints;
@@ -312,55 +228,90 @@ void ResamplingSdReader::deleteInterpolationPoints(void) {
 
 void ResamplingSdReader::begin(void)
 {
-    _playing = false;
-    _file_offset = _header_size;
-    _file_size = 0;
-    
     if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
         initializeInterpolationPoints();
     }
+    _playing = false;
+    _bufferPosition = _header_offset;
+    _file_size = 0;
 }
 
-bool ResamplingSdReader::play(const char *filename)
+bool ResamplingSdReader::playRaw(const char *filename, uint16_t numChannels) {
+    return play(filename, false, numChannels); 
+}
+
+bool ResamplingSdReader::playWav(const char *filename) {
+    return play(filename, true); 
+}
+
+bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numChannelsIfRaw)
 {
     stop();
-    if (strcmp(_filename,filename) != 0) {
+
+    _header_offset = 0;
+    _file_size = 0;
+    _loop_start = 0;
+    _loop_finish = _file_size;
+    if (!isWave) // if raw file, then hardcode the numChannels as per the parameter
+        setNumChannels(numChannelsIfRaw);
+    
+    if (!_filename || strcmp(_filename,filename) != 0) {
         if (_file) {
-            Serial.printf("closing %s", _filename);
+            Serial.printf("closing %s\n", _filename);
             __disable_irq();
             _file.close();
             __enable_irq();
         }
-        _filename = new char[strlen(filename)];
-        strncpy(_filename, filename, strlen(filename));
+        if (_sourceBuffer) delete _sourceBuffer;
+        if (_filename) delete [] _filename;
+        _filename = new char[strlen(filename)+1] {0};
+        memcpy(_filename, filename, strlen(filename) + 1);
         StartUsingSPI();
 
         __disable_irq();
-        _file = SD.open(filename);
+        _file = SD.open(_filename);
         __enable_irq();
+
+        if (isWave) {
+            wav_header wav_header;
+            WaveHeaderParser wavHeaderParser;
+            char buffer[44];
+            size_t bytesRead =_file.read(buffer, 44);
+            _file.seek(0);
+            wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
+            if (wav_header.bit_depth != 16) {
+                Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
+                return false;
+            }
+            setNumChannels(wav_header.num_channels);
+            _header_offset = 22;
+        }
+
+        _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
 
         if (!_file) {
             StopUsingSPI();
             Serial.printf("Not able to open file: %s\n", filename);
-            _filename = (char *)"";
+            if (_filename) delete [] _filename;
+            _filename = nullptr;
             return false;
         }
 
         __disable_irq();
         _file_size = _file.size();
         __enable_irq();
-        _loop_start = 0;
-        _loop_finish = (_file_size - _header_size) / 2;
-        if (_file_size <= _header_size) {
+        _loop_start = _header_offset;
+        _loop_finish = _file_size / 2;
+        if (_file_size <= _header_offset * newdigate::IndexableFile<128, 2>::element_size) {
             _playing = false;
-            _filename =  (char *)"";
+            if (_filename) delete [] _filename;
+            _filename =  nullptr;
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }
     }
 
     reset();
-    //updateBuffers();
     _playing = true;
     return true;
 }
@@ -369,30 +320,19 @@ bool ResamplingSdReader::play()
 {
     stop();
     reset();
-    //updateBuffers();
     _playing = true;
     return true;
 }
 
 void ResamplingSdReader::reset(){
-    _bufferLength = 0;
-    _numBuffers = 0;
     _numInterpolationPoints = 0;
-    _noMoreBuffersToRead = false;
-    _last_read_offset = 0;
-    _remainder = 0;
     if (_playbackRate > 0.0) {
         // forward playabck - set _file_offset to first audio block in file
-        _file_offset = _header_size;
+        _bufferPosition = _header_offset;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        if (_file_size > _header_size + (RESAMPLE_BUFFER_SAMPLE_SIZE * 2))
-            _file_offset = _file_size - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2);
-        else
-            _file_offset = _header_size;
+        _bufferPosition = _file_size - _numChannels;
     }
-    _file.seek(_file_offset);
-    //_playing = true;
 }
 
 void ResamplingSdReader::stop()
@@ -413,78 +353,8 @@ int ResamplingSdReader::available(void) {
 void ResamplingSdReader::close(void) {
     if (_playing)
         stop();
+    _file.close();
+    _sourceBuffer = nullptr;
+    //TODO: dispose _sourceBuffer properly
     deleteInterpolationPoints();
 }
-
-bool ResamplingSdReader::updateBuffers() {
-    //printf("begin: file_offset: %d\n", _file_offset);
-    if (!_file) return false;
-
-    if (_numBuffers > 1) return true; // we've already got enough buffers ?
-
-    bool forward = (_playbackRate >= 0.0);
-
-    uint16_t numberOfBytesToRead = RESAMPLE_BUFFER_SAMPLE_SIZE * 2;
-    if (!forward) {
-        if (_file_offset < _header_size) {
-            // reverse playback, last buffer, only read partial remaining buffer that hasn't already played
-            numberOfBytesToRead = _file_offset - _header_size + RESAMPLE_BUFFER_SAMPLE_SIZE * 2;
-            //__disable_irq();
-            _file.seek(_header_size);
-            //__enable_irq();
-            if (numberOfBytesToRead == 0)
-                return false;
-
-        } else {
-            //__disable_irq();
-            _file.seek(_file_offset);
-            //__enable_irq();
-        }
-        if (_numBuffers == 0) {
-            _bufferPosition = numberOfBytesToRead - 2;
-        }
-    } else 
-    {
-        int final_file_offset = _header_size + (_loop_finish * 2) - (RESAMPLE_BUFFER_SAMPLE_SIZE * 2);
-        if (_file_offset > final_file_offset) {
-            numberOfBytesToRead = _header_size + (_loop_finish * 2) - _file_offset;
-        }
-        if (_numBuffers == 0)
-            _bufferPosition = 0;
-    }
-    if (numberOfBytesToRead == 0) return false;
-
-    unsigned int bufferOffset = 0;
-    if (_numBuffers == 1){
-        bufferOffset = (_currentBuffer == 0)? RESAMPLE_BUFFER_SAMPLE_SIZE : 0;
-    }
-
-    //Serial.printf("\nreading %d bytes, starting at:%d (into readbuff %d) - _file_offset:%d\n", numberOfBytesToRead, _file.position(), _readBuffer, _file_offset);
-    _last_read_offset = _file_offset;
-    //__disable_irq();
-    int numRead = _file.read(_buffer + bufferOffset, numberOfBytesToRead);
-    if (numRead == 0) {
-        _noMoreBuffersToRead = true;
-        return false;
-    }
-
-    if (numRead < RESAMPLE_BUFFER_SAMPLE_SIZE * 2)
-        _noMoreBuffersToRead = true;        
-    //__enable_irq();
-    if (_numBuffers == 0)
-        _bufferLength = numRead;
-    else
-        _nextBufferLength = numRead;
-    //Serial.printf("read %d bytes\n", numRead);
-
-    _numBuffers++;
-
-    if (_playbackRate < 0) {
-        _file_offset -= numRead;     
-    } else
-        _file_offset += numRead;
-
-    //printf("exit: file_offset: %d\n", _file_offset);
-    return true;
-}
-

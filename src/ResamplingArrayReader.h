@@ -98,6 +98,7 @@ private:
 
     int32_t _file_size;
     uint32_t _header_offset = 0; // == (header size in bytes ) / 2
+
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
@@ -106,7 +107,7 @@ private:
     int32_t _loop_finish = 0;
     uint16_t _numChannels = 1;
     uint16_t _numInterpolationPointsChannels = 0;
-    int16_t *_sourceBuffer;
+    int16_t *_sourceBuffer = nullptr;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;

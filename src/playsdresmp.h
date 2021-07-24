@@ -48,7 +48,6 @@ public:
 private:
 
     uint32_t file_size;
-    volatile uint32_t file_offset;
     volatile bool playing;
     ResamplingSdReader sdReader;
     uint16_t _numChannels = 1;    

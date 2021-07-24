@@ -7,7 +7,6 @@
 void AudioPlayArrayResmp::begin()
 {
     playing = false;
-    file_offset = 0;
     file_size = 0;
     arrayReader.begin();
 }
@@ -48,7 +47,7 @@ void AudioPlayArrayResmp::update()
     audio_block_t *blocks[_numChannels];
     int16_t *data[_numChannels];
     // only update if we're playing
-    if (!playing) return;
+    if (!arrayReader.isPlaying()) return;
 
     // allocate the audio blocks to transmit
     for (int i=0; i < _numChannels; i++) {
@@ -60,7 +59,6 @@ void AudioPlayArrayResmp::update()
     if (arrayReader.available()) {
         // we can read more data from the file...
         n = arrayReader.read((void**)data, AUDIO_BLOCK_SAMPLES);
-        file_offset += n;
         for (int channel=0; channel < _numChannels; channel++) {
             for (i=n; i < AUDIO_BLOCK_SAMPLES; i++) {
                 blocks[channel]->data[i] = 0;
@@ -80,7 +78,7 @@ void AudioPlayArrayResmp::update()
 
 uint32_t AudioPlayArrayResmp::positionMillis()
 {
-    return ((uint64_t)file_offset * B2M) >> 32;
+    return ((uint64_t)file_size * B2M) >> 32;
 }
 
 uint32_t AudioPlayArrayResmp::lengthMillis()

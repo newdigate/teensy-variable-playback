@@ -58,7 +58,6 @@ private:
 
     uint32_t file_size;
 
-    volatile uint32_t file_offset;
     volatile bool playing;
     ResamplingArrayReader arrayReader;
     uint16_t _numChannels = 1;

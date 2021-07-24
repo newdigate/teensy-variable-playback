@@ -10,6 +10,7 @@
 #include "spi_interrupt.h"
 #include "loop_type.h"
 #include "interpolation.h"
+#include "IndexableFile.h"
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
@@ -19,19 +20,21 @@ public:
     }
 
     void begin(void);
-    bool play(const char *filename);
+    bool playRaw(const char *filename, uint16_t numChannels);
+    bool playWav(const char *filename);
+
     bool play();
     void stop(void);
     bool isPlaying(void) { return _playing; }
 
     unsigned int read(void **buf, uint16_t nbyte);
-    bool readNextValue(int16_t *value, uint16_t channel);
+    bool readNextValue(int16_t *value, uint16_t channelNumber);
 
     void setPlaybackRate(double f) {
         _playbackRate = f;
-        if (f < 0 && _file_offset == _header_size) {
+        if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _file_offset = _file_size;
+            _bufferPosition = _file_size - _numChannels;
         }
     }
 
@@ -52,10 +55,6 @@ public:
     void reset(void);
     void close(void);
 
-    void setHeaderSize(uint32_t headerSize) {
-        _header_size = headerSize;
-    }
-
     void setLoopStart(uint32_t loop_start) {
         _loop_start = loop_start;
     }
@@ -72,42 +71,49 @@ public:
         }
     }
 
+    int16_t getNumChannels() {
+        return _numChannels;
+    }
+
     void setNumChannels(uint16_t numChannels) {
-        if (_numChannels != numChannels) {   
+        if (numChannels != _numChannels) {   
             _numChannels = numChannels;
             initializeInterpolationPoints();
         }
     }
 
+    void setHeaderSize(uint32_t headerSizeInBytes) {
+        _header_offset = headerSizeInBytes / 2;
+        if (_bufferPosition < _header_offset) {
+            if (_playbackRate >= 0) {
+                _bufferPosition = _header_offset;
+            } else
+                _bufferPosition = _loop_finish + _header_offset;
+        }
+    }
+
 private:
     volatile bool _playing = false;
-    volatile int32_t _file_offset;
-    volatile int32_t _last_read_offset = 0;
 
     int32_t _file_size;
-    int32_t _header_size = 0;
+    uint32_t _header_offset = 0; // == (header size in bytes ) / 2
+
     double _playbackRate = 1.0;
     double _remainder = 0.0;
     loop_type _loopType = looptype_none;
-    char *_filename = (char *)"";
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
     uint16_t _numChannels = 1;
     uint16_t _numInterpolationPointsChannels = 0;
-
-    int16_t _buffer[RESAMPLE_BUFFER_SAMPLE_SIZE * 2]; // two buffers
-    unsigned int _bufferLength = 0;
-    unsigned int _numBuffers = 0;
-    unsigned int _currentBuffer = 0;
-    bool _noMoreBuffersToRead = false;
-    unsigned int _nextBufferLength = 0;
+    char *_filename = nullptr;
+    newdigate::IndexableFile<128, 2> *_sourceBuffer = nullptr;
     File _file;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
     InterpolationData **_interpolationPoints = nullptr;
-    bool updateBuffers(void);
+
     void StartUsingSPI(){
         //Serial.printf("start spi: %s\n", _filename);
 
@@ -126,10 +132,11 @@ private:
         AudioStopUsingSPI();
 #endif
     }
-
+    
+    bool play(const char *filename, bool isWave, uint16_t numChannelsIfRaw = 0);
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);
 };
 
 
-#endif //PAULSTOFFREGEN_RESAMPLINGSDREADER_H
+#endif //TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H

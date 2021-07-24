@@ -7,7 +7,8 @@ set(SOURCE_FILES
         ResamplingSdReader.cpp
         ResamplingArrayReader.cpp
         playarrayresmp.cpp
-        interpolation.cpp)
+        interpolation.cpp
+        IndexableFile.cpp)
 
 set(HEADER_FILES
         loop_type.h
@@ -17,7 +18,8 @@ set(HEADER_FILES
         ResamplingArrayReader.h
         playarrayresmp.h
         interpolation.h
-        TeensyVariablePlayback.h)
+        TeensyVariablePlayback.h
+        IndexableFile.h)
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 if (NOT DEFINED TEENSY_VERSION)
