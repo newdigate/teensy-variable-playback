@@ -39,6 +39,30 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
+        },        
+        {
+            "name": "save_wav",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/save_wav/save_wav",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },        
+        {
+            "name": "sd_play_all",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/sd_play_all/sd_play_all",
+            "args": ["${workspaceFolder}/test/resources/alternative"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
         },
     ] 
 }
