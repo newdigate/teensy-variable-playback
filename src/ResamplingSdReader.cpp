@@ -27,7 +27,7 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                     case looptype_repeat:
                     {
                         if (_playbackRate >= 0.0) 
-                            _bufferPosition = _header_offset + _loop_start;
+                            _bufferPosition = _loop_start;
                         else
                             _bufferPosition = _loop_finish;
 
@@ -287,8 +287,6 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
             _header_offset = 22;
         }
 
-        _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
-
         if (!_file) {
             StopUsingSPI();
             Serial.printf("Not able to open file: %s\n", filename);
@@ -296,6 +294,8 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
             _filename = nullptr;
             return false;
         }
+
+        _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
 
         __disable_irq();
         _file_size = _file.size();
@@ -331,7 +331,7 @@ void ResamplingSdReader::reset(){
         _bufferPosition = _header_offset;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _bufferPosition = _file_size - _numChannels;
+        _bufferPosition = _file_size/2 - _numChannels;
     }
 }
 

@@ -70,9 +70,11 @@ if (DEFINED BUILD_FOR_LINUX)
             
             low_level/array/test_array_mono_loop_forward_playback.cpp
             low_level/array/test_array_stereo_loop_forward_playback.cpp
-
+            
             low_level/arraywav/test_array_mono_loop_forward_playback.cpp
             low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
+
+            low_level/indexedfile/test_indexablefile.cpp
             )
 
     target_link_libraries(tests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

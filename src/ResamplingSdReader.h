@@ -56,12 +56,12 @@ public:
     void close(void);
 
     void setLoopStart(uint32_t loop_start) {
-        _loop_start = loop_start;
+        _loop_start = _header_offset + (loop_start * _numChannels);
     }
 
     void setLoopFinish(uint32_t loop_finish) {
         // sample number, (NOT byte number)
-        _loop_finish = loop_finish;
+        _loop_finish = _header_offset + (loop_finish * _numChannels);
     }
 
     void setInterpolationType(ResampleInterpolationType interpolationType) {        
@@ -132,7 +132,7 @@ private:
         AudioStopUsingSPI();
 #endif
     }
-    
+
     bool play(const char *filename, bool isWave, uint16_t numChannelsIfRaw = 0);
     void initializeInterpolationPoints(void);
     void deleteInterpolationPoints(void);

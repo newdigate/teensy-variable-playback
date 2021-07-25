@@ -24,23 +24,23 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
 
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(1.0);
-        resamplingSdReader->play("test2.bin");
+        resamplingSdReader->playRaw("test2.bin", 1);
         resamplingSdReader->setLoopType(looptype_none);
         resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
         int16_t actual[1024];
         int16_t *buffers[1] = { actual };
-        int j = 0, bytesRead = 0, total_bytes_read = 0;
+        int j = 0, samplesRead = 0, total_bytes_read = 0;
         do {
-            bytesRead = resamplingSdReader->read((void**)buffers, 512 );
-            total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d \n", j, bytesRead);
+            samplesRead = resamplingSdReader->read((void**)buffers, 256 );
+            total_bytes_read += samplesRead * 2;
+            printf("j:%d samplesRead: %d \n", j, samplesRead);
 
-            for (int i=0; i < bytesRead/2; i++) {
+            for (int i=0; i < samplesRead; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");
             j++;
-        } while (bytesRead > 0);
+        } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
@@ -65,26 +65,26 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
 
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(0.5);
-        resamplingSdReader->play("test2.bin");
+        resamplingSdReader->playRaw("test2.bin", 1);
         resamplingSdReader->setLoopType(looptype_none);
         //resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
 
         int16_t actual[expectedSize];
         int16_t *buffers[1] = { actual };
-        int j = 0, bytesRead = 0, total_bytes_read = 0;
+        int j = 0, samplesRead = 0, total_bytes_read = 0;
         do {
-            bytesRead = resamplingSdReader->read((void**)buffers, 512 );
-            total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d: ", j, bytesRead);
-            for (int i=0; i < bytesRead/2; i++) {
+            samplesRead = resamplingSdReader->read((void**)buffers, 256 );
+            total_bytes_read += samplesRead * 2;
+            printf("j:%d samplesRead: %d: ", j, samplesRead);
+            for (int i=0; i < samplesRead; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");
-            if (bytesRead != 0)
-                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + (bytesRead / 2) - 1], &actual[0], &actual[(bytesRead / 2) - 1]);
+            if (samplesRead != 0)
+                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
 
             j++;
-        } while (bytesRead > 0);
+        } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
