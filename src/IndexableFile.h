@@ -10,7 +10,7 @@ namespace newdigate {
 
 struct indexedbuffer {
     uint32_t index;
-    uint16_t buffer_size;
+    int16_t buffer_size;
     int16_t *buffer;
 };
 
@@ -32,26 +32,30 @@ public:
     }
 
     int16_t &operator[](int i) {
-        uint32_t indexFor_i = i >> buffer_to_index_shift;
+        int32_t indexFor_i = i >> buffer_to_index_shift;
         indexedbuffer *match = find_with_index(indexFor_i);
         if (match == nullptr) {
+            if (_buffers.size() > MAX_NUM_BUFFERS - 1) {
+                indexedbuffer *first = _buffers[0];
+                _buffers.erase(_buffers.begin());
+                delete [] first->buffer;
+                delete first;
+            }
             indexedbuffer *next = new indexedbuffer();
             next->index = indexFor_i;
             next->buffer = new int16_t[BUFFER_SIZE];
             size_t basePos = indexFor_i << buffer_to_index_shift;
             size_t seekPos = basePos * element_size;
             _file.seek(seekPos);
-            unsigned bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
+            int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
+            if (!_file.available()){  
+                _file.seek(0);
+                _file.close();
+                _file = SD.open(_file.name());
+            }
             next->buffer_size = bytesRead;
             _buffers.push_back(next);
             match = next;
-
-            if (_buffers.size() > MAX_NUM_BUFFERS) {
-                indexedbuffer *first = *_buffers.begin();
-                _buffers.erase(_buffers.begin());
-                delete [] first->buffer;
-                delete first;
-            }
         }
         return match->buffer[i % BUFFER_SIZE];
     }
