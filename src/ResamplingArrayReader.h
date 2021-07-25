@@ -27,7 +27,7 @@ public:
         _playbackRate = f;
         if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _bufferPosition = _file_size - _numChannels;
+            _bufferPosition = _file_size/2 - _numChannels;
         }
     }
 
@@ -57,12 +57,12 @@ public:
     void close(void);
 
     void setLoopStart(uint32_t loop_start) {
-        _loop_start = loop_start;
+        _loop_start = _header_offset + (loop_start * _numChannels);
     }
 
     void setLoopFinish(uint32_t loop_finish) {
         // sample number, (NOT byte number)
-        _loop_finish = loop_finish;
+        _loop_finish = _header_offset + (loop_finish * _numChannels);
     }
 
     void setInterpolationType(ResampleInterpolationType interpolationType) {
@@ -89,7 +89,7 @@ public:
             if (_playbackRate >= 0) {
                 _bufferPosition = _header_offset;
             } else
-                _bufferPosition = _loop_finish + _header_offset;
+                _bufferPosition = _loop_finish - _numChannels;
         }
     }
 
@@ -97,7 +97,7 @@ private:
     volatile bool _playing = false;
 
     int32_t _file_size;
-    uint32_t _header_offset = 0; // == (header size in bytes ) / 2
+    int32_t _header_offset = 0; // == (header size in bytes ) / 2
 
     double _playbackRate = 1.0;
     double _remainder = 0.0;
@@ -105,7 +105,7 @@ private:
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
-    uint16_t _numChannels = 1;
+    int16_t _numChannels = -1;
     uint16_t _numInterpolationPointsChannels = 0;
     int16_t *_sourceBuffer = nullptr;
 

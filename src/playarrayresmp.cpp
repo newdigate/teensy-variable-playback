@@ -6,7 +6,6 @@
 
 void AudioPlayArrayResmp::begin()
 {
-    playing = false;
     file_size = 0;
     arrayReader.begin();
 }
@@ -14,8 +13,7 @@ void AudioPlayArrayResmp::begin()
 bool AudioPlayArrayResmp::playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
 {
     stop();
-    _numChannels = numChannels;
-    playing = arrayReader.playRaw(data, numSamples, _numChannels);
+    bool playing = arrayReader.playRaw(data, numSamples, numChannels);
     return playing;
 }
 
@@ -27,8 +25,8 @@ bool AudioPlayArrayResmp::playRaw(const unsigned int *data, uint32_t numSamples,
 bool AudioPlayArrayResmp::playWav(int16_t *data, uint32_t fileSize)
 {
     stop();
-    playing = arrayReader.playWav(data, fileSize);
-    _numChannels = arrayReader.getNumChannels();
+    bool playing = arrayReader.playWav(data, fileSize);
+
     return playing;
 }
 
@@ -43,6 +41,10 @@ void AudioPlayArrayResmp::stop()
 
 void AudioPlayArrayResmp::update()
 {
+    int _numChannels = arrayReader.getNumChannels();
+    if (_numChannels == -1)
+        return;
+
     unsigned int i, n;
     audio_block_t *blocks[_numChannels];
     int16_t *data[_numChannels];
@@ -67,7 +69,6 @@ void AudioPlayArrayResmp::update()
         }
     } else {
         arrayReader.close();
-        playing = false;
     }
     for (int channel=0; channel < _numChannels; channel++) {
         release(blocks[channel]);

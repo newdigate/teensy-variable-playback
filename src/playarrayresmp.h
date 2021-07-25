@@ -28,7 +28,7 @@ public:
     bool playWav(const unsigned int *data, uint32_t fileSize);
 
     void stop(void);
-    bool isPlaying(void) { return playing; }
+    bool isPlaying(void) { return arrayReader.isPlaying(); }
     uint32_t positionMillis(void);
     uint32_t lengthMillis(void);
     virtual void update(void);
@@ -51,21 +51,11 @@ public:
         else 
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
     }
-
-
-
 private:
 
     uint32_t file_size;
-
-    volatile bool playing;
     ResamplingArrayReader arrayReader;
-    uint16_t _numChannels = 1;
 
-    void setNumChannels(uint16_t numChannels) {
-        arrayReader.setNumChannels(numChannels);
-        _numChannels = numChannels;
-    }
 };
 
 

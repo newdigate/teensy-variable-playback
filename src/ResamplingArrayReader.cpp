@@ -27,9 +27,9 @@ unsigned int ResamplingArrayReader::read(void **buf, uint16_t nsamples) {
                     case looptype_repeat:
                     {
                         if (_playbackRate >= 0.0) 
-                            _bufferPosition = _header_offset + _loop_start;
+                            _bufferPosition = _loop_start;
                         else
-                            _bufferPosition = _loop_finish;
+                            _bufferPosition = _loop_finish - _numChannels;
 
                         break;
                     }
@@ -37,7 +37,7 @@ unsigned int ResamplingArrayReader::read(void **buf, uint16_t nsamples) {
                     case looptype_pingpong:
                     {
                         if (_playbackRate >= 0.0) {
-                            _bufferPosition = _file_size - _numChannels;
+                            _bufferPosition = _loop_finish - _numChannels;
                             //printf("switching to reverse playback...\n");
                         }
                         else {
@@ -202,6 +202,9 @@ bool ResamplingArrayReader::readNextValue(int16_t *value, uint16_t channel) {
 }
 
 void ResamplingArrayReader::initializeInterpolationPoints(void) {
+    if (_numChannels < 0)
+        return;
+        
     deleteInterpolationPoints();
     _interpolationPoints = new InterpolationData*[_numChannels];
     for (int channel=0; channel < _numChannels; channel++) {        
@@ -222,6 +225,7 @@ void ResamplingArrayReader::deleteInterpolationPoints(void) {
     }
      delete [] _interpolationPoints;
      _interpolationPoints = nullptr;
+     _numInterpolationPointsChannels = 0;
 }
 
 void ResamplingArrayReader::begin(void)
@@ -240,9 +244,9 @@ bool ResamplingArrayReader::playRaw(int16_t *array, uint32_t length, uint16_t nu
     stop();
 
     _header_offset = 0;
-    _file_size = length;
+    _file_size = length * 2;
     _loop_start = 0;
-    _loop_finish = _file_size;
+    _loop_finish = length;
     setNumChannels(numChannels);
 
     reset();
@@ -251,7 +255,7 @@ bool ResamplingArrayReader::playRaw(int16_t *array, uint32_t length, uint16_t nu
     return true;
 }
 
-bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)
+bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)                // length == total number of 16-bit samples for all channels, including header
 {
     _sourceBuffer = array;
     stop();
@@ -263,11 +267,11 @@ bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)
         Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
         return false;
     }
-    _numChannels = wav_header.num_channels;
+    setNumChannels(wav_header.num_channels);
     _header_offset = 22;
-    _file_size = length;
+    _file_size = length * 2; //2 bytes per sample
     _loop_start = _header_offset;
-    _loop_finish = _file_size ;
+    _loop_finish = length;
 
     reset();
     _playing = true;
@@ -289,7 +293,7 @@ void ResamplingArrayReader::reset(){
         _bufferPosition = _header_offset;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _bufferPosition = _file_size - _numChannels;
+        _bufferPosition = _loop_finish - _numChannels;
     }
 }
 

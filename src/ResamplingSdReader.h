@@ -34,7 +34,7 @@ public:
         _playbackRate = f;
         if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _bufferPosition = _file_size - _numChannels;
+            _bufferPosition = _file_size/2 - _numChannels;
         }
     }
 
@@ -87,8 +87,7 @@ public:
         if (_bufferPosition < _header_offset) {
             if (_playbackRate >= 0) {
                 _bufferPosition = _header_offset;
-            } else
-                _bufferPosition = _loop_finish + _header_offset;
+            }
         }
     }
 
@@ -96,7 +95,7 @@ private:
     volatile bool _playing = false;
 
     int32_t _file_size;
-    uint32_t _header_offset = 0; // == (header size in bytes ) / 2
+    int32_t _header_offset = 0; // == (header size in bytes ) / 2
 
     double _playbackRate = 1.0;
     double _remainder = 0.0;
@@ -104,7 +103,7 @@ private:
     int _bufferPosition = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
-    uint16_t _numChannels = 1;
+    int16_t _numChannels = -1;
     uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
     newdigate::IndexableFile<128, 2> *_sourceBuffer = nullptr;

@@ -8,7 +8,6 @@
 
 void AudioPlaySdResmp::begin()
 {
-    playing = false;
     file_size = 0;
     sdReader.begin();
 }
@@ -16,8 +15,7 @@ void AudioPlaySdResmp::begin()
 bool AudioPlaySdResmp::playRaw(const char *filename, uint16_t numChannels)
 {
     stop();
-    _numChannels = numChannels;
-    playing = sdReader.playRaw(filename, numChannels);
+    bool playing = sdReader.playRaw(filename, numChannels);
     return playing;
 }
 
@@ -25,7 +23,6 @@ bool AudioPlaySdResmp::playWav(const char *filename)
 {
     stop();
     bool playing = sdReader.playWav(filename);
-    _numChannels = sdReader.getNumChannels();
     return playing;
 
 }
@@ -37,6 +34,10 @@ void AudioPlaySdResmp::stop()
 
 void AudioPlaySdResmp::update()
 {
+    int _numChannels = sdReader.getNumChannels();
+    if (_numChannels == -1)
+        return;
+
     unsigned int i, n;
     audio_block_t *blocks[_numChannels];
     int16_t *data[_numChannels];
@@ -61,7 +62,6 @@ void AudioPlaySdResmp::update()
         }
     } else {
         sdReader.close();
-        playing = false;
     }
     for (int channel=0; channel < _numChannels; channel++) {
         release(blocks[channel]);
