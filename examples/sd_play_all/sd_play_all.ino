@@ -139,3 +139,8 @@ void populateFilenames(char *directory, char **filenames) {
   // close 
   dir.close();
 }
+
+namespace std {
+    void __throw_bad_function_call() {}
+    void __throw_length_error(char const*) {}
+}
