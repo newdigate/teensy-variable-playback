@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch test cmake",
+            "name": "launch using cmake",
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
@@ -17,7 +17,7 @@
             "MIMode": "lldb"
         },        
         {
-            "name": "(lldb) Launch save_raw",
+            "name": "save_raw",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/save_raw/save_raw",
@@ -29,7 +29,7 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) Launch save_raw_sd",
+            "name": "save_raw_sd",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/cmake-build-debug/extras/soundio/save_raw_sd/save_raw_sd",
