@@ -50,8 +50,10 @@ public:
             int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
             if (!_file.available()){  
                 _file.seek(0);
+                #ifndef TEENSYDUINO
                 _file.close();
                 _file = SD.open(_file.name());
+                #endif
             }
             next->buffer_size = bytesRead;
             _buffers.push_back(next);
