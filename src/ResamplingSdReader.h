@@ -34,7 +34,7 @@ public:
         _playbackRate = f;
         if (f < 0.0 && _bufferPosition == 0) {
             //_file.seek(_file_size);
-            _bufferPosition = _file_size/2 - _numChannels;
+            _bufferPosition = _file_size / 2 - _numChannels;
         }
     }
 

@@ -29,7 +29,7 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                         if (_playbackRate >= 0.0) 
                             _bufferPosition = _loop_start;
                         else
-                            _bufferPosition = _loop_finish - _numChannels;
+                            _bufferPosition = _loop_finish / _numChannels - _numChannels;
 
                         break;
                     }
@@ -37,7 +37,7 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                     case looptype_pingpong:
                     {
                         if (_playbackRate >= 0.0) {
-                            _bufferPosition = _loop_finish - _numChannels;
+                            _bufferPosition = _loop_finish / _numChannels - _numChannels;
                             //printf("switching to reverse playback...\n");
                         }
                         else {
@@ -329,7 +329,7 @@ void ResamplingSdReader::reset(){
         _bufferPosition = _header_offset;
     } else {
         // reverse playback - forward _file_offset to last audio block in file
-        _bufferPosition = _loop_finish - _numChannels;
+        _bufferPosition = _loop_finish / _numChannels - _numChannels;
     }
 }
 
