@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         do {
             bytesRead = resamplingSdReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d \n", j, bytesRead);
+            //printf("j:%d bytesRead: %d \n", j, bytesRead);
 
             for (int i=0; i < bytesRead/2; i++) {
                 printf("\t\t[%x]:%x", currentExpected, actual[i]);

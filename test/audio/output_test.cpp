@@ -68,7 +68,7 @@ void TestAudioOutput::update(void)
 			release(blockRight);
 		}
 	} else {        
-		Serial.print(" empty block \n");
+		//Serial.print(" empty block \n");
 	}
 }
 
