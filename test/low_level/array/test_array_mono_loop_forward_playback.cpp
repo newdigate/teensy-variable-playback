@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
         do {
             bytesRead = resamplingArrayReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d \n", j, bytesRead);           
-            printf("\n");
+            //printf("j:%d bytesRead: %d \n", j, bytesRead);           
+            //printf("\n");
             j++;
         } while (j < 3);
         printf("total_bytes_read: %d \n", total_bytes_read);

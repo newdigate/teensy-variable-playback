@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_SUITE(test_array_stereo_loop_forward_playback)
         do {
             bytesRead = resamplingArrayReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += bytesRead;
-            printf("j:%d bytesRead: %d \n", j, bytesRead);           
+            //printf("j:%d bytesRead: %d \n", j, bytesRead);           
             j++;
         } while (j < 3);
         printf("total_bytes_read: %d \n", total_bytes_read);

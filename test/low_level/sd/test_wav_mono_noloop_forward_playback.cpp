@@ -20,6 +20,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadForwardAtRegularPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t expectedDataSize = 257;
+        test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;        
         printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize];
@@ -42,7 +43,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
-            printf("j:%d bytesRead: %d \n", j, samplesRead);
+            //printf("j:%d bytesRead: %d \n", j, samplesRead);
 
             for (int i=0; i < samplesRead; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
@@ -60,6 +61,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadForwardAtHalfPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t size_of_datasource = 800;
+        test_sndhdrdata_sndhdr_wav[20] = size_of_datasource * 2;
         printf("ReadForwardAtRegularPlaybackRate(%d)\n", size_of_datasource);
         int16_t dataSource[size_of_datasource];
         for (int16_t i = 0; i < size_of_datasource; i++) {

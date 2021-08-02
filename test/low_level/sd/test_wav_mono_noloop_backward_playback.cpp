@@ -20,6 +20,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadBackwardAtRegularPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t expectedDataSize = 258;
+
+        test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
         printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize];
@@ -61,6 +63,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadBackwardAtHalfPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t expectedDataSize = 258;
+        test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
         printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize * 2];

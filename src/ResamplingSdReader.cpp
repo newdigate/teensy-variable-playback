@@ -271,21 +271,6 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     _file = SD.open(_filename);
     __enable_irq();
 
-    if (isWave) {
-        wav_header wav_header;
-        WaveHeaderParser wavHeaderParser;
-        char buffer[44];
-        size_t bytesRead =_file.read(buffer, 44);
-        _file.seek(0);
-        wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
-        if (wav_header.bit_depth != 16) {
-            Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
-            return false;
-        }
-        setNumChannels(wav_header.num_channels);
-        _header_offset = 22;
-    }
-
     if (!_file) {
         StopUsingSPI();
         Serial.printf("Not able to open file: %s\n", filename);
@@ -294,13 +279,31 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         return false;
     }
 
-    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
-
     __disable_irq();
     _file_size = _file.size();
     __enable_irq();
+
+    if (isWave) {
+        wav_header wav_header;
+        WaveHeaderParser wavHeaderParser;
+        char buffer[44];
+        __disable_irq();
+        size_t bytesRead =_file.read(buffer, 44);
+        _file.seek(0);
+        __enable_irq();
+        wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
+        if (wav_header.bit_depth != 16) {
+            Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
+            return false;
+        }
+        setNumChannels(wav_header.num_channels);
+        _header_offset = 22;
+        _loop_finish = ((wav_header.data_bytes) / 2) + 22; 
+    } else 
+        _loop_finish = _file_size / 2;
+
+    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
     _loop_start = _header_offset;
-    _loop_finish = _file_size / 2;
     if (_file_size <= _header_offset * newdigate::IndexableFile<128, 2>::element_size) {
         _playing = false;
         if (_filename) delete [] _filename;
