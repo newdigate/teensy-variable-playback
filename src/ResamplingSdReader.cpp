@@ -1,6 +1,7 @@
 #include "ResamplingSdReader.h"
 #include "interpolation.h"
 #include "waveheaderparser.h"
+bool ResamplingSdReader::isUsingSPI = false;
 
 // read n samples into each buffer (1 buffer per channel)
 unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
@@ -54,6 +55,9 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                         //Serial.printf("end of loop...\n");
                         /* no looping - return the number of (resampled) bytes returned... */
                         _playing = false;
+                        if (_sourceBuffer) _sourceBuffer->close();
+                        _sourceBuffer = nullptr;
+                        StopUsingSPI();
                         return count;
                     }
                 }   
@@ -255,10 +259,10 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     if (!isWave) // if raw file, then hardcode the numChannels as per the parameter
         setNumChannels(numChannelsIfRaw);
 
-    if (_file) {
+    if (_sourceBuffer) {
         //Serial.printf("closing %s\n", _filename);
         __disable_irq();
-        _file.close();
+        _sourceBuffer->close();
         __enable_irq();
     }
     if (_sourceBuffer) delete _sourceBuffer;
@@ -268,19 +272,19 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     StartUsingSPI();
 
     __disable_irq();
-    _file = SD.open(_filename);
+    File file = SD.open(_filename);
     __enable_irq();
 
-    if (!_file) {
+    if (!file) {
         StopUsingSPI();
-        Serial.printf("Not able to open file: %s\n", filename);
+        Serial.printf("Not able to open file: %s\n", _filename);
         if (_filename) delete [] _filename;
         _filename = nullptr;
         return false;
     }
 
     __disable_irq();
-    _file_size = _file.size();
+    _file_size = file.size();
     __enable_irq();
 
     if (isWave) {
@@ -288,8 +292,8 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         WaveHeaderParser wavHeaderParser;
         char buffer[44];
         __disable_irq();
-        size_t bytesRead =_file.read(buffer, 44);
-        _file.seek(0);
+        size_t bytesRead =file.read(buffer, 44);
+        file.seek(0);
         __enable_irq();
         wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
         if (wav_header.bit_depth != 16) {
@@ -301,8 +305,12 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         _loop_finish = ((wav_header.data_bytes) / 2) + 22; 
     } else 
         _loop_finish = _file_size / 2;
+    
+    __disable_irq();
+    file.close();
+    __enable_irq();
 
-    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_file);
+    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_filename);
     _loop_start = _header_offset;
     if (_file_size <= _header_offset * newdigate::IndexableFile<128, 2>::element_size) {
         _playing = false;
@@ -354,8 +362,10 @@ int ResamplingSdReader::available(void) {
 void ResamplingSdReader::close(void) {
     if (_playing)
         stop();
-    if (_file)
-        _file.close();
+    if (_sourceBuffer) {
+        _sourceBuffer->close();
+        delete _sourceBuffer;
+    }
     StopUsingSPI();
     _sourceBuffer = nullptr;
     //TODO: dispose _sourceBuffer properly

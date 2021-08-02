@@ -107,29 +107,32 @@ private:
     uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
     newdigate::IndexableFile<128, 2> *_sourceBuffer = nullptr;
-    File _file;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;
     InterpolationData **_interpolationPoints = nullptr;
 
+    static bool isUsingSPI;
     void StartUsingSPI(){
-        //Serial.printf("start spi: %s\n", _filename);
-
+        if (!isUsingSPI) {
+            isUsingSPI = true;
 #if defined(HAS_KINETIS_SDHC)
-        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
+            if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
 #else
-        AudioStartUsingSPI();
+            AudioStartUsingSPI();
 #endif
+        }
     }
 
     void StopUsingSPI() {
-        //Serial.printf("stop spi: %s\n", _filename);
+        if (isUsingSPI) {
+            isUsingSPI = false;
 #if defined(HAS_KINETIS_SDHC)
-        if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
+            if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
 #else
-        AudioStopUsingSPI();
+            AudioStopUsingSPI();
 #endif
+        }
     }
 
     bool play(const char *filename, bool isWave, uint16_t numChannelsIfRaw = 0);
