@@ -25,10 +25,12 @@ public:
 
     static constexpr size_t element_size = sizeof(int16_t);
     size_t buffer_to_index_shift;
-    IndexableFile(File& file) : 
-        _file(file), 
+    IndexableFile(const char *filename) : 
         _buffers(),
         buffer_to_index_shift(log2(BUFFER_SIZE)) {
+            _filename = new char[strlen(filename)+1] {0};
+            memcpy(_filename, filename, strlen(filename));
+            _file = SD.open(_filename);
     }
 
     int16_t &operator[](int i) {
@@ -48,13 +50,14 @@ public:
             size_t seekPos = basePos * element_size;
             _file.seek(seekPos);
             int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
+            #ifndef TEENSYDUINO
             if (!_file.available()){  
-                _file.seek(0);
-                #ifndef TEENSYDUINO
                 _file.close();
-                _file = SD.open(_file.name());
-                #endif
+                __disable_irq();
+                _file = SD.open(_filename);
+                __enable_irq();
             }
+            #endif
             next->buffer_size = bytesRead;
             _buffers.push_back(next);
             match = next;
@@ -62,8 +65,17 @@ public:
         return match->buffer[i % BUFFER_SIZE];
     }
 
+    void close() {
+        if (_file)
+            _file.close();
+
+        if (_filename)
+            delete [] _filename;
+        _filename = nullptr;
+    }
 private:
     File _file;
+    char *_filename;
     std::vector<indexedbuffer*> _buffers;
 
     indexedbuffer* find_with_index(uint32_t i) {
