@@ -269,9 +269,13 @@ bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)            
     }
     setNumChannels(wav_header.num_channels);
     _header_offset = 22;
-    _file_size = length * 2; //2 bytes per sample
+    _file_size = wav_header.data_bytes + 44; //2 bytes per sample
+    if (_file_size > length * 2){
+        Serial.printf("TeensyVariablePlayback: warning: length of array in bytes (%d) is smaller than the file data size in bytes (%d) according to the header - defaulting length to filesize...", length * 2, _file_size);
+        _loop_finish = length;
+    } else
+        _loop_finish = _file_size / 2;
     _loop_start = _header_offset;
-    _loop_finish = length;
 
     reset();
     _playing = true;
