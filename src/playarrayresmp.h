@@ -45,6 +45,14 @@ public:
         arrayReader.loop(samples);
     }
 
+    void setLoopStart(uint32_t loop_start) {
+        arrayReader.setLoopStart(loop_start);
+    }
+
+    void setLoopFinish(uint32_t loop_finish) {
+        arrayReader.setLoopFinish(loop_finish);
+    }
+
     void enableInterpolation(bool enable) {
         if (enable)
             arrayReader.setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
