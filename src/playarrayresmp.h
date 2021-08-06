@@ -9,12 +9,13 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "ResamplingArrayReader.h"
+#include "playresmp.h"
 
-class AudioPlayArrayResmp : public AudioStream
+class AudioPlayArrayResmp : public AudioPlayResmp
 {
 public:
     AudioPlayArrayResmp(void) :
-            AudioStream(0, NULL),
+            AudioPlayResmp(),
             arrayReader()
     {
         begin();

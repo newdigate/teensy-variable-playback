@@ -11,12 +11,13 @@
 #include "SD.h"
 #include "stdint.h"
 #include "ResamplingSdReader.h"
+#include "playresmp.h"
 
-class AudioPlaySdResmp : public AudioStream
+class AudioPlaySdResmp : public AudioPlayResmp
 {
 public:
     AudioPlaySdResmp(void) :
-            AudioStream(0, NULL),
+            AudioPlayResmp(),
             sdReader()
     {
         begin();
@@ -37,6 +38,14 @@ public:
 
     void setLoopType(loop_type t) {
         sdReader.setLoopType(t);
+    }
+
+    void setLoopStart(uint32_t loop_start) {
+        sdReader.setLoopStart(loop_start);
+    }
+
+    void setLoopFinish(uint32_t loop_finish) {
+        sdReader.setLoopFinish(loop_finish);
     }
 
     void enableInterpolation(bool enable) {
