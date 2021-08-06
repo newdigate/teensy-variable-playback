@@ -1,9 +1,9 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_PLAYRESMP_H
 #define TEENSY_RESAMPLING_SDREADER_PLAYRESMP_H
 
-#include <Arduino.h>
-#include <Audio.h>
-#include <loop_type.h>
+#include "Arduino.h"
+#include "Audio.h"
+#include "loop_type.h"
 
 class AudioPlayResmp : public AudioStream
 {
