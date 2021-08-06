@@ -60,6 +60,10 @@ void AudioPlaySdResmp::update()
             }
             transmit(blocks[channel], channel);
         }
+
+        if(_numChannels == 1) {
+            transmit(blocks[0], 1);
+        }
     } else {
         sdReader.close();
     }
