@@ -40,7 +40,7 @@ jobs:
           path: teensy-x86-sd-stubs
 
       - name: download dependencies
-        run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev libsoundio-dev
+        run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev libsoundio-dev libxml2-utils xsltproc
 
       - name: Make and Install teensy-x86-stubs
         run: cd teensy-x86-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
@@ -79,7 +79,11 @@ jobs:
         working-directory: ${{github.workspace}}
         shell: bash
         # Execute the build.  You can specify a specific target with "--target <NAME>"
-        run: build/test/tests
+        run: |
+          mkdir output
+          build/test/tests --output_format=XML --report_level=detailed  2> output/test-results.xml
+          xmllint --format output/test-results.xml > output/test-results-formatted.xml
+          xsltproc test/boost-to-junit-xml.xslt output/test-results.xml > output/junit-test-results.xml
 
       - name: upload artifacts
         if: always()      
@@ -87,3 +91,9 @@ jobs:
         with:
           name: test-audio-output
           path: output
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: output/junit-test-results.xml
