@@ -9,12 +9,13 @@
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "ResamplingArrayReader.h"
+#include "playresmp.h"
 
-class AudioPlayArrayResmp : public AudioStream
+class AudioPlayArrayResmp : public AudioPlayResmp
 {
 public:
     AudioPlayArrayResmp(void) :
-            AudioStream(0, NULL),
+            AudioPlayResmp(),
             arrayReader()
     {
         begin();
@@ -43,6 +44,14 @@ public:
     
     void startLoop(uint32_t samples) {
         arrayReader.loop(samples);
+    }
+
+    void setLoopStart(uint32_t loop_start) {
+        arrayReader.setLoopStart(loop_start);
+    }
+
+    void setLoopFinish(uint32_t loop_finish) {
+        arrayReader.setLoopFinish(loop_finish);
     }
 
     void enableInterpolation(bool enable) {
