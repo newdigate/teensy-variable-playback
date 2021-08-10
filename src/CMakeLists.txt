@@ -12,6 +12,7 @@ set(SOURCE_FILES
 
 set(HEADER_FILES
         loop_type.h
+        playresmp.h
         playsdresmp.h
         ResamplingSdReader.h
         waveheaderparser.h
