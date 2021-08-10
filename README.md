@@ -254,3 +254,6 @@ void loop() {
 ```
   
 </details>  
+
+# credits
+* convert boost test report to junit xml format: [Stuart Lange](https://stackoverflow.com/a/2975928/4634140)
