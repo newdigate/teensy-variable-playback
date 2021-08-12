@@ -133,6 +133,7 @@ void populateFilenames(char *directory, char **filenames) {
     if ((m > 0 || a > 0) && (underscore != 0)) {  
         filenames[index] = new char[curfile.length()+1] {0};
         memcpy(filenames[index], curfile.c_str(), curfile.length());
+        index++;
     } 
     files.close();
   }
