@@ -15,6 +15,7 @@ play 16-bit audio samples at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 12/08/2021: v1.0.11: When playing a mono sample, transmit on both channels (credit to @atoktoto) 
 * 28/07/2021: v1.0.10: Fix issues when starting playback in reverse
 * 23/07/2021: v1.0.9: Fix issue which crashes teensy when playing multiple files from SD card using array of filenames
 * 21/07/2021: v1.0.8: **Breaking changes** 
