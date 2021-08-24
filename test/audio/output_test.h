@@ -36,7 +36,7 @@ public:
 		
 		string filePath =  outputPath +  string(filename);
 		std::cout << "saving output audio .wav file to " << filePath << std::endl;
-		_outputFile.open(filePath);
+		_outputFile.open(filePath, ios_base::in | ios_base::out);
 		if (!_outputFile.is_open()) {
         	Serial.println("couldn't open file for recording...");			
         } else {

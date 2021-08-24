@@ -57,6 +57,7 @@ if (DEFINED BUILD_FOR_LINUX)
             audio/wav/AudioWavFixture.h
             audio/wav/test_wav_mono_loop_forward_playback.cpp
             audio/wav/test_wav_stereo_loop_forward_playback.cpp
+            audio/wav/test_wav_tags.cpp
 
             low_level/sd/ResamplingReaderFixture.h
             low_level/sd/test_raw_mono_noloop_forward_playback.cpp

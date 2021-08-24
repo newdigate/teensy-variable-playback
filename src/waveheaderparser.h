@@ -148,6 +148,7 @@ public:
              && buffer[offset+2] == 'S' 
              && buffer[offset+3] == 'T') {
             infoTagsSize = static_cast<uint32_t>(buffer[offset+7] << 24 | buffer[offset+6] << 16 | buffer[offset+5] << 8 | buffer[offset+4]);    
+            infoTagsSize += 8;
             return true;
         }
 
