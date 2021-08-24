@@ -255,7 +255,7 @@ bool ResamplingSdReader::playWav(const char *filename) {
 bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numChannelsIfRaw)
 {
     stop();
-    
+    //system("echo ${PWD}");
     if (!isWave) // if raw file, then hardcode the numChannels as per the parameter
         setNumChannels(numChannelsIfRaw);
 
@@ -289,11 +289,13 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
 
     if (isWave) {
         wav_header wav_header;
+        wav_data_header data_header;
+
         WaveHeaderParser wavHeaderParser;
-        char buffer[44];
+        char buffer[36];
         __disable_irq();
-        size_t bytesRead =file.read(buffer, 44);
-        file.seek(0);
+        size_t bytesRead = file.read(buffer, 36);
+        
         __enable_irq();
         wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
         if (wav_header.bit_depth != 16) {
@@ -301,8 +303,25 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
             return false;
         }
         setNumChannels(wav_header.num_channels);
-        _header_offset = 22;
-        _loop_finish = ((wav_header.data_bytes) / 2) + 22; 
+        
+        bytesRead = file.read(buffer, 8);
+        unsigned infoTagsSize;
+        if (!wavHeaderParser.readInfoTags((unsigned char *)buffer, 0, infoTagsSize))
+        {
+            Serial.println("Not able to read header! Aborting...");
+            return false;
+        }
+
+        file.seek(36 + infoTagsSize);
+        bytesRead = file.read(buffer, 8);
+
+        if (!wavHeaderParser.readDataHeader((unsigned char *)buffer, 0, data_header)) {
+            Serial.println("Not able to read header! Aborting...");
+            return false;
+        }
+
+        _header_offset = (44 + infoTagsSize) / 2;
+        _loop_finish = ((data_header.data_bytes) / 2) + _header_offset; 
     } else 
         _loop_finish = _file_size / 2;
     

@@ -27,7 +27,9 @@ struct wav_header {
     int byte_rate;          // 28 - 31
     short sample_alignment; // 32 - 33
     short bit_depth;        // 34 - 35
+};
 
+struct wav_data_header {
     // Data
     char data_header[4];    // 36 - 39
     unsigned int data_bytes;// 40 - 43
@@ -35,7 +37,7 @@ struct wav_header {
 
 class WaveHeaderParser {
 public:
-    bool readWaveHeader(const char *filename, wav_header &header) {
+    bool readWaveHeader(const char *filename, wav_header &header, wav_data_header &wav_data_header) {
         __disable_irq();
         File wavFile = SD.open(filename);
         __enable_irq();
@@ -44,17 +46,42 @@ public:
             return false;
         }
         bool result = readWaveHeader(filename, header, wavFile);
+        if (result) {
+            wavFile.seek(36);
+            unsigned char buffer[8];
+            size_t bytesRead = wavFile.read(buffer, 8);
+            if (bytesRead != 8) {
+                Serial.printf("Not able to read header... %s\n", filename);
+                result = false;
+            }
+
+            if (result) {
+                unsigned infoTagsSize;
+                result = readInfoTags(buffer, 0, infoTagsSize);
+
+                if (result) {
+                    wavFile.seek(36 + infoTagsSize);
+                    bytesRead = wavFile.read(buffer, 8);
+                    if (bytesRead != 8) {
+                        Serial.printf("Not able to read header... %s\n", filename);
+                        return false;
+                    }
+
+                    result = readDataHeader(buffer, 0, wav_data_header);
+                }
+            }
+        }
         wavFile.close();
         return result;
     }
 
     bool readWaveHeader(const char *filename, wav_header &header, File &wavFile) {
-        char buffer[44];
+        char buffer[36];
         __disable_irq();
-        int bytesRead = wavFile.read(buffer, 44);
+        int bytesRead = wavFile.read(buffer, 36);
         __enable_irq();
-        if (bytesRead != 44) {
-            Serial.printf("expected 44 bytes (was %d)\n", bytesRead);
+        if (bytesRead != 36) {
+            Serial.printf("expected 36 bytes (was %d)\n", bytesRead);
             return false;
         }
         return readWaveHeaderFromBuffer(buffer, header);
@@ -112,15 +139,42 @@ public:
         auto bit_depth = static_cast<unsigned long>(b[35] << 8 | b[34]);
         header.bit_depth = bit_depth;
 
-        for (int i=0; i < 4; i++)
-            header.data_header[i] = buffer[i+36];
-        if (buffer[36] != 'd' || buffer[37] != 'a' || buffer[38] != 't' || buffer[39] != 'a') {
+        return true;
+    }
+
+    bool readInfoTags(unsigned char *buffer, size_t offset, unsigned &infoTagsSize) {
+        if (    buffer[offset+0] == 'L' 
+             && buffer[offset+1] == 'I' 
+             && buffer[offset+2] == 'S' 
+             && buffer[offset+3] == 'T') {
+            infoTagsSize = static_cast<uint32_t>(buffer[offset+7] << 24 | buffer[offset+6] << 16 | buffer[offset+5] << 8 | buffer[offset+4]);    
+            return true;
+        }
+
+        if (    buffer[offset+0] == 'd' 
+             && buffer[offset+1] == 'a' 
+             && buffer[offset+2] == 't' 
+             && buffer[offset+3] == 'a') {
+            infoTagsSize = 0;
+            return true;
+        }
+
+        Serial.println("expected 'data' or 'LIST'...");
+        return false;
+    }
+
+    bool readDataHeader(unsigned char *buffer, size_t offset, wav_data_header &data_header) {
+
+      for (int i=0; i < 4; i++)
+            data_header.data_header[i] = buffer[i+offset];
+
+        if (buffer[offset+0] != 'd' || buffer[offset+1] != 'a' || buffer[offset+2] != 't' || buffer[offset+3] != 'a') {
             Serial.printf("expected data... (was %d)\n", buffer);
             return false;
         }
 
-        auto data_bytes = static_cast<unsigned long>(b[43] << 24 | b[42] << 16 | b[41] << 8 | b[40]);
-        header.data_bytes = data_bytes;
+        auto data_bytes = static_cast<unsigned long>(buffer[offset+7] << 24 | buffer[offset+6] << 16 | buffer[offset+5] << 8 | buffer[offset+4]);
+        data_header.data_bytes = data_bytes;
         return true;
     }
 private:

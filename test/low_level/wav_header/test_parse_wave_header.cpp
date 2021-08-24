@@ -23,7 +23,8 @@ BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
         SD.setSDCardFileData((char*) test_sndhdrdata_sndhdr_wav, test_sndhdrdata_sndhdr_wav_len);
 
         wav_header header;
-        bool success = waveHeaderParser->readWaveHeader("blah.wav", header);
+        wav_data_header data_header;
+        bool success = waveHeaderParser->readWaveHeader("blah.wav", header, data_header);
         BOOST_CHECK_EQUAL(success, true);
         const char expectedRIFF[5] = "RIFF";
         BOOST_CHECK_EQUAL_COLLECTIONS(&header.riff_header[0], &header.riff_header[3],&expectedRIFF[0], &expectedRIFF[3]);
@@ -33,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
         const char expectedfmt[5] = "fmt ";
         BOOST_CHECK_EQUAL_COLLECTIONS(&header.fmt_header[0], &header.fmt_header[3],&expectedfmt[0], &expectedfmt[3]);
         const char expecteddata[5] = "data";
-        BOOST_CHECK_EQUAL_COLLECTIONS(&header.data_header[0], &header.data_header[3],&expecteddata[0], &expecteddata[3]);
+        BOOST_CHECK_EQUAL_COLLECTIONS(&data_header.data_header[0], &data_header.data_header[3],&expecteddata[0], &expecteddata[3]);
         //BOOST_CHECK_EQUAL(File::numOpenFiles,0);
         //BOOST_CHECK_EQUAL(File::numInstances,0);
     }
