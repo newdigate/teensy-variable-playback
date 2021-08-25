@@ -261,15 +261,34 @@ bool ResamplingArrayReader::playWav(int16_t *array, uint32_t length)            
     stop();
 
     wav_header wav_header;
+    wav_data_header data_header;
+
     WaveHeaderParser wavHeaderParser;
-    wavHeaderParser.readWaveHeaderFromBuffer((const char *) array, wav_header);
+    if (!wavHeaderParser.readWaveHeaderFromBuffer((const char *) array, wav_header)) {
+        Serial.println("Not able to read header! Aborting.... ");
+        return false;
+    }
+
     if (wav_header.bit_depth != 16) {
-        Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
+        Serial.printf("Needs 16 bit audio! Aborting.... (got %d)\n", wav_header.bit_depth);
         return false;
     }
     setNumChannels(wav_header.num_channels);
-    _header_offset = 22;
-    _file_size = wav_header.data_bytes + 44; //2 bytes per sample
+    unsigned infoTagsSize;
+    if (!wavHeaderParser.readInfoTags((unsigned char *)array, 36, infoTagsSize))
+    {
+        Serial.println("Not able to read header! Aborting...");
+        return false;
+    }
+
+    if (!wavHeaderParser.readDataHeader((unsigned char *)array, 36 + infoTagsSize, data_header)) {
+        Serial.println("Not able to read header! Aborting...");
+        return false;
+    }
+
+
+    _header_offset = (44 + infoTagsSize) / 2;
+    _file_size = data_header.data_bytes + 44 + infoTagsSize; //2 bytes per sample
     if (_file_size > length * 2){
         Serial.printf("TeensyVariablePlayback: warning: length of array in bytes (%d) is smaller than the file data size in bytes (%d) according to the header - defaulting length to filesize...", length * 2, _file_size);
         _loop_finish = length;

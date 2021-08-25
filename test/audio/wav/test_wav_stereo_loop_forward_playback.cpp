@@ -10,9 +10,12 @@
     
 BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
     
-    const std::string referencePath = "test/resources/reference/";
-
     const uint16_t numberOfChannels = 2;
+
+    const std::string referencePath = "test/resources/reference/";
+    const std::string inputPath = "test/resources/input/";
+    const std::string outputPath = "output/";
+
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_0000_quadratic_stereo_noloop, AudioWavFixture) {
 
         // GUItool: begin automatically generated code
@@ -25,11 +28,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 1.0;
         const std::string testName = "Wav_fwd_1_0000_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
+        const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath + testName + ".wav";
-        SD.setSDCardFolderPath(referencePath);
+        SD.setSDCardFolderPath(inputPath);
         
-        testout.saveOutputFile(outputFile.c_str());
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
@@ -61,11 +64,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 0.5;
         const std::string testName = "Wav_fwd_0_5000_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
+        const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath + testName + ".wav";
-        SD.setSDCardFolderPath(referencePath);
+        SD.setSDCardFolderPath(inputPath);
 
-        testout.saveOutputFile(outputFile.c_str());
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
     
         wave.begin();
         wave.enableInterpolation(true);
@@ -99,10 +102,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 2.0;
         const std::string testName = "Wav_fwd_2_0000_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
-        const std::string referenceFileName = "test/resources/reference/"+testName+".wav";
+        const std::string outputFileName = outputPath + outputFile;
+        const std::string referenceFileName = referencePath + testName + ".wav";
+        SD.setSDCardFolderPath(inputPath);
 
-        testout.saveOutputFile(outputFile.c_str());     
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());     
         wave.begin();           
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
@@ -135,11 +139,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 0.7437;
         const std::string testName = "Wav_fwd_0_7437_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
+        const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath + testName + ".wav";
-        SD.setSDCardFolderPath(referencePath);
+        SD.setSDCardFolderPath(inputPath);
 
-        testout.saveOutputFile(outputFile.c_str());
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
@@ -173,11 +177,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 1.7437;
         const std::string testName = "Wav_fwd_1_7437_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
+        const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath + testName + ".wav";
-        SD.setSDCardFolderPath(referencePath);
+        SD.setSDCardFolderPath(inputPath);
 
-        testout.saveOutputFile(outputFile.c_str());
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
@@ -210,11 +214,11 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         const double playbackRate = 8.7437;
         const std::string testName = "Wav_fwd_8_7437_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
-        const std::string outputFileName = "output/" + outputFile;
+        const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath + testName + ".wav";
-        SD.setSDCardFolderPath(referencePath);
+        SD.setSDCardFolderPath(inputPath);
 
-        testout.saveOutputFile(outputFile.c_str());
+        testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();        
         wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
