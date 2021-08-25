@@ -5,7 +5,7 @@
     "keywords": "sound, audio, sample, resample, pitch, interpolation, legrange, sampler, playback, speed",
     "description": "Teensy Variable Playback",
     "url": "https://github.com/newdigate/teensy-variable-playback",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "export": {
       "exclude": [
         ".vscode",
@@ -26,11 +26,10 @@
       "type": "git",
       "url": "https://github.com/newdigate/teensy-variable-playback"
     },
-    "dependencies":
-    {
-      "name": "Audio",
-      "frameworks": "arduino"
-    },
+    "dependencies":[{
+        "name": "Audio",
+        "frameworks": "arduino"
+    }],
     "examples": [
       "examples/*/*.ino",
       "examples/*/*/*.ino"
