@@ -72,14 +72,12 @@ void AudioPlaySdResmp::update()
     }
 }
 
-#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
-
 uint32_t AudioPlaySdResmp::positionMillis()
 {
-    return ((uint64_t)file_size * B2M) >> 32;
+    return sdReader.positionMillis();
 }
 
 uint32_t AudioPlaySdResmp::lengthMillis()
 {
-    return ((uint64_t)file_size * B2M) >> 32;
+    return sdReader.lengthMillis();
 }

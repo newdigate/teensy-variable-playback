@@ -14,6 +14,8 @@
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
+#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
+
 class ResamplingSdReader {
 public:
     ResamplingSdReader() {
@@ -91,6 +93,15 @@ public:
         }
     }
 
+    uint32_t positionMillis(void) {
+        if (_file_size == 0) return 0;
+
+        return (uint32_t) (( (double)_bufferPosition * lengthMillis() ) / (double)(_file_size/2));
+    }
+
+    uint32_t lengthMillis(void) {
+        return ((uint64_t)_file_size * B2M) >> 32;
+    }
 private:
     volatile bool _playing = false;
 
