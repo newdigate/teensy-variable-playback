@@ -16,6 +16,7 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 25/09/2021: v1.0.13: positionMillis() implemented for AudioPlaySdResmp
 * 25/08/2021: v1.0.12: Skip over RIFF tags in .wav header
 * 12/08/2021: v1.0.11: When playing a mono sample, transmit on both channels (credit to @atoktoto) 
 * 28/07/2021: v1.0.10: Fix issues when starting playback in reverse
