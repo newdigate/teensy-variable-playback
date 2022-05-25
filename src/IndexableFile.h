@@ -32,6 +32,14 @@ public:
             memcpy(_filename, filename, strlen(filename));
             _file = SD.open(_filename);
     }
+    ~IndexableFile() {
+       for (auto && x : _buffers){
+            delete [] x->buffer;
+            delete x;
+        }
+        if (_filename)
+            delete [] _filename;
+    }
 
     int16_t &operator[](int i) {
         int32_t indexFor_i = i >> buffer_to_index_shift;

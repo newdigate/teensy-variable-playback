@@ -55,9 +55,8 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                         //Serial.printf("end of loop...\n");
                         /* no looping - return the number of (resampled) bytes returned... */
                         _playing = false;
-                        if (_sourceBuffer) _sourceBuffer->close();
-                        _sourceBuffer = nullptr;
-                        StopUsingSPI();
+                        close();
+                        
                         return count;
                     }
                 }   
@@ -254,19 +253,12 @@ bool ResamplingSdReader::playWav(const char *filename) {
 
 bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numChannelsIfRaw)
 {
-    stop();
+    close();
     //system("echo ${PWD}");
     if (!isWave) // if raw file, then hardcode the numChannels as per the parameter
         setNumChannels(numChannelsIfRaw);
 
-    if (_sourceBuffer) {
-        //Serial.printf("closing %s\n", _filename);
-        __disable_irq();
-        _sourceBuffer->close();
-        __enable_irq();
-    }
-    if (_sourceBuffer) delete _sourceBuffer;
-    if (_filename) delete [] _filename;
+
     _filename = new char[strlen(filename)+1] {0};
     memcpy(_filename, filename, strlen(filename) + 1);
     StartUsingSPI();
@@ -381,12 +373,14 @@ int ResamplingSdReader::available(void) {
 void ResamplingSdReader::close(void) {
     if (_playing)
         stop();
-    if (_sourceBuffer) {
+    if (_sourceBuffer != nullptr) {
+        __disable_irq();
         _sourceBuffer->close();
+        __enable_irq();
         delete _sourceBuffer;
+        _sourceBuffer = nullptr;
+        StopUsingSPI();
     }
-    StopUsingSPI();
-    _sourceBuffer = nullptr;
-    //TODO: dispose _sourceBuffer properly
+    if (_filename) delete [] _filename;
     deleteInterpolationPoints();
 }
