@@ -381,6 +381,9 @@ void ResamplingSdReader::close(void) {
         _sourceBuffer = nullptr;
         StopUsingSPI();
     }
-    if (_filename) delete [] _filename;
+    if (_filename != nullptr) {
+        delete [] _filename;
+        _filename = nullptr;
+    }
     deleteInterpolationPoints();
 }
