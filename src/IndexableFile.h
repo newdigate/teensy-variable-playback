@@ -37,8 +37,10 @@ public:
             delete [] x->buffer;
             delete x;
         }
-        if (_filename)
+        if (_filename != nullptr) {
             delete [] _filename;
+            _filename = nullptr;
+        }
     }
 
     int16_t &operator[](int i) {
