@@ -73,7 +73,7 @@ jobs:
 
     - uses: actions/checkout@v2
       with:
-        repository: greiman/SdFat.git
+        repository: PaulStoffregen/SdFat.git
         path: deps/SdFat
         fetch-depth: 1
         ref: master
