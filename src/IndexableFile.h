@@ -33,14 +33,7 @@ public:
             _file = SD.open(_filename);
     }
     ~IndexableFile() {
-       for (auto && x : _buffers){
-            delete [] x->buffer;
-            delete x;
-        }
-        if (_filename != nullptr) {
-            delete [] _filename;
-            _filename = nullptr;
-        }
+        close();
     }
 
     int16_t &operator[](int i) {
@@ -76,13 +69,22 @@ public:
     }
 
     void close() {
-        if (_file)
+        if (_file) {
             _file.close();
+        }
 
-        if (_filename)
+       for (auto && x : _buffers){
+            delete [] x->buffer;
+            delete x;
+        }
+        _buffers.clear();
+
+        if (_filename != nullptr) {
             delete [] _filename;
-        _filename = nullptr;
+            _filename = nullptr;
+        }    
     }
+
 private:
     File _file;
     char *_filename;
