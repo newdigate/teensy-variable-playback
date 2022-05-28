@@ -321,8 +321,6 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     file.close();
     __enable_irq();
 
-    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_filename);
-    _loop_start = _header_offset;
     if (_file_size <= _header_offset * newdigate::IndexableFile<128, 2>::element_size) {
         _playing = false;
         if (_filename) delete [] _filename;
@@ -330,6 +328,8 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         Serial.printf("Wave file contains no samples: %s\n", filename);
         return false;
     }
+    _sourceBuffer = new newdigate::IndexableFile<128, 2>(_filename);
+    _loop_start = _header_offset;
 
     reset();
     _playing = true;
@@ -374,9 +374,7 @@ void ResamplingSdReader::close(void) {
     if (_playing)
         stop();
     if (_sourceBuffer != nullptr) {
-        __disable_irq();
         _sourceBuffer->close();
-        __enable_irq();
         delete _sourceBuffer;
         _sourceBuffer = nullptr;
         StopUsingSPI();

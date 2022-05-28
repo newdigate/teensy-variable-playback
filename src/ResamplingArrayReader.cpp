@@ -53,7 +53,7 @@ unsigned int ResamplingArrayReader::read(void **buf, uint16_t nsamples) {
                     {
                         //Serial.printf("end of loop...\n");
                         /* no looping - return the number of (resampled) bytes returned... */
-                        _playing = false;
+                        close();
                         return count;
                     }
                 }   
