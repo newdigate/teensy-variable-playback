@@ -55,9 +55,7 @@ void AudioPlaySdResmp::update()
         // we can read more data from the file...
         n = sdReader.read((void**)data, AUDIO_BLOCK_SAMPLES);
         for (int channel=0; channel < _numChannels; channel++) {
-            for (i=n; i < AUDIO_BLOCK_SAMPLES; i++) {
-                blocks[channel]->data[i] = 0;
-            }
+            memset( &blocks[channel]->data[n], 0, (AUDIO_BLOCK_SAMPLES - n) * 2);
             transmit(blocks[channel], channel);
         }
 
