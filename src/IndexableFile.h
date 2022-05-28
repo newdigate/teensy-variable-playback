@@ -55,8 +55,8 @@ public:
             int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
             #ifndef TEENSYDUINO
             if (!_file.available()){  
-                _file.close();
                 __disable_irq();
+                _file.close();
                 _file = SD.open(_filename);
                 __enable_irq();
             }
@@ -69,8 +69,10 @@ public:
     }
 
     void close() {
-        if (_file) {
+        if (_file.available()) {
+            __disable_irq();
             _file.close();
+            __enable_irq();
         }
 
        for (auto && x : _buffers){
