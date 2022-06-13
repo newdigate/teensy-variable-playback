@@ -52,11 +52,8 @@ unsigned int ResamplingSdReader::read(void **buf, uint16_t nsamples) {
                     case looptype_none:            
                     default:
                     {
-                        //Serial.printf("end of loop...\n");
                         /* no looping - return the number of (resampled) bytes returned... */
-                        _playing = false;
                         close();
-                        
                         return count;
                     }
                 }   
@@ -268,10 +265,7 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     __enable_irq();
 
     if (!file) {
-        StopUsingSPI();
-        Serial.printf("Not able to open file: %s\n", _filename);
-        if (_filename) delete [] _filename;
-        _filename = nullptr;
+        close();
         return false;
     }
 
@@ -292,6 +286,7 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
         if (wav_header.bit_depth != 16) {
             Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
+            close();
             return false;
         }
         setNumChannels(wav_header.num_channels);
@@ -301,6 +296,7 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
         if (!wavHeaderParser.readInfoTags((unsigned char *)buffer, 0, infoTagsSize))
         {
             Serial.println("Not able to read header! Aborting...");
+            close();
             return false;
         }
 
@@ -309,6 +305,7 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
 
         if (!wavHeaderParser.readDataHeader((unsigned char *)buffer, 0, data_header)) {
             Serial.println("Not able to read header! Aborting...");
+            close();
             return false;
         }
 
@@ -322,9 +319,7 @@ bool ResamplingSdReader::play(const char *filename, bool isWave, uint16_t numCha
     __enable_irq();
 
     if (_file_size <= _header_offset * newdigate::IndexableFile<128, 2>::element_size) {
-        _playing = false;
-        if (_filename) delete [] _filename;
-        _filename =  nullptr;
+        close();
         Serial.printf("Wave file contains no samples: %s\n", filename);
         return false;
     }
