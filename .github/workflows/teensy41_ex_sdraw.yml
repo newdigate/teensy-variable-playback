@@ -83,7 +83,7 @@ jobs:
         repository: PaulStoffregen/LittleFS.git
         path: deps/LittleFS
         fetch-depth: 1
-        ref: master
+        ref: main
 
     - name: download toolchain
       run: |

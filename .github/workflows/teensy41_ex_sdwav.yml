@@ -83,8 +83,8 @@ jobs:
         repository: PaulStoffregen/LittleFS.git
         path: deps/LittleFS
         fetch-depth: 1
-        ref: master
-        
+        ref: main
+
     - name: download toolchain
       run: |
         curl  -L "https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2" --output /tmp/gcc-arm-none-eabi.tar.bz2
