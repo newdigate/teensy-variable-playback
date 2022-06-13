@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 add_subdirectory(array)
+add_subdirectory(LittleFS)
 add_subdirectory(sampleloader)
 add_subdirectory(sd_play_all)
 add_subdirectory(sd_raw)

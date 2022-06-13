@@ -8,7 +8,9 @@ set(SOURCE_FILES
         ResamplingArrayReader.cpp
         playarrayresmp.cpp
         interpolation.cpp
-        IndexableFile.cpp)
+        IndexableFile.cpp
+        ResamplingLfsReader.cpp
+        playlfsresmp.cpp)
 
 set(HEADER_FILES
         loop_type.h
@@ -20,7 +22,9 @@ set(HEADER_FILES
         playarrayresmp.h
         interpolation.h
         TeensyVariablePlayback.h
-        IndexableFile.h)
+        IndexableFile.h
+        ResamplingLfsReader.h
+        playlfsresmp.h)
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 if (NOT DEFINED TEENSY_VERSION)

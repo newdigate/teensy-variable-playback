@@ -77,6 +77,13 @@ jobs:
         path: deps/SdFat
         fetch-depth: 1
         ref: master
+        
+    - uses: actions/checkout@v2
+      with:
+        repository: PaulStoffregen/LittleFS.git
+        path: deps/LittleFS
+        fetch-depth: 1
+        ref: master
 
     - name: download toolchain
       run: |
