@@ -64,7 +64,6 @@ private:
 
     uint32_t file_size;
     ResamplingArrayReader arrayReader;
-
 };
 
 

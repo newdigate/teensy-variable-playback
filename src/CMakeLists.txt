@@ -7,8 +7,8 @@ set(SOURCE_FILES
         playarrayresmp.cpp
         interpolation.cpp
         IndexableFile.cpp
-        #ResamplingLfsReader.cpp
-        #playlfsresmp.cpp
+        ResamplingLfsReader.cpp
+        playlfsresmp.cpp
         )
 
 set(HEADER_FILES
@@ -23,10 +23,10 @@ set(HEADER_FILES
         interpolation.h
         TeensyVariablePlayback.h
         IndexableFile.h
-        #IndexableLittleFSFile.h
+        IndexableLittleFSFile.h
         IndexableSDFile.h
-        #ResamplingLfsReader.h
-        #playlfsresmp.h
+        ResamplingLfsReader.h
+        playlfsresmp.h
         )
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
