@@ -6,8 +6,6 @@ set(SOURCE_FILES
         playsdresmp.cpp
         playarrayresmp.cpp
         interpolation.cpp
-        IndexableFile.cpp
-        ResamplingLfsReader.cpp
         playlfsresmp.cpp
         )
 
