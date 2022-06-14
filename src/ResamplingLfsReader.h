@@ -10,7 +10,8 @@
 #include "spi_interrupt.h"
 #include "loop_type.h"
 #include "interpolation.h"
-#include "IndexableFile.h"
+#include "IndexableLittleFSFile.h"
+#include <LittleFS.h>
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 

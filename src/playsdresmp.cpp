@@ -15,16 +15,15 @@ void AudioPlaySdResmp::begin()
 bool AudioPlaySdResmp::playRaw(const char *filename, uint16_t numChannels)
 {
     stop();
-    bool playing = sdReader.playRaw(filename, numChannels);
+    bool playing = sdReader.play(filename, false, numChannels);
     return playing;
 }
 
 bool AudioPlaySdResmp::playWav(const char *filename)
 {
     stop();
-    bool playing = sdReader.playWav(filename);
+    bool playing = sdReader.play(filename, true, 0);
     return playing;
-
 }
 
 void AudioPlaySdResmp::stop()
