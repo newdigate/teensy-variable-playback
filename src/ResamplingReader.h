@@ -19,7 +19,7 @@ public:
     }
 
     virtual File open(char *filename) = 0;
-    virtual TArray* createSourceBuffer() = 0;// new newdigate::IndexableFile<128, 2>(_filename);
+    virtual TArray* createSourceBuffer() = 0;
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
 
@@ -68,7 +68,6 @@ public:
         memcpy(_filename, filename, strlen(filename) + 1);
 
         File file = open(_filename);
-
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
