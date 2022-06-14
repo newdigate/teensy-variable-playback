@@ -57,7 +57,7 @@ public:
 private:
 
     uint32_t file_size;
-    ResamplingSdReader sdReader;
+    newdigate::ResamplingSdReader sdReader;
   
 };
 

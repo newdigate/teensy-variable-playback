@@ -8,12 +8,15 @@
 #include "interpolation.h"
 #include "ResamplingReader.h"
 
+namespace newdigate {
+
 class ResamplingArrayReader : public ResamplingReader<int16_t> {
 public:
     ResamplingArrayReader() :
         ResamplingReader() {
     }
-    virtual int16_t getSourceBufferValue(long index) override {
+
+    int16_t getSourceBufferValue(long index) override {
         return _sourceBuffer[index];
     }
 
@@ -21,7 +24,7 @@ public:
         return _playing;
     }
 
-    virtual int16_t* createSourceBuffer() override {
+    int16_t* createSourceBuffer() override {
         return _sourceBuffer;
     }
 
@@ -32,11 +35,12 @@ public:
         }
     }
 
-    virtual File open(char *filename) override {
+    File open(char *filename) override {
         return File();
     }
 protected:
 };
 
+}
 
 #endif //TEENSYAUDIOLIBRARY_RESAMPLINGARRAYREADER_H

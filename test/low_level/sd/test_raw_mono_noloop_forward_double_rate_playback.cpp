@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
         SD.setSDCardFileData((char *) dataSource, size_of_datasource * 2);
     }
 
-    void testReadForwardAtDoublePlaybackRate(const uint32_t size_of_datasource, ResamplingSdReader *resamplingSdReader) {
+    void testReadForwardAtDoublePlaybackRate(const uint32_t size_of_datasource, newdigate::ResamplingSdReader *resamplingSdReader) {
         printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
 
         int16_t dataSource[size_of_datasource];

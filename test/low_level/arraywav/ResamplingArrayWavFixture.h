@@ -10,14 +10,14 @@
 struct ResamplingArrayWavFixture {
 
     ResamplingArrayWavFixture()  {
-        resamplingArrayReader = new ResamplingArrayReader();
+        resamplingArrayReader = new newdigate::ResamplingArrayReader();
     }
 
     ~ResamplingArrayWavFixture() {
         delete resamplingArrayReader;
     }
 
-    ResamplingArrayReader * resamplingArrayReader;
+    newdigate::ResamplingArrayReader * resamplingArrayReader;
 };
 
 #endif //TEENSY_RESAMPLING_SDREADER_RESAMPLINGARRAYWAVFIXTURE_H

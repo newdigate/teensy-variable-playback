@@ -8,6 +8,8 @@
 #include "interpolation.h"
 #include "waveheaderparser.h"
 
+namespace newdigate {
+
 template<class TArray>
 class ResamplingReader {
 public:
@@ -484,5 +486,6 @@ protected:
 
 };
 
+}
 
 #endif //TEENSYAUDIOLIBRARY_RESAMPLINGREADER_H

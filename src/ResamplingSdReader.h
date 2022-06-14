@@ -17,7 +17,9 @@
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
-class ResamplingSdReader : public ResamplingReader< newdigate::IndexableSDFile<128, 2> > {
+namespace newdigate {
+
+class ResamplingSdReader : public ResamplingReader< IndexableSDFile<128, 2> > {
 public:
     ResamplingSdReader() : 
         ResamplingReader() 
@@ -53,8 +55,8 @@ public:
         deleteInterpolationPoints();
     }
 
-    newdigate::IndexableSDFile<128, 2>* createSourceBuffer() override {
-        return new newdigate::IndexableSDFile<128, 2>(_filename);
+    IndexableSDFile<128, 2>* createSourceBuffer() override {
+        return new IndexableSDFile<128, 2>(_filename);
     }
 
     uint32_t positionMillis(void) {
@@ -71,5 +73,6 @@ protected:
      
 };
 
+}
 
 #endif //TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H

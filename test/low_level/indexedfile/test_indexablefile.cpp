@@ -2,7 +2,7 @@
 #include "IndexedFileFixture.h"
 
 #include <SD.h>
-#include "IndexableFile.h"
+#include "IndexableSDFile.h"
 
 BOOST_AUTO_TEST_SUITE(test_indexablefile)
 
@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(test_indexablefile)
         }
         SD.setSDCardFileData((char*)file_contents, sample_size * 2);
 
-        newdigate::IndexableFile<16, 2> indexable("blah.h");               // use max 2 buffers, with 16 elements each....
+        newdigate::IndexableSDFile<16, 2> indexable("blah.h");               // use max 2 buffers, with 16 elements each....
 
         /*
         for (int i=0; i<sample_size; i++) {

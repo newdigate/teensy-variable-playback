@@ -57,7 +57,7 @@ public:
 private:
 
     uint32_t file_size;
-    ResamplingLfsReader lfsReader;
+    newdigate::ResamplingLfsReader lfsReader;
   
 };
 

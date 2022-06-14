@@ -10,14 +10,14 @@
 struct ResamplingArrayFixture {
 
     ResamplingArrayFixture()  {
-        resamplingArrayReader = new ResamplingArrayReader();
+        resamplingArrayReader = new newdigate::ResamplingArrayReader();
     }
 
     ~ResamplingArrayFixture() {
         delete resamplingArrayReader;
     }
 
-    ResamplingArrayReader * resamplingArrayReader;
+    newdigate::ResamplingArrayReader * resamplingArrayReader;
 };
 
 #endif //TEENSY_RESAMPLING_SDREADER_RESAMPLINGARRAYFIXTURE_H

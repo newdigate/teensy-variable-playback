@@ -63,7 +63,7 @@ public:
 private:
 
     uint32_t file_size;
-    ResamplingArrayReader arrayReader;
+    newdigate::ResamplingArrayReader arrayReader;
 };
 
 
