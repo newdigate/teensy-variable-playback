@@ -24,7 +24,7 @@ public:
         return _myFS.open(filename);
     }
 
-    ~IndexableLittleFSFile() {
+    virtual ~IndexableLittleFSFile() {
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS>::close();
     }
 

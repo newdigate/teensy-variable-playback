@@ -22,7 +22,7 @@ public:
         return SD.open(filename);
     }
 
-    ~IndexableSDFile() {
+    virtual ~IndexableSDFile() {
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS>::close();
     }
 

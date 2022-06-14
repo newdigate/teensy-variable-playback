@@ -34,7 +34,8 @@ public:
             _filename = new char[strlen(filename)+1] {0};
             memcpy(_filename, filename, strlen(filename));
     }
-    ~IndexableFile() {
+    
+    virtual ~IndexableFile() {
         close();
     }
 

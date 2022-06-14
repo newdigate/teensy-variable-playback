@@ -13,6 +13,8 @@ class ResamplingReader {
 public:
     ResamplingReader() {
     }
+    virtual ~ResamplingReader() {       
+    }
 
     virtual File open(char *filename) = 0;
     virtual TArray* createSourceBuffer() = 0;// new newdigate::IndexableFile<128, 2>(_filename);
@@ -62,34 +64,25 @@ public:
 
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
-        StartUsingSPI();
 
-        __disable_irq();
         File file = open(_filename);
-        __enable_irq();
 
         if (!file) {
-            StopUsingSPI();
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
             _filename = nullptr;
             return false;
         }
 
-        __disable_irq();
         _file_size = file.size();
-        __enable_irq();
-
         if (isWave) {
             wav_header wav_header;
             wav_data_header data_header;
 
             WaveHeaderParser wavHeaderParser;
             char buffer[36];
-            __disable_irq();
             size_t bytesRead = file.read(buffer, 36);
             
-            __enable_irq();
             wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
             if (wav_header.bit_depth != 16) {
                 Serial.printf("Needs 16 bit audio! Aborting.... (got %d)", wav_header.bit_depth);
@@ -118,9 +111,7 @@ public:
         } else 
             _loop_finish = _file_size / 2;
         
-        __disable_irq();
         file.close();
-        __enable_irq();
 
         if (_file_size <= _header_offset * sizeof(int16_t)) {
             _playing = false;
@@ -129,11 +120,8 @@ public:
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }
-        
-        if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
-            initializeInterpolationPoints();
-        }
-        _sourceBuffer = createSourceBuffer();// new newdigate::IndexableFile<128, 2>(_filename);
+
+        _sourceBuffer = createSourceBuffer();
         _loop_start = _header_offset;
 
         reset();
@@ -376,11 +364,9 @@ public:
     }
 
     void loop(uint32_t numSamples) {
-        __disable_irq();
         _loop_start = _bufferPosition;
         _loop_finish = _bufferPosition + numSamples * _numChannels;
         _loopType = loop_type::looptype_repeat;
-        __enable_irq();
     }
 
     void setLoopType(loop_type loopType)
@@ -397,6 +383,9 @@ public:
     }
 
     void reset(void) {
+        if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
+            initializeInterpolationPoints();
+        }
         _numInterpolationPoints = 0;
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
@@ -460,10 +449,6 @@ protected:
     uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
     TArray *_sourceBuffer = nullptr;
-    //int16_t *_sourceBuffer = nullptr;
-
-    virtual void StartUsingSPI() = 0;
-    virtual void StopUsingSPI() = 0;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;

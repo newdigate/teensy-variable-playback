@@ -45,7 +45,6 @@ public:
             _sourceBuffer->close();
             delete _sourceBuffer;
             _sourceBuffer = nullptr;
-            StopUsingSPI();
         }
         if (_filename != nullptr) {
             delete [] _filename;
@@ -54,7 +53,7 @@ public:
         deleteInterpolationPoints();
     }
 
-    virtual newdigate::IndexableSDFile<128, 2>* createSourceBuffer() override {
+    newdigate::IndexableSDFile<128, 2>* createSourceBuffer() override {
         return new newdigate::IndexableSDFile<128, 2>(_filename);
     }
 
@@ -70,11 +69,6 @@ public:
     
 protected:    
      
-    void StartUsingSPI() override {
-    }
-
-    void StopUsingSPI() override {
-    }
 };
 
 

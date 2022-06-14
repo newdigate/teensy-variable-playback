@@ -25,7 +25,7 @@ public:
         return _sourceBuffer;
     }
 
-    virtual void close(void) override {
+    void close(void) override {
         if (_playing) {
             stop();
             deleteInterpolationPoints();
@@ -36,11 +36,6 @@ public:
         return File();
     }
 protected:
-    void StartUsingSPI() override {
-    }
-
-    void StopUsingSPI() override {
-    }
 };
 
 

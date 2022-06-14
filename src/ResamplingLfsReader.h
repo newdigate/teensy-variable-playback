@@ -46,7 +46,6 @@ public:
             _sourceBuffer->close();
             delete _sourceBuffer;
             _sourceBuffer = nullptr;
-            StopUsingSPI();
         }
         if (_filename != nullptr) {
             delete [] _filename;
@@ -55,7 +54,7 @@ public:
         deleteInterpolationPoints();
     }
 
-    virtual newdigate::IndexableLittleFSFile<128, 2>* createSourceBuffer() override {
+    newdigate::IndexableLittleFSFile<128, 2>* createSourceBuffer() override {
         return new newdigate::IndexableLittleFSFile<128, 2>(_myFS, _filename);
     }
 
@@ -71,11 +70,6 @@ public:
     
 protected:    
     LittleFS &_myFS;
-    void StartUsingSPI() override {
-    }
-
-    void StopUsingSPI() override {
-    }
 };
 
 
