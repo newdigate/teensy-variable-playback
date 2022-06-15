@@ -7,6 +7,7 @@ set(SOURCE_FILES
         playarrayresmp.cpp
         interpolation.cpp
         playlfsresmp.cpp
+        playserialflashresmp.cpp
         )
 
 set(HEADER_FILES
@@ -21,10 +22,13 @@ set(HEADER_FILES
         interpolation.h
         TeensyVariablePlayback.h
         IndexableFile.h
+        IndexableSerialFlashFile.h
         IndexableLittleFSFile.h
         IndexableSDFile.h
         ResamplingLfsReader.h
+        ResamplingSerialFlashReader.h
         playlfsresmp.h
+        playserialflashresmp.h
         )
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)

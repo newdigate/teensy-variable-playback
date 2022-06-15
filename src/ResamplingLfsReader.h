@@ -19,12 +19,14 @@
 
 namespace newdigate {
 
-class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<128, 2> > {
+class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<128, 2>, File > {
 public:
     ResamplingLfsReader(LittleFS &fs) : 
         ResamplingReader(),
         _myFS(fs) 
     {
+    }
+    virtual ~ResamplingLfsReader() {
     }
 
     int16_t getSourceBufferValue(long index) override {

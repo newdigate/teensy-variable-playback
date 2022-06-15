@@ -10,11 +10,11 @@
 
 namespace newdigate {
 
-class ResamplingArrayReader : public ResamplingReader<int16_t> {
+class ResamplingArrayReader : public ResamplingReader<int16_t, File> {
 public:
     ResamplingArrayReader() :
         ResamplingReader() {
-    }
+    }    
     
     virtual ~ResamplingArrayReader() {
     }

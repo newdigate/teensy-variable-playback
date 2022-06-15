@@ -10,7 +10,7 @@
 
 namespace newdigate {
 
-template<class TArray>
+template<class TArray, class TFile>
 class ResamplingReader {
 public:
     ResamplingReader() {
@@ -18,7 +18,7 @@ public:
     virtual ~ResamplingReader() {       
     }
 
-    virtual File open(char *filename) = 0;
+    virtual TFile open(char *filename) = 0;
     virtual TArray* createSourceBuffer() = 0;
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
@@ -67,7 +67,7 @@ public:
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
 
-        File file = open(_filename);
+        TFile file = open(_filename);
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
