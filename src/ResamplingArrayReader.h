@@ -15,6 +15,9 @@ public:
     ResamplingArrayReader() :
         ResamplingReader() {
     }
+    
+    virtual ~ResamplingArrayReader() {
+    }
 
     int16_t getSourceBufferValue(long index) override {
         return _sourceBuffer[index];
