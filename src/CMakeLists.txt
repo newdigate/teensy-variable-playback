@@ -3,11 +3,7 @@ project(teensy_variable_playback C CXX)
 set(teensy_variable_playback_VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
-        playsdresmp.cpp
-        playarrayresmp.cpp
         interpolation.cpp
-        playlfsresmp.cpp
-        playserialflashresmp.cpp
         )
 
 set(HEADER_FILES

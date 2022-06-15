@@ -58,10 +58,8 @@ public:
             int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
             #ifndef TEENSYDUINO
             if (!_file.available()){  
-                __disable_irq();
                 _file.close();
                 _file = open(_filename);
-                __enable_irq();
             }
             #endif
             next->buffer_size = bytesRead;
@@ -73,9 +71,7 @@ public:
 
     void close() {
         if (_file.available()) {
-            __disable_irq();
             _file.close();
-            __enable_irq();
         }
 
        for (auto && x : _buffers){

@@ -5,20 +5,135 @@
 #include "Audio.h"
 #include "loop_type.h"
 
+template <class TResamplingReader>
 class AudioPlayResmp : public AudioStream
 {
     public:
-        AudioPlayResmp(void): AudioStream(0, NULL) {}
-        virtual ~AudioPlayResmp() {}
+        AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
+        {
+        }
 
-        virtual void setPlaybackRate(float f) = 0;
-        virtual void setLoopType(loop_type t) = 0;
-        virtual void setLoopStart(uint32_t loop_start) = 0;
-        virtual void setLoopFinish(uint32_t loop_finish) = 0;
-        virtual void begin() = 0;
-        virtual void enableInterpolation(bool enable) = 0;
-        virtual bool isPlaying(void) = 0;
-        virtual void stop() = 0;
+        virtual ~AudioPlayResmp() {
+        }
+
+        void begin(void)
+        {
+            reader->begin();
+        }
+
+        bool playRaw(const char *filename, uint16_t numChannels)
+        {
+            stop();
+            return reader->play(filename, false, numChannels);
+        }
+
+        bool playWav(const char *filename)
+        {
+            stop();
+            return reader->play(filename, true, 0);
+        }
+        
+        bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
+        {
+            stop();
+            return reader->playRaw(data, numSamples, numChannels);
+        }
+
+        bool playRaw(const unsigned int *data, uint32_t numSamples, uint16_t numChannels) 
+        {
+            return playRaw((int16_t *) data, numSamples, numChannels);
+        }
+
+        bool playWav(int16_t *data, uint32_t fileSize)
+        {
+            stop();
+            return reader->playWav(data, fileSize);
+        }
+
+        bool playWav(const unsigned int *data, uint32_t fileSize) {
+            return playWav((int16_t *) data, fileSize);
+        }
+
+        void setPlaybackRate(float f) {
+            reader->setPlaybackRate(f);
+        }
+
+        void setLoopType(loop_type t) {
+            reader->setLoopType(t);
+        }
+
+        void setLoopStart(uint32_t loop_start) {
+            reader->setLoopStart(loop_start);
+        }
+
+        void setLoopFinish(uint32_t loop_finish) {
+            reader->setLoopFinish(loop_finish);
+        }
+
+        void enableInterpolation(bool enable) {
+            if (enable)
+                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
+            else 
+                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
+        }
+
+        bool isPlaying(void) {
+            return reader->isPlaying();
+        };
+
+        void stop() {
+            reader->stop();
+        }
+
+        void update()
+        {
+            int _numChannels = reader->getNumChannels();
+            if (_numChannels == -1)
+                return;
+
+            unsigned int i, n;
+            audio_block_t *blocks[_numChannels];
+            int16_t *data[_numChannels];
+            // only update if we're playing
+            if (!reader->isPlaying()) return;
+
+            // allocate the audio blocks to transmit
+            for (int i=0; i < _numChannels; i++) {
+                blocks[i] = allocate();
+                if (blocks[i] == nullptr) return;
+                data[i] = blocks[i]->data;
+            }
+
+            if (reader->available()) {
+                // we can read more data from the file...
+                n = reader->read((void**)data, AUDIO_BLOCK_SAMPLES);
+                for (int channel=0; channel < _numChannels; channel++) {
+                    memset( &blocks[channel]->data[n], 0, (AUDIO_BLOCK_SAMPLES - n) * 2);
+                    transmit(blocks[channel], channel);
+                }
+
+                if(_numChannels == 1) {
+                    transmit(blocks[0], 1);
+                }
+            } else {
+                reader->close();
+            }
+            for (int channel=0; channel < _numChannels; channel++) {
+                release(blocks[channel]);
+            }
+        }
+        uint32_t positionMillis()
+        {
+            return reader->positionMillis();
+        }
+
+        uint32_t lengthMillis()
+        {
+            return reader->lengthMillis();
+        }
+
+    protected:
+        TResamplingReader *reader;
 };
 
 #endif // TEENSY_RESAMPLING_SDREADER_PLAYRESMP_H

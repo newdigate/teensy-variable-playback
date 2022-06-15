@@ -433,7 +433,18 @@ public:
                 _bufferPosition = _loop_finish - _numChannels;
         }
     }
+    
+    #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
+    uint32_t positionMillis()
+    {
+        return ((uint64_t)_file_size * B2M) >> 32;
+    }
 
+    uint32_t lengthMillis()
+    {
+        return ((uint64_t)_file_size * B2M) >> 32;
+    }
+    
 protected:
     volatile bool _playing = false;
 
