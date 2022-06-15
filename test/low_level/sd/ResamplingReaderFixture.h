@@ -10,14 +10,14 @@
 struct ResamplingReaderFixture {
 
     ResamplingReaderFixture()  {
-        resamplingSdReader = new ResamplingSdReader();
+        resamplingSdReader = new newdigate::ResamplingSdReader();
     }
 
     ~ResamplingReaderFixture() {
         delete resamplingSdReader;
     }
 
-    ResamplingSdReader * resamplingSdReader;
+    newdigate::ResamplingSdReader * resamplingSdReader;
 };
 
 #endif //TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H

@@ -3,12 +3,8 @@ project(teensy_variable_playback C CXX)
 set(teensy_variable_playback_VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
-        playsdresmp.cpp
-        ResamplingSdReader.cpp
-        ResamplingArrayReader.cpp
-        playarrayresmp.cpp
         interpolation.cpp
-        IndexableFile.cpp)
+        )
 
 set(HEADER_FILES
         loop_type.h
@@ -17,10 +13,19 @@ set(HEADER_FILES
         ResamplingSdReader.h
         waveheaderparser.h
         ResamplingArrayReader.h
+        ResamplingReader.h
         playarrayresmp.h
         interpolation.h
         TeensyVariablePlayback.h
-        IndexableFile.h)
+        IndexableFile.h
+        IndexableSerialFlashFile.h
+        IndexableLittleFSFile.h
+        IndexableSDFile.h
+        ResamplingLfsReader.h
+        ResamplingSerialFlashReader.h
+        playlfsresmp.h
+        playserialflashresmp.h
+        )
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 if (NOT DEFINED TEENSY_VERSION)

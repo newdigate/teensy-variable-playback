@@ -18,21 +18,24 @@ constexpr bool isPowerOf2(size_t value){
     return !(value == 0) && !(value & (value - 1));
 }
 
-template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS> // BUFFER_SIZE needs to be a power of two
+template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
 class IndexableFile {
 public:
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
+    
+    virtual TFile open(const char *filename) = 0;
 
     static constexpr size_t element_size = sizeof(int16_t);
     size_t buffer_to_index_shift;
     IndexableFile(const char *filename) : 
         _buffers(),
-        buffer_to_index_shift(log2(BUFFER_SIZE)) {
+        buffer_to_index_shift(log2(BUFFER_SIZE)) 
+    {
             _filename = new char[strlen(filename)+1] {0};
             memcpy(_filename, filename, strlen(filename));
-            _file = SD.open(_filename);
     }
-    ~IndexableFile() {
+    
+    virtual ~IndexableFile() {
         close();
     }
 
@@ -55,10 +58,8 @@ public:
             int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
             #ifndef TEENSYDUINO
             if (!_file.available()){  
-                __disable_irq();
                 _file.close();
-                _file = SD.open(_filename);
-                __enable_irq();
+                _file = open(_filename);
             }
             #endif
             next->buffer_size = bytesRead;
@@ -70,9 +71,7 @@ public:
 
     void close() {
         if (_file.available()) {
-            __disable_irq();
             _file.close();
-            __enable_irq();
         }
 
        for (auto && x : _buffers){
@@ -87,8 +86,8 @@ public:
         }    
     }
 
-private:
-    File _file;
+protected:
+    TFile _file;
     char *_filename;
     std::vector<indexedbuffer*> _buffers;
 
@@ -103,5 +102,7 @@ private:
 };
 
 }
+
+
 
 #endif 

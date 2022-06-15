@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(sd_raw)
+set(CMAKE_CXX_STANDARD 14)
+add_definitions(-DPROG_FLASH_SIZE=10000)
+teensy_include_directories(../../src)
+teensy_add_executable(littlefs_raw littlefs_raw.ino)
+teensy_target_link_libraries(littlefs_raw teensy_variable_playback  SD SdFat Audio LittleFS SPI SerialFlash cores Wire arm_math)

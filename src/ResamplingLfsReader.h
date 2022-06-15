@@ -2,16 +2,16 @@
 // Created by Nicholas Newdigate on 10/02/2019.
 //
 
-#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
-#define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
+#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGLFSREADER_H
+#define TEENSYAUDIOLIBRARY_RESAMPLINGLFSREADER_H
 
-#include "SD.h"
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"
 #include "interpolation.h"
-#include "IndexableSDFile.h"
+#include "IndexableLittleFSFile.h"
 #include "ResamplingReader.h"
+#include "LittleFS.h"
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
@@ -19,14 +19,14 @@
 
 namespace newdigate {
 
-class ResamplingSdReader : public ResamplingReader< IndexableSDFile<128, 2>, File > {
+class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<128, 2>, File > {
 public:
-    ResamplingSdReader() : 
-        ResamplingReader() 
+    ResamplingLfsReader(LittleFS &fs) : 
+        ResamplingReader(),
+        _myFS(fs) 
     {
     }
-    
-    virtual ~ResamplingSdReader() {
+    virtual ~ResamplingLfsReader() {
     }
 
     int16_t getSourceBufferValue(long index) override {
@@ -39,7 +39,7 @@ public:
     }
 
     File open(char *filename) override {
-        return SD.open(filename);
+        return _myFS.open(filename);
     }
 
     void close(void) override
@@ -58,8 +58,8 @@ public:
         deleteInterpolationPoints();
     }
 
-    IndexableSDFile<128, 2>* createSourceBuffer() override {
-        return new IndexableSDFile<128, 2>(_filename);
+    IndexableLittleFSFile<128, 2>* createSourceBuffer() override {
+        return new IndexableLittleFSFile<128, 2>(_myFS, _filename);
     }
 
     uint32_t positionMillis(void) {
@@ -73,9 +73,9 @@ public:
     }
     
 protected:    
-     
+    LittleFS &_myFS;
 };
 
 }
 
-#endif //TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
+#endif //TEENSYAUDIOLIBRARY_RESAMPLINGLFSREADER_H

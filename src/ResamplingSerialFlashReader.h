@@ -2,16 +2,16 @@
 // Created by Nicholas Newdigate on 10/02/2019.
 //
 
-#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
-#define TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
+#ifndef TEENSYAUDIOLIBRARY_RESAMPLINGSERIALFLASHREADER_H
+#define TEENSYAUDIOLIBRARY_RESAMPLINGSERIALFLASHREADER_H
 
-#include "SD.h"
 #include <cstdint>
 #include "spi_interrupt.h"
 #include "loop_type.h"
 #include "interpolation.h"
-#include "IndexableSDFile.h"
+#include "IndexableSerialFlashFile.h"
 #include "ResamplingReader.h"
+#include "SerialFlash.h"
 
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 
@@ -19,14 +19,15 @@
 
 namespace newdigate {
 
-class ResamplingSdReader : public ResamplingReader< IndexableSDFile<128, 2>, File > {
+class ResamplingSerialFlashReader : public ResamplingReader< IndexableSerialFlashFile<128, 2>, SerialFlashFile > {
 public:
-    ResamplingSdReader() : 
-        ResamplingReader() 
+    ResamplingSerialFlashReader(SerialFlashChip &fs) : 
+        ResamplingReader(),
+        _myFS(fs) 
     {
     }
-    
-    virtual ~ResamplingSdReader() {
+
+    virtual ~ResamplingSerialFlashReader() {
     }
 
     int16_t getSourceBufferValue(long index) override {
@@ -38,8 +39,8 @@ public:
         return _playing;
     }
 
-    File open(char *filename) override {
-        return SD.open(filename);
+    SerialFlashFile open(char *filename) override {
+        return _myFS.open(filename);
     }
 
     void close(void) override
@@ -58,8 +59,8 @@ public:
         deleteInterpolationPoints();
     }
 
-    IndexableSDFile<128, 2>* createSourceBuffer() override {
-        return new IndexableSDFile<128, 2>(_filename);
+    IndexableSerialFlashFile<128, 2>* createSourceBuffer() override {
+        return new IndexableSerialFlashFile<128, 2>(_myFS, _filename);
     }
 
     uint32_t positionMillis(void) {
@@ -73,9 +74,9 @@ public:
     }
     
 protected:    
-     
+    SerialFlashChip &_myFS;
 };
 
 }
 
-#endif //TEENSYAUDIOLIBRARY_RESAMPLINGSDREADER_H
+#endif //TEENSYAUDIOLIBRARY_RESAMPLINGSERIALFLASHREADER_H

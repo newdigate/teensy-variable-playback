@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
 
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(1.0);
-        resamplingSdReader->playRaw("test2.bin", 1);
+        resamplingSdReader->play("test2.bin", false, 1);
         resamplingSdReader->setLoopType(looptype_none);
         resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
         int16_t actual[1024];
