@@ -6,9 +6,6 @@
 #define TEENSYAUDIOLIBRARY_RESAMPLINGLFSREADER_H
 
 #include <cstdint>
-#include "spi_interrupt.h"
-#include "loop_type.h"
-#include "interpolation.h"
 #include "IndexableLittleFSFile.h"
 #include "ResamplingReader.h"
 #include "LittleFS.h"

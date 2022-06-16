@@ -2,7 +2,6 @@
 #define TEENSYAUDIOLIBRARY_RESAMPLINGREADER_H
 
 #include <Arduino.h>
-#include "SD.h"
 #include <cstdint>
 #include "loop_type.h"
 #include "interpolation.h"

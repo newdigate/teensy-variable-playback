@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(serialflash_raw)
+set(CMAKE_CXX_STANDARD 14)
+add_definitions(-DPROG_FLASH_SIZE=10000)
+teensy_include_directories(../../src)
+teensy_add_executable(serialflash serialflash.ino)
+teensy_target_link_libraries(serialflash teensy_variable_playback Audio  SerialFlash SPI cores Wire arm_math)
