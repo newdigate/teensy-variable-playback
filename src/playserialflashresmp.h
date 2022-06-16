@@ -18,7 +18,7 @@ public:
     AudioPlaySerialFlashResmp(SerialFlashChip &fs) :
             AudioPlayResmp<newdigate::ResamplingSerialFlashReader>()
     {
-        reader = new newdigate::ResamplingSdReader();
+        reader = new newdigate::ResamplingSerialFlashReader(fs);
         begin();
     }
 
