@@ -1,4 +1,4 @@
-name: example-sdwav-t41
+name: example-serialflash-t41
 
 on:
   push:

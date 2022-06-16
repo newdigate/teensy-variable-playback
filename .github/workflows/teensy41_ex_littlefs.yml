@@ -1,4 +1,4 @@
-name: example-sdwav-t41
+name: example-littlefs-t41
 
 on:
   push:
