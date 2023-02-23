@@ -29,14 +29,14 @@ public:
 		} else {
 			perror("getcwd() error");
 		}
-		string outputPath = string(cwd) + "/" + string(path);
+		std::string outputPath = std::string(cwd) + "/" + std::string(path);
 		__filesystem::path p(outputPath);
 		if (! __filesystem::exists(p) )
 			__filesystem::create_directories(outputPath);
 		
-		_filePath = outputPath + string(filename);
+		_filePath = outputPath + std::string(filename);
 		std::cout << "saving output audio .wav file to " << _filePath << std::endl;
-		_outputFile.open(_filePath, ios_base::trunc | ios_base::out);
+		_outputFile.open(_filePath, std::ios_base::trunc | std::ios_base::out);
 		if (!_outputFile.is_open()) {
         	Serial.printf("couldn't open file for recording...%s\n", _filePath.c_str());
 			return false;	
@@ -54,7 +54,7 @@ public:
 			char buf[4];
 			buf[1] = numChannels >> 8;
 			buf[0] = numChannels;
-			_outputFile.seekp(22, ios_base::beg);
+			_outputFile.seekp(22, std::ios_base::beg);
 			_outputFile.write(buf, 2);
 
 			long bytespersecond = numChannels * 2 * 44100;
@@ -62,20 +62,20 @@ public:
 			buf[2] = bytespersecond >> 16;
 			buf[1] = bytespersecond >> 8;
 			buf[0] = bytespersecond;
-			_outputFile.seekp(28, ios_base::beg);
+			_outputFile.seekp(28, std::ios_base::beg);
 			_outputFile.write(buf, 4);
 
 			short bytespersampleframe = numChannels * 2;
 			buf[1] = bytespersampleframe >> 8;
 			buf[0] = bytespersampleframe;
-			_outputFile.seekp(32, ios_base::beg);
+			_outputFile.seekp(32, std::ios_base::beg);
 			_outputFile.write(buf, 2);
 
 			buf[3] = _dataSize >> 24;
 			buf[2] = _dataSize >> 16;
 			buf[1] = _dataSize >> 8;
 			buf[0] = _dataSize;
-			_outputFile.seekp(40, ios_base::beg);
+			_outputFile.seekp(40, std::ios_base::beg);
 			_outputFile.write(buf, 4);
 			_outputFile.close();
 			_filename = nullptr;
