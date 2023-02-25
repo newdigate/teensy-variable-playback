@@ -228,25 +228,49 @@ public:
                     return false;
             }
         } else {
-            if (_crossfade == 0.0 && _bufferPosition1 > (_loop_finish - _numChannels) - _crossfadeDurationInSamples) {
-                _bufferPosition2 = _loop_start;
-                _crossfade = 1.0 - (( (_loop_finish-_numChannels) - _bufferPosition1 ) / static_cast<double>(_crossfadeDurationInSamples));
-                _crossfadeState = 1;
-            } else if (_crossfade == 1.0 && _bufferPosition2 > (_loop_finish - _numChannels)- _crossfadeDurationInSamples) {
-                _bufferPosition1 = _loop_start;
-                _crossfade = ((_loop_finish - _numChannels) - _bufferPosition2) / static_cast<double>(_crossfadeDurationInSamples);
-                _crossfadeState = 2;
-            } else if (_crossfadeState == 1) {
-                _crossfade = 1.0 - (((_loop_finish - _numChannels) - _bufferPosition1) / static_cast<double>(_crossfadeDurationInSamples));
-                if (_crossfade >= 1.0) {
-                    _crossfadeState = 0;
-                    _crossfade = 1.0;
+            if (_playbackRate >= 0.0) {
+                if (_crossfade == 0.0 && _bufferPosition1 > (_loop_finish - _numChannels) - _crossfadeDurationInSamples) {
+                    _bufferPosition2 = _loop_start;
+                    _crossfade = 1.0 - (( (_loop_finish-_numChannels) - _bufferPosition1 ) / static_cast<double>(_crossfadeDurationInSamples));
+                    _crossfadeState = 1;
+                } else if (_crossfade == 1.0 && _bufferPosition2 > (_loop_finish - _numChannels)- _crossfadeDurationInSamples) {
+                    _bufferPosition1 = _loop_start;
+                    _crossfade = ((_loop_finish - _numChannels) - _bufferPosition2) / static_cast<double>(_crossfadeDurationInSamples);
+                    _crossfadeState = 2;
+                } else if (_crossfadeState == 1) {
+                    _crossfade = 1.0 - (((_loop_finish - _numChannels) - _bufferPosition1) / static_cast<double>(_crossfadeDurationInSamples));
+                    if (_crossfade >= 1.0) {
+                        _crossfadeState = 0;
+                        _crossfade = 1.0;
+                    }
+                } else if (_crossfadeState == 2) {
+                    _crossfade = ( (_loop_finish - _numChannels) - _bufferPosition2 ) / static_cast<double>(_crossfadeDurationInSamples);
+                    if (_crossfade <= 0.0) {
+                        _crossfadeState = 0;
+                        _crossfade = 0.0;
+                    }
                 }
-            } else if (_crossfadeState == 2) {
-                _crossfade = ( (_loop_finish - _numChannels) - _bufferPosition2 ) / static_cast<double>(_crossfadeDurationInSamples);
-                if (_crossfade <= 0.0) {
-                    _crossfadeState = 0;
-                    _crossfade = 0.0;
+            } else {
+                if (_crossfade == 0.0 && _bufferPosition1 < _crossfadeDurationInSamples + _header_offset) {
+                    _bufferPosition2 = _loop_finish - _numChannels;
+                    _crossfade = 1.0 - (_bufferPosition1 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
+                    _crossfadeState = 1;
+                } else if (_crossfade == 1.0 && _bufferPosition2 < _crossfadeDurationInSamples + _header_offset) {
+                    _bufferPosition1 = _loop_finish - _numChannels;
+                    _crossfade = (_bufferPosition2 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
+                    _crossfadeState = 2;
+                } else if (_crossfadeState == 1) {
+                    _crossfade = 1.0 - (_bufferPosition1 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
+                    if (_crossfade >= 1.0) {
+                        _crossfadeState = 0;
+                        _crossfade = 1.0;
+                    }
+                } else if (_crossfadeState == 2) {
+                    _crossfade = (_bufferPosition2 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
+                    if (_crossfade <= 0.0) {
+                        _crossfadeState = 0;
+                        _crossfade = 0.0;
+                    }
                 }
             }
         }
