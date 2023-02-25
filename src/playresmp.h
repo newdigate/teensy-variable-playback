@@ -70,6 +70,10 @@ class AudioPlayResmp : public AudioStream
             reader->setLoopFinish(loop_finish);
         }
 
+        void setUseDualPlaybackHead(bool useDualPlaybackHead) {
+            reader->setUseDualPlaybackHead(useDualPlaybackHead);
+        }
+
         void enableInterpolation(bool enable) {
             if (enable)
                 reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
