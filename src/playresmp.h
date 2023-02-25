@@ -74,6 +74,10 @@ class AudioPlayResmp : public AudioStream
             reader->setUseDualPlaybackHead(useDualPlaybackHead);
         }
 
+        void setCrossfadeDurationInSamples(unsigned int crossfadeDurationInSamples) {
+            reader->setCrossfadeDurationInSamples(crossfadeDurationInSamples);
+        }
+
         void enableInterpolation(bool enable) {
             if (enable)
                 reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
