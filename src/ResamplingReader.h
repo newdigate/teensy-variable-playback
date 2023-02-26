@@ -29,7 +29,10 @@ public:
         }
         _playing = false;
         _crossfade = 0.0;
-        _bufferPosition1 = _header_offset;
+        if (_play_start == play_start::play_start_sample)
+            _bufferPosition1 = _header_offset;
+        else
+            _bufferPosition1 = _loop_start;
         _file_size = 0;
     }
 
@@ -190,11 +193,12 @@ public:
                         {
                             if (_playbackRate >= 0.0) {
                                 _bufferPosition1 = _loop_finish - _numChannels;
-                                //printf("switching to reverse playback...\n");
                             }
                             else {
-                                _bufferPosition1 = _header_offset;
-                                //printf("switching to forward playback...\n");
+                                if (_play_start == play_start::play_start_sample)
+                                    _bufferPosition1 = _header_offset;
+                                else
+                                    _bufferPosition1 = _loop_start;
                             }
                             _playbackRate = -_playbackRate;
                             break;
@@ -223,9 +227,14 @@ public:
                 if (_bufferPosition1 >=  _loop_finish )
                     return false;
             } else if (_playbackRate < 0) {
-                // reverse playback    
-                if (_bufferPosition1 < _header_offset)
-                    return false;
+                // reverse playback
+                if (_play_start == play_start::play_start_sample) {
+                    if (_bufferPosition1 < _header_offset)
+                        return false;
+                } else {
+                    if (_bufferPosition1 < _loop_start)
+                        return false;    
+                }
             }
         } else {
             if (_playbackRate >= 0.0) {
@@ -427,9 +436,36 @@ public:
     void setPlaybackRate(double f) {
         _playbackRate = f;
         if (!_useDualPlaybackHead) {
-            if (f < 0.0 && _bufferPosition1 == 0) {
-                //_file.seek(_file_size);
-                _bufferPosition1 = _file_size/2 - _numChannels;
+            if (f < 0.0) {
+                if  (_bufferPosition1 <= _header_offset) {
+                    if (_play_start == play_start::play_start_sample)
+                        _bufferPosition1 = _file_size/2 - _numChannels;
+                    else
+                        _bufferPosition1 = _loop_finish - _numChannels;
+                } 
+            } else {
+                if (f >= 0.0 && _bufferPosition1 < _header_offset) {
+                    if (_play_start == play_start::play_start_sample) 
+                        _bufferPosition1 = _header_offset;
+                    else
+                        _bufferPosition1 = _loop_start;
+                }
+            }
+        } else { 
+            // _useDualPlaybackHead == true 
+            if (_crossfade == 0.0) {
+                if (f < 0.0) { 
+                    if( _bufferPosition1 <= _header_offset) {
+                        if (_play_start == play_start::play_start_sample)
+                            _bufferPosition1 = _file_size/2 - _numChannels;
+                        else
+                            _bufferPosition1 = _loop_finish - _numChannels;
+                    }
+                } else {
+                    if (f >= 0.0 && _bufferPosition1 < _header_offset) {
+                        _bufferPosition1 = _header_offset;
+                    }
+                }
             }
         }
     }
@@ -465,10 +501,16 @@ public:
         _numInterpolationPoints = 0;
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
-            _bufferPosition1 = _header_offset;
+            if (_play_start == play_start::play_start_sample)
+                _bufferPosition1 = _header_offset;
+            else
+                _bufferPosition1 = _loop_start;
         } else {
             // reverse playback - forward _file_offset to last audio block in file
-            _bufferPosition1 = _loop_finish - _numChannels;
+            if (_play_start == play_start::play_start_sample)
+                _bufferPosition1 = _file_size/2 - _numChannels;
+            else
+                _bufferPosition1 = _loop_finish - _numChannels;
         }
         _crossfade = 0.0;
     }
@@ -510,14 +552,12 @@ public:
 
     void setHeaderSizeInBytes(uint32_t headerSizeInBytes) {
         _header_offset = headerSizeInBytes / 2;
-        if (_bufferPosition1 < _header_offset) {
-            if (_playbackRate >= 0) {
-                _bufferPosition1 = _header_offset;
-            } else
-                _bufferPosition1 = _loop_finish - _numChannels;
-        }
     }
     
+    void setPlayStart(play_start start) {
+        _play_start = start;
+    }
+
     #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
     uint32_t positionMillis()
     {
@@ -537,7 +577,8 @@ protected:
 
     double _playbackRate = 1.0;
     double _remainder = 0.0;
-    loop_type _loopType = looptype_none;
+    loop_type _loopType = loop_type::looptype_none;
+    play_start _play_start = play_start::play_start_sample;
     int _bufferPosition1 = 0;
     int _bufferPosition2 = 0;
     double _crossfade = 0.0;
