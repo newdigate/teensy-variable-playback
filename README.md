@@ -16,6 +16,18 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 26/02/2022: v1.0.15:
+  * added support for dual playback head for seemless looping
+    * enable dual playback using linear crossfading
+    * set crossfade duration in number of samples
+  ```
+        AudioPlaySdResmp         wave;      
+        wave.setUseDualPlaybackHead(true);
+        wave.setCrossfadeDurationInSamples(1000);
+        wave.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
+        wave.setLoopStart(0); 
+        wave.setLoopFinish(3000);
+  ```
 * 16/06/2022: v1.0.14: 
   * refactored code to generic classes
   * improve memory leaks
