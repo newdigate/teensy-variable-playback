@@ -16,11 +16,21 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 26/02/2022: v1.0.16:
+  * add option for starting sample at begining or at loop start
+  ``` c
+  typedef enum play_start {
+      play_start_sample,
+      play_start_loop,
+  };
+
+  wave.setPlayStart(play_start::play_start_loop); 
+  ```
 * 26/02/2022: v1.0.15:
   * added support for dual playback head for seemless looping
     * enable dual playback using linear crossfading
     * set crossfade duration in number of samples
-  ```
+  ``` c
         AudioPlaySdResmp         wave;      
         wave.setUseDualPlaybackHead(true);
         wave.setCrossfadeDurationInSamples(1000);
