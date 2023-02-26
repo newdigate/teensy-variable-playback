@@ -11,4 +11,9 @@ typedef enum loop_type {
     looptype_pingpong
 } loop_type;
 
+typedef enum play_start {
+    play_start_sample,
+    play_start_loop,
+} play_start;
+
 #endif //TEENSY_RESAMPLING_LOOP_TYPE_H
