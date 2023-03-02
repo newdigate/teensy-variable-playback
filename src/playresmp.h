@@ -144,6 +144,26 @@ class AudioPlayResmp : public AudioStream
             return reader->lengthMillis();
         }
 
+        double getCrossFade() {
+            return reader->getCrossfade();
+        }
+
+        int getBufferPosition1() {
+            return reader->getBufferPosition1();
+        }
+
+        int getBufferPosition2() {
+            return reader->getBufferPosition2();
+        }
+
+        bool getUseDualPlaybackHead() {
+            return reader->getUseDualPlaybackHead();
+        }
+
+        int32_t getLoopFinish() {
+            return reader->getLoopFinish();
+        }
+
     protected:
         TResamplingReader *reader;
 };

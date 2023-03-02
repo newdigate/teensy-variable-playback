@@ -568,6 +568,34 @@ public:
     {
         return ((uint64_t)_file_size * B2M) >> 32;
     }
+
+    int getBufferPosition1() {
+        return _bufferPosition1;
+    }
+
+    int getBufferPosition2() {
+        return _bufferPosition2;
+    }
+
+    double getCrossfade() {
+        return _crossfade;
+    }
+
+    bool getUseDualPlaybackHead(){
+        return _useDualPlaybackHead;
+    }
+    
+    unsigned int getCrossfadeDurationInSamples() {
+        return _crossfadeDurationInSamples;
+    } 
+
+    int32_t getLooptStart() {
+        return  _loop_start / _numChannels - _header_offset;
+    }
+
+    int32_t getLoopFinish() {
+        return  _loop_finish / _numChannels - _header_offset;
+    }
     
 protected:
     volatile bool _playing = false;
