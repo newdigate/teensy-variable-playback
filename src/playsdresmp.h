@@ -16,12 +16,13 @@
 class AudioPlaySdResmp : public AudioPlayResmp<newdigate::ResamplingSdReader>
 {
 public:
-    AudioPlaySdResmp(void) :
+    AudioPlaySdResmp(SDClass &sd = SD) :
         AudioPlayResmp<newdigate::ResamplingSdReader>()
     {
-        reader = new newdigate::ResamplingSdReader();
+        reader = new newdigate::ResamplingSdReader(sd);
         begin();
     }
+    
 
     virtual ~AudioPlaySdResmp() {
         delete reader;

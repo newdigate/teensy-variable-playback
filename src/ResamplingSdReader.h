@@ -21,8 +21,9 @@ namespace newdigate {
 
 class ResamplingSdReader : public ResamplingReader< IndexableSDFile<128, 4>, File > {
 public:
-    ResamplingSdReader() : 
-        ResamplingReader() 
+    ResamplingSdReader(SDClass &sd = SD) : 
+        ResamplingReader(),
+        _sd(sd)
     {
     }
     
@@ -39,7 +40,7 @@ public:
     }
 
     File open(char *filename) override {
-        return SD.open(filename);
+        return _sd.open(filename);
     }
 
     void close(void) override
@@ -80,7 +81,7 @@ public:
     }
     
 protected:    
-     
+     SDClass &_sd;
 };
 
 }
