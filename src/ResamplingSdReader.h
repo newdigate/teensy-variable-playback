@@ -60,7 +60,7 @@ public:
     }
 
     IndexableSDFile<128, 4>* createSourceBuffer() override {
-        return new IndexableSDFile<128, 4>(_filename);
+        return new IndexableSDFile<128, 4>(_filename, _sd);
     }
 
     uint32_t positionMillis(void) {

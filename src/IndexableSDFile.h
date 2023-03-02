@@ -13,13 +13,15 @@ class IndexableSDFile : public IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File> 
 public:
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
 
-    IndexableSDFile(const char *filename) : 
-        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>(filename) {
+    IndexableSDFile(const char *filename, SDLib::SDClass &sd) : 
+        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>(filename),
+        _sd(sd)
+    {
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>::_file = open(filename);
     }
     
     File open(const char *filename) override {
-        return SD.open(filename);
+        return _sd.open(filename);
     }
 
     virtual ~IndexableSDFile() {
@@ -29,6 +31,8 @@ public:
     int16_t &operator[](int i) {
         return IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>::operator[](i);
     }
+protected:
+    SDLib::SDClass &_sd;
 };
 
 }
