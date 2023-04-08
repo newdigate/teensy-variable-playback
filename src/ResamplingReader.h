@@ -132,6 +132,8 @@ public:
         _playing = true;
         return true;
     }
+	
+	size_t getBufferSize(void) { return _sourceBuffer->getBufferSize(); }
 
     bool playRaw(const char *filename, uint16_t numChannelsIfRaw){
         return play(filename, false, numChannelsIfRaw);

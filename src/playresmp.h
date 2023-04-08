@@ -91,11 +91,13 @@ class AudioPlayResmp : public AudioStream
 
         bool isPlaying(void) {
             return reader->isPlaying();
-        };
+        }
 
         void stop() {
             reader->stop();
         }
+		
+		size_t getBufferSize(void) { return reader->getBufferSize(); }
 
         void update()
         {

@@ -39,6 +39,8 @@ public:
         close();
     }
 	
+	size_t getBufferSize(void) {return BUFFER_SIZE; }
+	
 	/*
 	 Retrieve a single sample from an "indexed file".
 	 
