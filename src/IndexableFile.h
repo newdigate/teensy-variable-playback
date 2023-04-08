@@ -55,14 +55,16 @@ public:
 		{
             if (_buffers.size() > MAX_NUM_BUFFERS - 1) // reached limit of number of allowed buffers
 			{
-                indexedbuffer* first = _buffers[0]; // assume the oldest buffer is no longer needed
+                match = _buffers[0]; // assume the oldest buffer is no longer needed
                 _buffers.erase(_buffers.begin());	// remove from vector
-                delete [] first->buffer;			// delete buffer memory
-                delete first;						// and indexedbuffer object
+				// we already have the indexedbuffer and its sample storage - keep those
             }
-            indexedbuffer *next = new indexedbuffer();  // create new indexedbuffer object
-            next->index = indexFor_i;					// say which samples it'll have in it
-            next->buffer = new int16_t[BUFFER_SIZE];	// allocate space for the samples
+			else
+			{
+				match = new indexedbuffer();  // create new indexedbuffer object
+				match->buffer = new int16_t[BUFFER_SIZE];	// allocate space for the samples
+			}
+            match->index = indexFor_i;					// say which samples it'll have in it
 			
 			// figure out file position to load into the buffer
             size_t basePos = indexFor_i << buffer_to_index_shift;
@@ -70,7 +72,7 @@ public:
 			
 			// load the sample data from the file: note BUFFER_SIZE is in samples
             _file.seek(seekPos);
-            int16_t bytesRead = _file.read(next->buffer, BUFFER_SIZE * element_size);
+            int16_t bytesRead = _file.read(match->buffer, BUFFER_SIZE * element_size);
             #ifndef TEENSYDUINO
             if (!_file.available()){  
                 _file.close();
@@ -80,13 +82,11 @@ public:
 			
 			// fill in remaining indexedbuffer information: at the end of the file
 			// we may not have enough samples to fill the buffer.
-            next->buffer_size = bytesRead;
+            match->buffer_size = bytesRead;
 			
 			// add the newly-loaded indexedbuffer at the back of the vector: it's the newest one
-            _buffers.push_back(next);
+            _buffers.push_back(match);
 			
-			// we now have a buffer with the desired sample in it
-            match = next;
         }
         return match->buffer[i % BUFFER_SIZE];
     }
