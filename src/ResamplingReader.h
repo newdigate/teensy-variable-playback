@@ -126,6 +126,7 @@ public:
         }
 
         _sourceBuffer = createSourceBuffer();
+		_sourceBuffer->preLoadBuffers(0);
         _loop_start = _header_offset;
 
         reset();

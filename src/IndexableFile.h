@@ -8,7 +8,11 @@
 namespace newdigate {
 
 
-struct indexedbuffer {
+class indexedbuffer 
+{
+public:
+	indexedbuffer(int16_t samples) { buffer = new int16_t[samples]; }
+	~indexedbuffer(void) { delete [] buffer; }
     uint32_t index;
     int16_t buffer_size;
     int16_t *buffer;
@@ -27,19 +31,79 @@ public:
 
     static constexpr size_t element_size = sizeof(int16_t);
     size_t buffer_to_index_shift;
+	size_t buffer_mask;
     IndexableFile(const char *filename) : 
-        _buffers(),
-        buffer_to_index_shift(log2(BUFFER_SIZE)) 
+        buffer_to_index_shift(log2(BUFFER_SIZE)), 
+		buffer_mask(~(BUFFER_SIZE - 1)),
+        _buffers()
     {
             _filename = new char[strlen(filename)+1] {0};
             memcpy(_filename, filename, strlen(filename));
     }
-    
+  
+  
     virtual ~IndexableFile() {
         close();
     }
+
 	
 	size_t getBufferSize(void) {return BUFFER_SIZE; }
+
+	
+	/**
+	 * Load provided buffer with sample data.
+	 */
+	size_t loadBuffer(indexedbuffer* buf,	//!< buffer to load
+					  int i)				//!< index of first sample
+	{
+		
+		// figure out file position to load into the buffer
+		size_t basePos = i & buffer_mask;
+		size_t seekPos = basePos * element_size;
+		
+		// load the sample data from the file: note BUFFER_SIZE is in samples
+		_file.seek(seekPos);
+		size_t bytesRead = _file.read(buf->buffer, BUFFER_SIZE * element_size);
+		#ifndef TEENSYDUINO
+		if (!_file.available()){  
+			_file.close();
+			_file = open(_filename);
+		}
+		#endif
+		
+		// fill in remaining indexedbuffer information: at the end of the file
+		// we may not have enough samples to fill the buffer.
+		buf->index = i >> buffer_to_index_shift;	// say which samples it'll have in it
+		buf->buffer_size = bytesRead; // amount of data (bytes, not samples...)
+
+		return bytesRead;
+	}
+	
+	
+	/**
+	 * Preload buffere.
+	 */
+	size_t preLoadBuffers(int i) //!< first sample number to load
+	{
+		size_t numInVector = _buffers.size();
+		size_t loaded = 0;
+		
+		for (int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
+		{
+			indexedbuffer* buf;
+			if (bufn >= numInVector)
+			{
+				buf = new indexedbuffer(BUFFER_SIZE);
+				_buffers.push_back(buf);
+			}
+			else
+				buf = _buffers[bufn];
+			
+			loaded += loadBuffer(buf,i);
+			i += BUFFER_SIZE;
+		}
+		return loaded;
+	}
 	
 	/*
 	 Retrieve a single sample from an "indexed file".
@@ -63,34 +127,17 @@ public:
             }
 			else
 			{
-				match = new indexedbuffer();  // create new indexedbuffer object
-				match->buffer = new int16_t[BUFFER_SIZE];	// allocate space for the samples
+				match = new indexedbuffer(BUFFER_SIZE);  // create new indexedbuffer object
 			}
-            match->index = indexFor_i;					// say which samples it'll have in it
 			
-			// figure out file position to load into the buffer
-            size_t basePos = indexFor_i << buffer_to_index_shift;
-            size_t seekPos = basePos * element_size;
-			
-			// load the sample data from the file: note BUFFER_SIZE is in samples
-            _file.seek(seekPos);
-            int16_t bytesRead = _file.read(match->buffer, BUFFER_SIZE * element_size);
-            #ifndef TEENSYDUINO
-            if (!_file.available()){  
-                _file.close();
-                _file = open(_filename);
-            }
-            #endif
-			
-			// fill in remaining indexedbuffer information: at the end of the file
-			// we may not have enough samples to fill the buffer.
-            match->buffer_size = bytesRead;
-			
-			// add the newly-loaded indexedbuffer at the back of the vector: it's the newest one
-            _buffers.push_back(match);
-			
+			loadBuffer(match,i);
+
+			// Add the newly-loaded indexedbuffer at the back of the vector: it's the newest one.
+			// Do this here because it may be either a new or a recycled buffer.
+            _buffers.push_back(match);			
         }
-        return match->buffer[i % BUFFER_SIZE];
+		
+        return match->buffer[i & ~buffer_mask];
     }
 
     void close() {
@@ -101,7 +148,6 @@ public:
 
 		// delete all buffered data and clear the vector
 		for (auto && x : _buffers){
-            delete [] x->buffer;
             delete x;
         }
         _buffers.clear();
