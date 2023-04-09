@@ -135,6 +135,9 @@ public:
     }
 	
 	size_t getBufferSize(void) { return _sourceBuffer->getBufferSize(); }
+	void resetStatus(void) { _sourceBuffer->resetStatus(); }
+	void getStatus(char* buf) { _sourceBuffer->getStatus(buf); }
+	void triggerReload(void) { _sourceBuffer->triggerReload(); }
 
     bool playRaw(const char *filename, uint16_t numChannelsIfRaw){
         return play(filename, false, numChannelsIfRaw);
@@ -163,9 +166,12 @@ public:
 
     unsigned int read(void **buf, uint16_t nsamples) {
         if (!_playing) return 0;
-
+		
         int16_t *index[_numChannels];
         unsigned int count = 0;
+
+		resetStatus();
+
         for (int channel=0; channel < _numChannels; channel++) {
             index[channel] = (int16_t*)buf[channel];
         }
@@ -218,7 +224,7 @@ public:
                     }   
                 }
             }
-        }
+        }		
         return count;
     }
 
@@ -656,6 +662,16 @@ protected:
     }
 
 };
+
+// Explicitly specialize some instantiations of functions where
+// they need to be different for the supplied type. e.g. it makes
+// no sense to track buffer statuses for an in-memory "file".
+template<>
+void ResamplingReader<short int,File>::resetStatus(void) {}
+template<>
+void ResamplingReader<short int,File>::getStatus(char* buf) { strcpy(buf,"int[]"); }
+template<>
+void ResamplingReader<short int,File>::triggerReload(void) {}
 
 }
 

@@ -4,9 +4,10 @@
 #include "Arduino.h"
 #include "Audio.h"
 #include "loop_type.h"
+#include "EventResponder.h"
 
 template <class TResamplingReader>
-class AudioPlayResmp : public AudioStream
+class AudioPlayResmp : public AudioStream, public EventResponder
 {
     public:
         AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
@@ -16,9 +17,17 @@ class AudioPlayResmp : public AudioStream
         virtual ~AudioPlayResmp() {
         }
 
+		static void event_response(EventResponderRef evRef)
+		{
+			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
+			
+			reader->triggerReload();
+		}
+		
         void begin(void)
         {
             reader->begin();
+			attach(event_response);
         }
 
         bool playRaw(const char *filename, uint16_t numChannels)
@@ -98,6 +107,8 @@ class AudioPlayResmp : public AudioStream
         }
 		
 		size_t getBufferSize(void) { return reader->getBufferSize(); }
+		void getStatus(char* buf)  { return reader->getStatus(buf); }
+		void triggerReload()  { return reader->triggerReload(this); }
 
         void update()
         {
@@ -105,7 +116,7 @@ class AudioPlayResmp : public AudioStream
             if (_numChannels == -1)
                 return;
 
-            unsigned int i, n;
+            unsigned int n;
             audio_block_t *blocks[_numChannels];
             int16_t *data[_numChannels];
             // only update if we're playing
@@ -129,6 +140,8 @@ class AudioPlayResmp : public AudioStream
                 if(_numChannels == 1) {
                     transmit(blocks[0], 1);
                 }
+				
+				triggerEvent(0,reader);
             } else {
                 reader->close();
             }

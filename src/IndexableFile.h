@@ -11,20 +11,24 @@ namespace newdigate {
 class indexedbuffer 
 {
 public:
-	indexedbuffer(int16_t samples) { buffer = new int16_t[samples]; }
+	indexedbuffer(int16_t samples) : status('.') { buffer = new int16_t[samples]; }
 	~indexedbuffer(void) { delete [] buffer; }
     uint32_t index;
     int16_t buffer_size;
+	char status;
     int16_t *buffer;
 };
+
 
 constexpr bool isPowerOf2(size_t value){
     return !(value == 0) && !(value & (value - 1));
 }
 
 template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
-class IndexableFile {
+class IndexableFile
+{
 public:
+	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r'};
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
     
     virtual TFile open(const char *filename) = 0;
@@ -32,13 +36,16 @@ public:
     static constexpr size_t element_size = sizeof(int16_t);
     size_t buffer_to_index_shift;
 	size_t buffer_mask;
+	int fails;
+	
     IndexableFile(const char *filename) : 
         buffer_to_index_shift(log2(BUFFER_SIZE)), 
 		buffer_mask(~(BUFFER_SIZE - 1)),
+		fails(0),
         _buffers()
     {
-            _filename = new char[strlen(filename)+1] {0};
-            memcpy(_filename, filename, strlen(filename));
+		_filename = new char[strlen(filename)+1] {0};
+		memcpy(_filename, filename, strlen(filename));
     }
   
   
@@ -47,7 +54,57 @@ public:
     }
 
 	
-	size_t getBufferSize(void) {return BUFFER_SIZE; }
+	size_t getBufferSize(void) {return (size_t) fails;}//BUFFER_SIZE; }
+	
+	size_t getBufferCount(void) {return MAX_NUM_BUFFERS; }
+	
+	void triggerReload(void) 
+	{
+		if (_buffers.size() > 0 && unused == _buffers[0]->status)
+		{
+			size_t max=0,nmax=0;
+			char buf1[20],buf2[20];
+			
+			//getStatus(buf1);
+			
+			indexedbuffer* reload = _buffers[0];
+			_buffers.erase(_buffers.begin());	
+            _buffers.push_back(reload);
+
+			for (auto && x : _buffers)
+			{
+				if (x->index > max)
+				{
+					nmax = max;
+					max = x->index;
+				}
+			}
+			
+			if (0 != nmax)
+				max += max - nmax;
+			else
+				max = max + 1;
+			max <<= buffer_to_index_shift;
+
+			loadBuffer(reload,max);
+			//getStatus(buf2);
+			
+			//Serial.printf("Loaded from index %d: %s -> %s\n",max,buf1,buf2);
+		}
+	}
+	
+	void resetStatus(void) 
+	{
+		for (auto && x : _buffers)
+			x->status = loaded;
+	}
+	
+	void getStatus(char* buf)
+	{
+		for (auto && x : _buffers)
+			*buf++ = x->status;
+		*buf=0;
+	}
 
 	
 	/**
@@ -75,6 +132,7 @@ public:
 		// we may not have enough samples to fill the buffer.
 		buf->index = i >> buffer_to_index_shift;	// say which samples it'll have in it
 		buf->buffer_size = bytesRead; // amount of data (bytes, not samples...)
+		buf->status = loaded;
 
 		return bytesRead;
 	}
@@ -119,6 +177,8 @@ public:
 		
         if (match == nullptr)  // none of the buffers contains the required sample
 		{
+			fails++;
+			
             if (_buffers.size() > MAX_NUM_BUFFERS - 1) // reached limit of number of allowed buffers
 			{
                 match = _buffers[0]; // assume the oldest buffer is no longer needed
@@ -136,6 +196,7 @@ public:
 			// Do this here because it may be either a new or a recycled buffer.
             _buffers.push_back(match);			
         }
+		match->status = 'r';
 		
         return match->buffer[i & ~buffer_mask];
     }
@@ -172,6 +233,8 @@ protected:
             if (x->index == i) {
                 return x;
             }
+			if (read != x->status)
+				x->status = unused;
         }
         return nullptr;
     }
