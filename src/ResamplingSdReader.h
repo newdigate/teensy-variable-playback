@@ -13,13 +13,17 @@
 #include "IndexableSDFile.h"
 #include "ResamplingReader.h"
 
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 128
+// Settings for SD card buffering
+#undef RESAMPLE_BUFFER_SAMPLE_SIZE
+#undef RESAMPLE_BUFFER_COUNT
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 512
+#define RESAMPLE_BUFFER_COUNT 		  7
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
 namespace newdigate {
 
-class ResamplingSdReader : public ResamplingReader< IndexableSDFile<128, 4>, File > {
+class ResamplingSdReader : public ResamplingReader< IndexableSDFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>, File > {
 public:
     ResamplingSdReader(SDClass &sd = SD) : 
         ResamplingReader(),
@@ -59,8 +63,8 @@ public:
         deleteInterpolationPoints();
     }
 
-    IndexableSDFile<128, 4>* createSourceBuffer() override {
-        return new IndexableSDFile<128, 4>(_filename, _sd);
+    IndexableSDFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {
+        return new IndexableSDFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_filename, _sd);
     }
 
     uint32_t positionMillis(void) {

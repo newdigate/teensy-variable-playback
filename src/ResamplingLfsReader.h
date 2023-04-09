@@ -10,13 +10,17 @@
 #include "ResamplingReader.h"
 #include "LittleFS.h"
 
+// Settings for LFS buffering
+#undef RESAMPLE_BUFFER_SAMPLE_SIZE
+#undef RESAMPLE_BUFFER_COUNT
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
+#define RESAMPLE_BUFFER_COUNT 		  2
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
 namespace newdigate {
 
-class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<128, 2>, File > {
+class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>, File > {
 public:
     ResamplingLfsReader(LittleFS &fs) : 
         ResamplingReader(),
@@ -55,8 +59,8 @@ public:
         deleteInterpolationPoints();
     }
 
-    IndexableLittleFSFile<128, 2>* createSourceBuffer() override {
-        return new IndexableLittleFSFile<128, 2>(_myFS, _filename);
+    IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {
+        return new IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_myFS, _filename);
     }
 
     uint32_t positionMillis(void) {
