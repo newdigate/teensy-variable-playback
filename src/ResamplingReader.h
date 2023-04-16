@@ -134,10 +134,10 @@ public:
         return true;
     }
 	
-	size_t getBufferSize(void) { return _sourceBuffer->getBufferSize(); }
-	void resetStatus(void) { _sourceBuffer->resetStatus(); }
-	void getStatus(char* buf) { _sourceBuffer->getStatus(buf); }
-	void triggerReload(void) { _sourceBuffer->triggerReload(); }
+	size_t getBufferSize(void) { return _sourceBuffer?_sourceBuffer->getBufferSize():-1; }
+	void resetStatus(void) { if (_sourceBuffer) _sourceBuffer->resetStatus(); }
+	void getStatus(char* buf) { if (_sourceBuffer) _sourceBuffer->getStatus(buf); }
+	void triggerReload(void) { if (_sourceBuffer) _sourceBuffer->triggerReload(); }
 
     bool playRaw(const char *filename, uint16_t numChannelsIfRaw){
         return play(filename, false, numChannelsIfRaw);

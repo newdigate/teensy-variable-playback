@@ -60,7 +60,7 @@ public:
 	
 	void triggerReload(void) 
 	{
-		if (_buffers.size() > 0 && unused == _buffers[0]->status)
+		if (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			size_t max=0,nmax=0;
 			char buf1[20],buf2[20];
@@ -106,7 +106,7 @@ public:
 		*buf=0;
 	}
 
-	
+	indexedbuffer* bufs;
 	/**
 	 * Load provided buffer with sample data.
 	 */
@@ -133,6 +133,8 @@ public:
 		buf->index = i >> buffer_to_index_shift;	// say which samples it'll have in it
 		buf->buffer_size = bytesRead; // amount of data (bytes, not samples...)
 		buf->status = loaded;
+		
+		bufs = _buffers[0];
 
 		return bytesRead;
 	}

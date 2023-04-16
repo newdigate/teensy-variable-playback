@@ -35,7 +35,9 @@ public:
     }
 
     int16_t getSourceBufferValue(long index) override {
-        return (*_sourceBuffer)[index];
+        return (_sourceBuffer == nullptr)
+					?0
+					:(*_sourceBuffer)[index];
     }
 
     int available(void)
