@@ -130,9 +130,9 @@ public:
 		_sourceBuffer->setLoopStart(_loop_start);
 		_sourceBuffer->setLoopFinish(_loop_finish);
 		if (_playbackRate >= 0.0f)
-			_sourceBuffer->preLoadBuffers(_loop_start);
+			_sourceBuffer->preLoadBuffers(_loop_start, _bufferInPSRAM);
 		else
-			_sourceBuffer->preLoadBuffers(_loop_finish,false);
+			_sourceBuffer->preLoadBuffers(_loop_finish, _bufferInPSRAM, false);
         _loop_start = _header_offset;
 
         reset();
@@ -617,6 +617,15 @@ public:
     int32_t getLoopFinish() {
         return  _loop_finish / _numChannels - _header_offset;
     }
+	
+    void setBufferInPSRAM(bool flag){
+        _bufferInPSRAM = flag;
+    }
+    
+    bool getBufferInPSRAM(){
+        return _bufferInPSRAM;
+    }
+    
     
 protected:
     volatile bool _playing = false;
@@ -640,6 +649,7 @@ protected:
     uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
     TArray *_sourceBuffer = nullptr;
+	bool _bufferInPSRAM = false;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints = 0;

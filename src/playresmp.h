@@ -103,6 +103,14 @@ class AudioPlayResmp : public AudioStream, public EventResponder
             return reader->isPlaying();
         }
 
+        bool getBufferInPSRAM(void) {
+            return reader->getBufferInPSRAM();
+        }
+
+        void setBufferInPSRAM(bool flag) {
+            reader->setBufferInPSRAM(flag);
+        }
+
         void stop() {
 			clearEvent();
             reader->stop();

@@ -12,11 +12,26 @@ namespace newdigate {
 class indexedbuffer 
 {
 public:
-	indexedbuffer(int16_t samples) : status('.') { buffer = new int16_t[samples]; }
-	~indexedbuffer(void) { delete [] buffer; }
+	indexedbuffer(int16_t samples, bool usePSRAM = false) 
+		: status('.'), 
+		  bufInPSRAM(usePSRAM) 
+	{ 
+		if (usePSRAM)
+			buffer = (int16_t*) extmem_malloc(samples * sizeof *buffer); 
+		else
+			buffer = new int16_t[samples]; 
+	}
+	~indexedbuffer(void) 
+	{ 
+		if (bufInPSRAM)
+			extmem_free(buffer);
+		else
+			delete [] buffer; 
+	}
     uint32_t index;
     int16_t buffer_size;
 	char status;
+	bool bufInPSRAM; // true if buffer points to memory allocated in PSRAM
     int16_t *buffer;
 };
 
@@ -240,17 +255,20 @@ public:
 	 * Preload buffere.
 	 */
 	size_t preLoadBuffers(int i, 				//!< first sample number to load
+						 bool bufInPSRAM,		//!< true if we want to use PSRAM to buffer audio
 						 bool forwards = true) 	//!< true if playback is forwards (at the start)
 	{
 		size_t numInVector = _buffers.size();
 		size_t loaded = 0;
+		
+		_bufInPSRAM = bufInPSRAM;
 		
 		for (int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
 		{
 			indexedbuffer* buf;
 			if (bufn >= numInVector)
 			{
-				buf = new indexedbuffer(BUFFER_SIZE);
+				buf = new indexedbuffer(BUFFER_SIZE, bufInPSRAM);
 				_buffers.push_back(buf);
 			}
 			else
@@ -262,6 +280,7 @@ public:
 			else
 				i -= BUFFER_SIZE;
 		}
+		
 		return loaded;
 	}
 	
@@ -289,7 +308,7 @@ public:
             }
 			else
 			{
-				match = new indexedbuffer(BUFFER_SIZE);  // create new indexedbuffer object
+				match = new indexedbuffer(BUFFER_SIZE, _bufInPSRAM);  // create new indexedbuffer object
 			}
 			
 			loadBuffer(match,i);
@@ -335,6 +354,8 @@ protected:
     loop_type _loop_type = loop_type::looptype_none;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;    
+	
+	bool _bufInPSRAM = false;
 	
 	// vector of audio buffers with status etc.
 	std::vector<indexedbuffer*> _buffers;
