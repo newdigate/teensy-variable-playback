@@ -99,11 +99,12 @@ class AudioPlayResmp : public AudioStream
 
         void update()
         {
+			bool gotBlocks = true;
             int _numChannels = reader->getNumChannels();
             if (_numChannels == -1)
                 return;
 
-            unsigned int i, n;
+            unsigned int n;
             audio_block_t *blocks[_numChannels];
             int16_t *data[_numChannels];
             // only update if we're playing
@@ -112,28 +113,40 @@ class AudioPlayResmp : public AudioStream
             // allocate the audio blocks to transmit
             for (int i=0; i < _numChannels; i++) {
                 blocks[i] = allocate();
-                if (blocks[i] == nullptr) return;
-                data[i] = blocks[i]->data;
+                if (blocks[i] == nullptr) 
+					gotBlocks = false;
+				else
+					data[i] = blocks[i]->data;
             }
 
-            if (reader->available()) {
-                // we can read more data from the file...
-                n = reader->read((void**)data, AUDIO_BLOCK_SAMPLES);
-                for (int channel=0; channel < _numChannels; channel++) {
-                    memset( &blocks[channel]->data[n], 0, (AUDIO_BLOCK_SAMPLES - n) * 2);
-                    transmit(blocks[channel], channel);
-                }
+			if (gotBlocks) // enough blocks, do the transmit
+			{
+				if (reader->available()) {
+					// we can read more data from the file...
+					n = reader->read((void**)data, AUDIO_BLOCK_SAMPLES);
+					for (int channel=0; channel < _numChannels; channel++) {
+						memset( &blocks[channel]->data[n], 0, (AUDIO_BLOCK_SAMPLES - n) * 2);
+						transmit(blocks[channel], channel);
+					}
 
-                if(_numChannels == 1) {
-                    transmit(blocks[0], 1);
-                }
-            } else {
-                reader->close();
-            }
-            for (int channel=0; channel < _numChannels; channel++) {
-                release(blocks[channel]);
+					if(_numChannels == 1) {
+						transmit(blocks[0], 1);
+					}
+
+				} else {
+					reader->close();
+				}
+			}
+			
+			// release all allocated blocks, even if there
+			// weren't enough and we couldn't transmit
+            for (int channel=0; channel < _numChannels; channel++) 
+			{
+				if (nullptr != blocks[channel]) // only release if allocated!
+					release(blocks[channel]);
             }
         }
+		
         uint32_t positionMillis()
         {
             return reader->positionMillis();
