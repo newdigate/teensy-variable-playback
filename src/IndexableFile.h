@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <vector>
+#include "loop_type.h"
 
 namespace newdigate {
 
@@ -28,7 +29,8 @@ template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE
 class IndexableFile
 {
 public:
-	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r'};
+	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r', 
+		 loop_start = 'a', loop_start_next = 'b', loop_finish_prev = 'y', loop_finish = 'z'};
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
     
     virtual TFile open(const char *filename) = 0;
@@ -58,11 +60,23 @@ public:
 	
 	size_t getBufferCount(void) {return MAX_NUM_BUFFERS; }
 	
-	void triggerReload(void) 
+	/**
+	 * Function to reload unused buffer.
+	 *
+	 * This is executed via EventResponder code from yield(), so
+	 * not from interrupt and effectively within the context of the
+	 * user sketch.
+	 *
+	 * The playback rate parameter is used to determine whether
+	 * to reload the buffer with data from after the maximum
+	 * available (forward playback), or before the minimum
+	 * (reverse playback).
+	 */
+	void triggerReload(float playbackRate) //!< direction and speed of playback
 	{
 		if (!_buffers.empty() && unused == _buffers[0]->status)
 		{
-			size_t max=0,nmax=0;
+			size_t nextIdx=0;
 			char buf1[20],buf2[20];
 			
 			//getStatus(buf1);
@@ -71,25 +85,20 @@ public:
 			_buffers.erase(_buffers.begin());	
             _buffers.push_back(reload);
 
-			for (auto && x : _buffers)
-			{
-				if (x->index > max)
-				{
-					nmax = max;
-					max = x->index;
-				}
-			}
-			
-			if (0 != nmax)
-				max += max - nmax;
+			if (playbackRate >= 0.0f)
+				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
 			else
-				max = max + 1;
-			max <<= buffer_to_index_shift;
+			{
+				nextIdx = findMinBuffer()->index;	// might well be 0
+				if (nextIdx > 0)
+					nextIdx--;
+			}
+			nextIdx <<= buffer_to_index_shift;
 
-			loadBuffer(reload,max);
+			loadBuffer(reload,nextIdx);
 			//getStatus(buf2);
 			
-			//Serial.printf("Loaded from index %d: %s -> %s\n",max,buf1,buf2);
+			//Serial.printf("Loaded from index %d: %s -> %s\n",nextIdx,buf1,buf2);
 		}
 	}
 	
@@ -105,6 +114,93 @@ public:
 			*buf++ = x->status;
 		*buf=0;
 	}
+
+	/**
+	 * Find the buffer with the maximum index value.
+	 *
+	 * If we're playing forwards, this buffer will be the last
+	 * to be played, and if we want to do a speculative pre-load
+	 * we should probably load (at least) the next block.
+	 *
+	 * Normally, if we're keeping the loop ends buffered, we
+	 * must disregard these as they'll give an unhelpful
+	 * return value...
+	 *
+	 * \return pointer to buffer
+	 */
+	indexedbuffer* findMaxBuffer(bool includeLoopEnds = false)
+	{
+		size_t max=0;
+		indexedbuffer* rv = nullptr;
+		
+		if (includeLoopEnds)
+		{
+			for (auto && x : _buffers)
+			{
+				if (x->index > max)
+				{
+					max = x->index;
+					rv = x;
+				}
+			}
+		}
+		else
+		{
+			for (auto && x : _buffers)
+			{
+				if (loop_start != x->status 
+				 && loop_start_next != x->status 
+				 && loop_finish_prev != x->status 
+				 && loop_finish != x->status 
+				 && x->index > max)
+				{
+					max = x->index;
+					rv = x;
+				}
+			}
+		}	
+		
+		return rv;
+	}
+
+	/**
+	 * Find buffer with minimum index value
+	 */
+	indexedbuffer* findMinBuffer(bool includeLoopEnds = false)
+	{
+		size_t min=-1; // actually will be maximum value, as size_t is unsigned
+		indexedbuffer* rv = nullptr;
+		
+		if (includeLoopEnds)
+		{
+			for (auto && x : _buffers)
+			{
+				if (x->index < min)
+				{
+					min = x->index;
+					rv = x;
+				}
+			}
+		}
+		else
+		{
+			for (auto && x : _buffers)
+			{
+				if (loop_start != x->status 
+				 && loop_start_next != x->status 
+				 && loop_finish_prev != x->status 
+				 && loop_finish != x->status 
+				 && x->index < min)
+				{
+					min = x->index;
+					rv = x;
+				}
+			}
+		}	
+		
+		return rv;
+	}
+
 
 	indexedbuffer* bufs;
 	/**
@@ -143,7 +239,8 @@ public:
 	/**
 	 * Preload buffere.
 	 */
-	size_t preLoadBuffers(int i) //!< first sample number to load
+	size_t preLoadBuffers(int i, 				//!< first sample number to load
+						 bool forwards = true) 	//!< true if playback is forwards (at the start)
 	{
 		size_t numInVector = _buffers.size();
 		size_t loaded = 0;
@@ -160,7 +257,10 @@ public:
 				buf = _buffers[bufn];
 			
 			loaded += loadBuffer(buf,i);
-			i += BUFFER_SIZE;
+			if (forwards)
+				i += BUFFER_SIZE;
+			else
+				i -= BUFFER_SIZE;
 		}
 		return loaded;
 	}
@@ -221,11 +321,23 @@ public:
             _filename = nullptr;
         }    
     }
+	
+	void setLoopType(loop_type l) { _loop_type = l; }
+	void setLoopStart(int32_t l) { _loop_start = l; }
+	void setLoopFinish(int32_t l) { _loop_finish = l; }
 
 protected:
     TFile _file;
     char *_filename;
-    std::vector<indexedbuffer*> _buffers;
+	
+	// we need a copy of the loop parameters in
+	// order to pre-load the buffers correctly
+    loop_type _loop_type = loop_type::looptype_none;
+    int32_t _loop_start = 0;
+    int32_t _loop_finish = 0;    
+	
+	// vector of audio buffers with status etc.
+	std::vector<indexedbuffer*> _buffers;
 
 	// search vector of buffers for the one with a 
 	// specific sample (set) in it.

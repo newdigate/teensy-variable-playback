@@ -126,7 +126,13 @@ public:
         }
 
         _sourceBuffer = createSourceBuffer();
-		_sourceBuffer->preLoadBuffers(0);
+		_sourceBuffer->setLoopType(_loopType);
+		_sourceBuffer->setLoopStart(_loop_start);
+		_sourceBuffer->setLoopFinish(_loop_finish);
+		if (_playbackRate >= 0.0f)
+			_sourceBuffer->preLoadBuffers(_loop_start);
+		else
+			_sourceBuffer->preLoadBuffers(_loop_finish,false);
         _loop_start = _header_offset;
 
         reset();
@@ -137,7 +143,7 @@ public:
 	size_t getBufferSize(void) { return _sourceBuffer?_sourceBuffer->getBufferSize():-1; }
 	void resetStatus(void) { if (_sourceBuffer) _sourceBuffer->resetStatus(); }
 	void getStatus(char* buf) { if (_sourceBuffer) _sourceBuffer->getStatus(buf); }
-	void triggerReload(void) { if (_sourceBuffer) _sourceBuffer->triggerReload(); }
+	void triggerReload(void) { if (_sourceBuffer) _sourceBuffer->triggerReload(_playbackRate); }
 
     bool playRaw(const char *filename, uint16_t numChannelsIfRaw){
         return play(filename, false, numChannelsIfRaw);
@@ -492,6 +498,8 @@ public:
 
     void setLoopType(loop_type loopType)
     {
+		if (nullptr != _sourceBuffer)
+			_sourceBuffer->setLoopType(_loopType);
         _loopType = loopType;
     }
 
@@ -526,11 +534,15 @@ public:
 
     void setLoopStart(uint32_t loop_start) {
         _loop_start = _header_offset + (loop_start * _numChannels);
+		if (nullptr != _sourceBuffer)
+			_sourceBuffer->setLoopFinish(_loop_finish);
     }
 
     void setLoopFinish(uint32_t loop_finish) {
         // sample number, (NOT byte number)
         _loop_finish = _header_offset + (loop_finish * _numChannels);
+		if (nullptr != _sourceBuffer)
+			_sourceBuffer->setLoopFinish(_loop_finish);
     }
 
     void setUseDualPlaybackHead(bool useDualPlaybackHead) {
@@ -598,7 +610,7 @@ public:
         return _crossfadeDurationInSamples;
     } 
 
-    int32_t getLooptStart() {
+    int32_t getLoopStart() {
         return  _loop_start / _numChannels - _header_offset;
     }
 
