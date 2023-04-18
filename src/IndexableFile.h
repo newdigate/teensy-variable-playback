@@ -89,7 +89,7 @@ public:
 	 */
 	void triggerReload(float playbackRate) //!< direction and speed of playback
 	{
-		if (!_buffers.empty() && unused == _buffers[0]->status)
+		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			size_t nextIdx=0;
 			char buf1[20],buf2[20];
@@ -292,6 +292,7 @@ public:
 	 
 	 Note that the index is independent of the channel count.
 	*/
+	int16_t zero = 0;
     int16_t &operator[](int i) {
         int32_t indexFor_i = i >> buffer_to_index_shift;
         indexedbuffer *match = find_with_index(indexFor_i); // find which buffer has the sample
@@ -299,23 +300,8 @@ public:
         if (match == nullptr)  // none of the buffers contains the required sample
 		{
 			fails++;
-			
-            if (_buffers.size() > MAX_NUM_BUFFERS - 1) // reached limit of number of allowed buffers
-			{
-                match = _buffers[0]; // assume the oldest buffer is no longer needed
-                _buffers.erase(_buffers.begin());	// remove from vector
-				// we already have the indexedbuffer and its sample storage - keep those
-            }
-			else
-			{
-				match = new indexedbuffer(BUFFER_SIZE, _bufInPSRAM);  // create new indexedbuffer object
-			}
-			
-			loadBuffer(match,i);
-
-			// Add the newly-loaded indexedbuffer at the back of the vector: it's the newest one.
-			// Do this here because it may be either a new or a recycled buffer.
-            _buffers.push_back(match);			
+			zero = 0; 		// in case someone wrote to the reference at some point!
+			return zero;	// stutter, but don't crash due to reading filesystem under interrupt
         }
 		match->status = 'r';
 		
