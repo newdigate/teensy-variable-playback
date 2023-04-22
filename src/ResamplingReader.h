@@ -224,7 +224,7 @@ public:
                         {
                             //Serial.printf("end of loop...\n");
                             /* no looping - return the number of (resampled) bytes returned... */
-                            close();
+                            // close(); // can't close(), called from update interrupt!
                             return count;
                         }
                     }   

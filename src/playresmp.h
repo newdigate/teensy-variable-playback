@@ -9,6 +9,7 @@
 template <class TResamplingReader>
 class AudioPlayResmp : public AudioStream, public EventResponder
 {
+		enum {evReload,evClose};
     public:
         AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
         {
@@ -20,9 +21,19 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 		static void event_response(EventResponderRef evRef)
 		{
 			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
+			int status = evRef.getStatus();
 			
 			if (nullptr != reader)
-				reader->triggerReload();
+				switch (status)
+				{
+					case evReload:
+						reader->triggerReload();
+						break;
+						
+					case evClose:
+						reader->close();
+						break;
+				}
 		}
 		
         void begin(void)
@@ -156,9 +167,12 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 						transmit(blocks[0], 1);
 					}
 					
-					triggerEvent(0,reader);
+					if (AUDIO_BLOCK_SAMPLES == n) // got enough samples...
+						triggerEvent(evReload,reader); // ...load more if needed
+					else
+						triggerEvent(evClose,reader); // ...end of file, finish playing
 				} else {
-					reader->close();
+					triggerEvent(evClose,reader);
 				}
 			}
             for (int channel=0; channel < _numChannels; channel++) 
