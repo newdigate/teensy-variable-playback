@@ -40,6 +40,7 @@ constexpr bool isPowerOf2(size_t value){
     return !(value == 0) && !(value & (value - 1));
 }
 
+
 template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
 class IndexableFile
 {
@@ -97,8 +98,12 @@ public:
 			//getStatus(buf1);
 			
 			indexedbuffer* reload = _buffers[0];
+			bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
+			AudioNoInterrupts();
 			_buffers.erase(_buffers.begin());	
             _buffers.push_back(reload);
+			if (intEnabled)
+				AudioInterrupts();
 
 			if (playbackRate >= 0.0f)
 				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
@@ -223,8 +228,7 @@ public:
 	 */
 	size_t loadBuffer(indexedbuffer* buf,	//!< buffer to load
 					  int i)				//!< index of first sample
-	{
-		
+	{		
 		// figure out file position to load into the buffer
 		size_t basePos = i & buffer_mask;
 		size_t seekPos = basePos * element_size;
@@ -269,7 +273,10 @@ public:
 			if (bufn >= numInVector)
 			{
 				buf = new indexedbuffer(BUFFER_SIZE, bufInPSRAM);
+				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
+				AudioNoInterrupts();
 				_buffers.push_back(buf);
+				AudioInterrupts();
 			}
 			else
 				buf = _buffers[bufn];
