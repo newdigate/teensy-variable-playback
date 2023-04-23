@@ -499,7 +499,7 @@ public:
     void setLoopType(loop_type loopType)
     {
 		if (nullptr != _sourceBuffer)
-			_sourceBuffer->setLoopType(_loopType);
+			_sourceBuffer->setLoopType(loopType);
         _loopType = loopType;
     }
 
@@ -535,7 +535,7 @@ public:
     void setLoopStart(uint32_t loop_start) {
         _loop_start = _header_offset + (loop_start * _numChannels);
 		if (nullptr != _sourceBuffer)
-			_sourceBuffer->setLoopFinish(_loop_finish);
+			_sourceBuffer->setLoopStart(_loop_start);
     }
 
     void setLoopFinish(uint32_t loop_finish) {

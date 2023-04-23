@@ -76,6 +76,7 @@ public:
 	
 	size_t getBufferCount(void) {return MAX_NUM_BUFFERS; }
 	
+	
 	/**
 	 * Function to reload unused buffer.
 	 *
@@ -92,30 +93,84 @@ public:
 	{
 		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
-			size_t nextIdx=0;
+			int nextIdx=0;
+			bool doLoad = true;
 			char buf1[20],buf2[20];
 			
 			//getStatus(buf1);
 			
-			indexedbuffer* reload = _buffers[0];
+			// We expect to use buffers starting at front of vector
+			indexedbuffer* reload = _buffers[0]; // point to buffer to re-use
+
+			if (playbackRate >= 0.0f)
+			{
+				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
+				switch (_loop_type)
+				{
+					case loop_type::looptype_none:
+						break;
+						
+					case loop_type::looptype_repeat:
+						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
+						{
+							/*
+							indexedbuffer* nl = _buffers.back();
+							int nextLast = nl->index; // get index of previous reload
+							*/
+							int nextLast = _buffers[MAX_NUM_BUFFERS - 1]->index;
+							if (nextLast + 1 == nextIdx) 	// haven't looped back already...
+								nextIdx = _loop_start_blocks;	// ...go back to start
+							else
+								nextIdx = nextLast + 1; // ...preload next block
+						}
+						break;
+						
+					case loop_type::looptype_pingpong:
+						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
+							doLoad = false;					// ...no load needed, probably
+						break;
+						
+				}
+			}
+			else
+			{
+				nextIdx = findMinBuffer()->index - 1;	// might well be < 0
+				switch (_loop_type)
+				{
+					case loop_type::looptype_none:
+						if (nextIdx < 0)
+							doLoad = false;
+						break;
+						
+					case loop_type::looptype_repeat:
+						if (nextIdx < _loop_start_blocks) 	// trying to go too far...
+						{
+							int nextLast = _buffers[MAX_NUM_BUFFERS - 1]->index;
+							if (nextLast - 1 == nextIdx) 	// haven't looped back already...
+								nextIdx = _loop_finish_blocks;	// ...go back to loop start (end of file)
+							else
+								nextIdx = nextLast - 1; // ...preload next block
+						}
+						break;
+						
+					case loop_type::looptype_pingpong:
+						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
+							doLoad = false;					// ...no load needed, probably
+						break;
+						
+				}			}
+			nextIdx <<= buffer_to_index_shift;
+
+			// move re-used buffer to the back of the vector
 			bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
 			AudioNoInterrupts();
 			_buffers.erase(_buffers.begin());	
             _buffers.push_back(reload);
 			if (intEnabled)
 				AudioInterrupts();
-
-			if (playbackRate >= 0.0f)
-				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
-			else
-			{
-				nextIdx = findMinBuffer()->index;	// might well be 0
-				if (nextIdx > 0)
-					nextIdx--;
-			}
-			nextIdx <<= buffer_to_index_shift;
-
-			loadBuffer(reload,nextIdx);
+			
+			if (doLoad)
+				loadBuffer(reload,nextIdx);
 			//getStatus(buf2);
 			
 			//Serial.printf("Loaded from index %d: %s -> %s\n",nextIdx,buf1,buf2);
@@ -335,8 +390,8 @@ public:
     }
 	
 	void setLoopType(loop_type l) { _loop_type = l; }
-	void setLoopStart(int32_t l) { _loop_start = l; }
-	void setLoopFinish(int32_t l) { _loop_finish = l; }
+	void setLoopStart(int32_t l) { _loop_start_blocks = l >> buffer_to_index_shift; }
+	void setLoopFinish(int32_t l) { _loop_finish_blocks = l >> buffer_to_index_shift; }
 
 protected:
     TFile _file;
@@ -345,8 +400,8 @@ protected:
 	// we need a copy of the loop parameters in
 	// order to pre-load the buffers correctly
     loop_type _loop_type = loop_type::looptype_none;
-    int32_t _loop_start = 0;
-    int32_t _loop_finish = 0;    
+    int32_t _loop_start_blocks = 0;
+    int32_t _loop_finish_blocks = 0;    
 	
 	bool _bufInPSRAM = false;
 	
