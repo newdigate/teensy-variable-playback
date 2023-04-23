@@ -83,6 +83,10 @@ class AudioPlayResmp : public AudioStream, public EventResponder
             reader->setLoopType(t);
         }
 
+        loop_type getLoopType(void) {
+            return reader->getLoopType();
+        }
+
         void setLoopStart(uint32_t loop_start) {
             reader->setLoopStart(loop_start);
         }

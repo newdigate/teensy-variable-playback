@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <SD.h>
 #include <vector>
+#include <algorithm> // to get std::reverse
 #include "loop_type.h"
 
 namespace newdigate {
@@ -95,6 +96,7 @@ public:
 		{
 			int nextIdx=0;
 			bool doLoad = true;
+			bool moveBuffer = true;
 			char buf1[20],buf2[20];
 			
 			//getStatus(buf1);
@@ -125,9 +127,14 @@ public:
 						}
 						break;
 						
-					case loop_type::looptype_pingpong:
+					case loop_type::looptype_pingpong: // forwards, we're pinging
 						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
-							doLoad = false;					// ...no load needed, probably
+						{
+							if (read == _buffers[MAX_NUM_BUFFERS - 1]->status)  // last update used last buffer, so...
+								std::reverse(_buffers.begin(), _buffers.end()); // ...reverse the order, start ponging
+							doLoad = false;					// ...no load needed
+							moveBuffer = false;
+						}
 						break;
 						
 				}
@@ -153,24 +160,35 @@ public:
 						}
 						break;
 						
-					case loop_type::looptype_pingpong:
-						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
-							doLoad = false;					// ...no load needed, probably
+					case loop_type::looptype_pingpong: // reverse, we're ponging
+						if (nextIdx < _loop_start_blocks) 	// trying to go too far...
+						{
+							if (read == _buffers[MAX_NUM_BUFFERS - 1]->status)  // last update used last buffer, so...
+								std::reverse(_buffers.begin(), _buffers.end()); // ...reverse the order, start pinging
+							doLoad = false;					// ...no load needed
+							moveBuffer = false;
+						}
 						break;
 						
-				}			}
+				}			
+			}
 			nextIdx <<= buffer_to_index_shift;
-
-			// move re-used buffer to the back of the vector
-			bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
-			AudioNoInterrupts();
-			_buffers.erase(_buffers.begin());	
-            _buffers.push_back(reload);
-			if (intEnabled)
-				AudioInterrupts();
 			
 			if (doLoad)
 				loadBuffer(reload,nextIdx);
+
+			if (moveBuffer)
+			{
+				// move re-used buffer to the back of the vector
+				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
+				AudioNoInterrupts();
+				_buffers.erase(_buffers.begin());	
+				_buffers.push_back(reload);
+				if (intEnabled)
+					AudioInterrupts();
+			}
+			else
+				break; // didn't move buffers so first one will remain in "unused" state
 			//getStatus(buf2);
 			
 			//Serial.printf("Loaded from index %d: %s -> %s\n",nextIdx,buf1,buf2);
