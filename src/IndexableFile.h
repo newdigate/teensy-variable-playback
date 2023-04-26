@@ -7,6 +7,8 @@
 #include <algorithm> // to get std::reverse
 #include "loop_type.h"
 
+#define TVP_DEBUG Serial6
+
 namespace newdigate {
 
 
@@ -45,6 +47,7 @@ constexpr bool isPowerOf2(size_t value){
 template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
 class IndexableFile
 {
+	enum bufferAction_e {nopBuffer, moveBuffer, reverseBuffer};
 public:
 	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r', 
 		 loop_start = 'a', loop_start_next = 'b', loop_finish_prev = 'y', loop_finish = 'z'};
@@ -56,11 +59,13 @@ public:
     size_t buffer_to_index_shift;
 	size_t buffer_mask;
 	int fails;
+	float prevPlaybackRate; // record of playback rate in force on previous reload
 	
     IndexableFile(const char *filename) : 
         buffer_to_index_shift(log2(BUFFER_SIZE)), 
 		buffer_mask(~(BUFFER_SIZE - 1)),
 		fails(0),
+		prevPlaybackRate(0.0f),
         _buffers()
     {
 		_filename = new char[strlen(filename)+1] {0};
@@ -92,12 +97,28 @@ public:
 	 */
 	void triggerReload(float playbackRate) //!< direction and speed of playback
 	{
+		char buf1[20],buf2[20];
+		float pbr = playbackRate;
+#if defined(TVP_DEBUG)
+	TVP_DEBUG.print(playbackRate > 0.0f ? '>' : '<');
+#endif // defined(TVP_DEBUG)
+		
+		// check if pingpong has changed direction since last reload
+		if (loop_type::looptype_pingpong == _loop_type
+		 && ((playbackRate > 0.0f && prevPlaybackRate < 0.0f)
+		  || (playbackRate < 0.0f && prevPlaybackRate > 0.0f)))
+		{
+			// correct timing of buffer reverse vs.
+			// next index depends on check using
+			// the old direction:
+			playbackRate = prevPlaybackRate; // say playback is in old direction
+		}
+		
 		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			int nextIdx=0;
 			bool doLoad = true;
-			bool moveBuffer = true;
-			char buf1[20],buf2[20];
+			bufferAction_e bufferAction = moveBuffer;
 			
 			//getStatus(buf1);
 			
@@ -106,6 +127,9 @@ public:
 
 			if (playbackRate >= 0.0f)
 			{
+#if defined(TVP_DEBUG)
+	TVP_DEBUG.print('>');
+#endif // defined(TVP_DEBUG)
 				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
 				switch (_loop_type)
 				{
@@ -130,10 +154,12 @@ public:
 					case loop_type::looptype_pingpong: // forwards, we're pinging
 						if (nextIdx > _loop_finish_blocks) 	// trying to go too far...
 						{
+							bufferAction = nopBuffer;
 							if (read == _buffers[MAX_NUM_BUFFERS - 1]->status)  // last update used last buffer, so...
-								std::reverse(_buffers.begin(), _buffers.end()); // ...reverse the order, start ponging
+							{
+								bufferAction = reverseBuffer;					// ...reverse the order, start ponging
+							}
 							doLoad = false;					// ...no load needed
-							moveBuffer = false;
 						}
 						break;
 						
@@ -141,6 +167,9 @@ public:
 			}
 			else
 			{
+#if defined(TVP_DEBUG)
+	TVP_DEBUG.print('<');
+#endif // defined(TVP_DEBUG)
 				nextIdx = findMinBuffer()->index - 1;	// might well be < 0
 				switch (_loop_type)
 				{
@@ -163,10 +192,12 @@ public:
 					case loop_type::looptype_pingpong: // reverse, we're ponging
 						if (nextIdx < _loop_start_blocks) 	// trying to go too far...
 						{
+							bufferAction = nopBuffer;
 							if (read == _buffers[MAX_NUM_BUFFERS - 1]->status)  // last update used last buffer, so...
-								std::reverse(_buffers.begin(), _buffers.end()); // ...reverse the order, start pinging
+							{
+								bufferAction = reverseBuffer;					// ...reverse the order, start pinging
+							}
 							doLoad = false;					// ...no load needed
-							moveBuffer = false;
 						}
 						break;
 						
@@ -177,22 +208,45 @@ public:
 			if (doLoad)
 				loadBuffer(reload,nextIdx);
 
-			if (moveBuffer)
+			if (nopBuffer != bufferAction) // do stuff to buffer ordering
 			{
-				// move re-used buffer to the back of the vector
+				// Mustn't be interrupted by audio update.
+				// A quick vector shuffle won't leave updates
+				// disabled for too long, so this is OK.
 				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
-				AudioNoInterrupts();
-				_buffers.erase(_buffers.begin());	
-				_buffers.push_back(reload);
+				AudioNoInterrupts(); // ===============================================
+				switch (bufferAction)
+				{
+					case reverseBuffer: // reverse the order
+#if defined(TVP_DEBUG)
+	TVP_DEBUG.print("<->");
+#endif // defined(TVP_DEBUG)
+						std::reverse(_buffers.begin(), _buffers.end()); 
+						prevPlaybackRate = -prevPlaybackRate; // record new playback direction
+						break;
+						
+					case moveBuffer: // move front element to back
+						_buffers.erase(_buffers.begin());	
+						_buffers.push_back(reload);
+						break;
+						
+					default:
+						break;
+				}
 				if (intEnabled)
-					AudioInterrupts();
+					AudioInterrupts(); // ===============================================
 			}
 			else
 				break; // didn't move buffers so first one will remain in "unused" state
-			//getStatus(buf2);
 			
 			//Serial.printf("Loaded from index %d: %s -> %s\n",nextIdx,buf1,buf2);
 		}
+	if (0.0f == prevPlaybackRate)
+		prevPlaybackRate = pbr;
+#if defined(TVP_DEBUG)
+	getStatus(buf2);
+	TVP_DEBUG.print(buf2);
+#endif // defined(TVP_DEBUG)
 	}
 	
 	void resetStatus(void) 
@@ -323,6 +377,10 @@ public:
 		buf->status = loaded;
 		
 		bufs = _buffers[0];
+#if defined(TVP_DEBUG)
+	TVP_DEBUG.print(buf->index);
+#endif // defined(TVP_DEBUG)
+		
 
 		return bytesRead;
 	}
