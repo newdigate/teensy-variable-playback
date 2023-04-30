@@ -176,8 +176,6 @@ public:
         int16_t *index[_numChannels];
         unsigned int count = 0;
 
-		resetStatus();
-
         for (int channel=0; channel < _numChannels; channel++) {
             index[channel] = (int16_t*)buf[channel];
         }
@@ -311,6 +309,7 @@ public:
         }
 
         if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
+//#define abs(d) (d<0.0?-d:d)
             double abs_remainder = abs(_remainder);
             if (abs_remainder > 0.0) {
 
@@ -359,6 +358,7 @@ public:
         } 
         else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
             double abs_remainder = abs(_remainder);
+//#undef abs			
             if (abs_remainder > 0.0) {
                 if (_playbackRate > 0) {                
                     if (_remainder - _playbackRate < 0.0){

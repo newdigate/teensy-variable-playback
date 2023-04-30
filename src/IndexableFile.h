@@ -7,7 +7,7 @@
 #include <algorithm> // to get std::reverse
 #include "loop_type.h"
 
-#define TVP_DEBUG Serial6
+#define noTVP_DEBUG Serial6
 
 namespace newdigate {
 
@@ -49,8 +49,7 @@ class IndexableFile
 {
 	enum bufferAction_e {nopBuffer, moveBuffer, reverseBuffer};
 public:
-	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r', 
-		 loop_start = 'a', loop_start_next = 'b', loop_finish_prev = 'y', loop_finish = 'z'};
+	enum {constructed = '.', loaded = 'l', unused = 'u', read = 'r'};
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
     
     virtual TFile open(const char *filename) = 0;
@@ -100,6 +99,7 @@ public:
 		char buf1[20],buf2[20];
 		float pbr = playbackRate;
 #if defined(TVP_DEBUG)
+	TVP_DEBUG.print(_buffers[0]->bufInPSRAM ? 'P' : 'H');
 	TVP_DEBUG.print(playbackRate > 0.0f ? '>' : '<');
 #endif // defined(TVP_DEBUG)
 		
@@ -114,6 +114,10 @@ public:
 			playbackRate = prevPlaybackRate; // say playback is in old direction
 		}
 		
+#if defined(TVP_DEBUG)
+	getStatus(buf2);
+#endif // defined(TVP_DEBUG)
+
 		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			int nextIdx=0;
@@ -208,7 +212,7 @@ public:
 			if (doLoad)
 				loadBuffer(reload,nextIdx);
 
-			if (nopBuffer != bufferAction) // do stuff to buffer ordering
+//			if (nopBuffer != bufferAction) // do stuff to buffer ordering
 			{
 				// Mustn't be interrupted by audio update.
 				// A quick vector shuffle won't leave updates
@@ -233,26 +237,37 @@ public:
 					default:
 						break;
 				}
+				
+#if defined(TVP_DEBUG)
+	getStatus(buf2);
+#endif // defined(TVP_DEBUG)
+				
 				if (intEnabled)
 					AudioInterrupts(); // ===============================================
 			}
-			else
+//			else
+	
+			if (nopBuffer == bufferAction) // do stuff to buffer ordering
 				break; // didn't move buffers so first one will remain in "unused" state
 			
 			//Serial.printf("Loaded from index %d: %s -> %s\n",nextIdx,buf1,buf2);
 		}
-	if (0.0f == prevPlaybackRate)
-		prevPlaybackRate = pbr;
+		resetStatus(); // reset ready for next update to mark blocks read
+		if (0.0f == prevPlaybackRate)
+			prevPlaybackRate = pbr;
 #if defined(TVP_DEBUG)
-	getStatus(buf2);
 	TVP_DEBUG.print(buf2);
 #endif // defined(TVP_DEBUG)
 	}
 	
 	void resetStatus(void) 
 	{
+		bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
+		AudioNoInterrupts(); // ===============================================
 		for (auto && x : _buffers)
 			x->status = loaded;
+		if (intEnabled)
+			AudioInterrupts(); // ===============================================
 	}
 	
 	void getStatus(char* buf)
@@ -295,11 +310,7 @@ public:
 		{
 			for (auto && x : _buffers)
 			{
-				if (loop_start != x->status 
-				 && loop_start_next != x->status 
-				 && loop_finish_prev != x->status 
-				 && loop_finish != x->status 
-				 && x->index > max)
+				if (x->index > max)
 				{
 					max = x->index;
 					rv = x;
@@ -333,11 +344,7 @@ public:
 		{
 			for (auto && x : _buffers)
 			{
-				if (loop_start != x->status 
-				 && loop_start_next != x->status 
-				 && loop_finish_prev != x->status 
-				 && loop_finish != x->status 
-				 && x->index < min)
+				if (x->index < min)
 				{
 					min = x->index;
 					rv = x;
