@@ -157,7 +157,7 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 					data[i] = blocks[i]->data;
             }
 
-			if (gotBlocks)
+			if (gotBlocks) // enough blocks, do the transmit
 			{
 				if (reader->available()) {
 					// we can read more data from the file...
@@ -179,12 +179,16 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 					triggerEvent(evClose,reader);
 				}
 			}
+			
+			// release all allocated blocks, even if there
+			// weren't enough and we couldn't transmit
             for (int channel=0; channel < _numChannels; channel++) 
 			{
-				if (nullptr != blocks[channel])
+				if (nullptr != blocks[channel]) // only release if allocated!
 					release(blocks[channel]);
             }
         }
+		
         uint32_t positionMillis()
         {
             return reader->positionMillis();
