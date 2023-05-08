@@ -355,12 +355,7 @@ public:
                             _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                             _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                             _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                            if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel);
-                            } else 
-                            {
-                                _interpolationPoints[channel][3].y = result;
-                            }
+                            _interpolationPoints[channel][3].y = result;
                             if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
                     }
@@ -375,12 +370,7 @@ public:
                             _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                             _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                             _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                            if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel);
-                            } else 
-                            {
-                                _interpolationPoints[channel][3].y = result;
-                            }
+                            _interpolationPoints[channel][3].y = result;
                             if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
                     }
