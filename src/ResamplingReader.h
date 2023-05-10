@@ -359,7 +359,10 @@ public:
                                 _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel);
                             } else 
                             {
-                                _interpolationPoints[channel][3].y = result;
+                                _interpolationPoints[channel][3].y = 
+                                    getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel) * _crossfade 
+                                    +
+                                    getSourceBufferValue(_bufferPosition2-(i*_numChannels)+1+channel) * (1.0 -_crossfade);
                             }
                             if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
@@ -379,7 +382,10 @@ public:
                                 _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel);
                             } else 
                             {
-                                _interpolationPoints[channel][3].y = result;
+                                _interpolationPoints[channel][3].y = 
+                                    getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel) * _crossfade 
+                                    +
+                                    getSourceBufferValue(_bufferPosition2+(i*_numChannels)-1+channel) * (1.0 - _crossfade); 
                             }
                             if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
@@ -387,7 +393,7 @@ public:
                 }
                 
                 if (_numInterpolationPoints >= 4) {
-                    //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
+                    //result = interpolate(_interpolationPoints[channel], _interpolationPoints[channel][0].x + ((_bufferPosition1 - _interpolationPoints[channel][0].x) * abs_remainder), 4);
                     int16_t interpolation 
                         = fastinterpolate(
                             _interpolationPoints[channel][0].y, 
@@ -400,10 +406,17 @@ public:
                 } else 
                     result = 0;
             } else {
-                _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
-                _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                _interpolationPoints[channel][3].y = result;
+                int numberOfSamplesToUpdate = (_playbackRate < 0.0)? ceil(_playbackRate) : floor(_playbackRate);
+                if (numberOfSamplesToUpdate > 4) 
+                    numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+                    _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
+                    _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
+                    _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
+                    _interpolationPoints[channel][3].y = result;
+                    if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                }
+
                 if (_numInterpolationPoints < 4) {
                     _numInterpolationPoints++;
                     result = 0;
