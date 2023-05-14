@@ -7,6 +7,7 @@
 #include "interpolation.h"
 #include "waveheaderparser.h"
 
+
 namespace newdigate {
 
 template<class TArray, class TFile>
@@ -168,51 +169,59 @@ public:
         }
 
         while (count < nsamples) {
-            for (int channel=0; channel < _numChannels; channel++) {
-                if (readNextValue(index[channel], channel)) {
-                    if (channel == _numChannels - 1)
-                        count++;
-                    index[channel]++;
-                }
-                else {
-                    // we have reached the end of the file
-					_crossfadeState = 0;
-                    switch (_loopType) {
-                        case looptype_repeat:
-                        {
-                            if (_playbackRate >= 0.0) 
-                                _bufferPosition1 = _loop_start;
-                            else
-                                _bufferPosition1 = _loop_finish - _numChannels;
+            for (int channel=0; channel < _numChannels; channel++) 
+			{
+				bool readOK = false;
+				
+				while (!readOK)
+				{
+					readOK = readNextValue(index[channel], channel);
+					
+					if (readOK) {
+						if (channel == _numChannels - 1)
+							count++;
+						index[channel]++;
+					}
+					else {
+						// we have reached the end of the file
+						_crossfadeState = 0;
+						switch (_loopType) {
+							case looptype_repeat:
+							{
+								if (_playbackRate >= 0.0) 
+									_bufferPosition1 = _loop_start;
+								else
+									_bufferPosition1 = _loop_finish - _numChannels;
 
-                            break;
-                        }
+								break;
+							}
 
-                        case looptype_pingpong:
-                        {
-                            if (_playbackRate >= 0.0) {
-                                _bufferPosition1 = _loop_finish - _numChannels;
-                            }
-                            else {
-                                if (_play_start == play_start::play_start_sample)
-                                    _bufferPosition1 = _header_offset;
-                                else
-                                    _bufferPosition1 = _loop_start;
-                            }
-                            _playbackRate = -_playbackRate;
-                            break;
-                        }            
+							case looptype_pingpong:
+							{
+								if (_playbackRate >= 0.0) {
+									_bufferPosition1 = _loop_finish - _numChannels;
+								}
+								else {
+									if (_play_start == play_start::play_start_sample)
+										_bufferPosition1 = _header_offset;
+									else
+										_bufferPosition1 = _loop_start;
+								}
+								_playbackRate = -_playbackRate;
+								break;
+							}            
 
-                        case looptype_none:            
-                        default:
-                        {
-                            //Serial.printf("end of loop...\n");
-                            /* no looping - return the number of (resampled) bytes returned... */
-                            close();
-                            return count;
-                        }
-                    }   
-                }
+							case looptype_none:            
+							default:
+							{
+								//Serial.printf("end of loop...\n");
+								/* no looping - return the number of (resampled) bytes returned... */
+								close();
+								return count;
+							}
+						}   
+					}
+				}
             }
         }
         return count;
@@ -405,9 +414,13 @@ public:
             }
         }
   
+        *value = result;
+		
 		// Assume caller reads channels in order: increment buffer positions
 		// when the last channel's data has been read.
         if (channel == _numChannels - 1) {
+//*value = _bufferPosition1;
+			
             _remainder += _playbackRate;
 
             auto delta = static_cast<signed int>(_remainder);
@@ -422,7 +435,6 @@ public:
 			}
         }
 
-        *value = result;
         return true;
     }
 	
