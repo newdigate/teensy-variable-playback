@@ -501,8 +501,10 @@ public:
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
-        for(int i=0;i++;i<8)
+        for(int i=0;i<8;i++) {
             _numInterpolationPoints[i] = 0;
+            _lastInterpolationPosition[i] = _header_offset/_numChannels;
+        }
 
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
