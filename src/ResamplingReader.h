@@ -21,6 +21,7 @@ public:
     virtual TArray* createSourceBuffer() = 0;
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
+    int _lastInterpolationPosition[8] = {0};
 
     void begin(void) 
     {
@@ -303,52 +304,56 @@ public:
                     if (_remainder - _playbackRate < 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
                         if (!_useDualPlaybackHead) {
-                            if ( _numInterpolationPoints < 2 &&_playbackRate > 1.0 && _bufferPosition1 - _numChannels > _header_offset * 2 ) {
+                            if ( _numInterpolationPoints[channel] < 2 &&_playbackRate > 1.0 && _bufferPosition1 - _numChannels > _header_offset * 2 ) {
                                 // need to update last sample
                                 _interpolationPoints[channel][1].y = getSourceBufferValue(_bufferPosition1 - _numChannels);
                             }
                         }
                         _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                         _interpolationPoints[channel][1].y = result;
-                        if (_numInterpolationPoints < 2)
-                            _numInterpolationPoints++;
+                        if (_numInterpolationPoints[channel] < 2)
+                            _numInterpolationPoints[channel]++;
                     }
                 } 
                 else if (_playbackRate < 0) {
                     if (_remainder - _playbackRate > 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
                         if (!_useDualPlaybackHead) {
-                            if (_numInterpolationPoints < 2  && _playbackRate < -1.0) {
+                            if (_numInterpolationPoints[channel] < 2  && _playbackRate < -1.0) {
                                 // need to update last sample
                                 _interpolationPoints[channel][1].y = getSourceBufferValue(_bufferPosition1 + _numChannels);
                             }
                         }
                         _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                         _interpolationPoints[channel][1].y = result;
-                        if (_numInterpolationPoints < 2)
-                            _numInterpolationPoints++;
+                        if (_numInterpolationPoints[channel] < 2)
+                            _numInterpolationPoints[channel]++;
                     }
                 }
 
-                if (_numInterpolationPoints > 1) {
+                if (_numInterpolationPoints[channel] > 1) {
                     result = abs_remainder * _interpolationPoints[channel][1].y + (1.0 - abs_remainder) * _interpolationPoints[channel][0].y;
                 }
             } else {
                 _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
                 _interpolationPoints[channel][1].y = result;
-                if (_numInterpolationPoints < 2)
-                    _numInterpolationPoints++;
+                if (_numInterpolationPoints[channel] < 2)
+                    _numInterpolationPoints[channel]++;
 
                 result =_interpolationPoints[channel][0].y;
             }
         } 
         else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
-            double abs_remainder = abs(_remainder);
-            if (abs_remainder > 0.0) {
+            int delta = abs(_bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
+            //Serial.printf("delta %d %d:\n", delta, _bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
+            if (_numInterpolationPoints[channel] == 0){
+                 _interpolationPoints[channel][3].y = result;
+                 _numInterpolationPoints[channel] = 1;
+            }
+            if (delta > 0) {
                 if (_playbackRate > 0) {                
-                    if (_remainder - _playbackRate < 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
-                        int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
+                        int numberOfSamplesToUpdate = delta;
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
@@ -359,16 +364,18 @@ public:
                                 _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel);
                             } else 
                             {
-                                _interpolationPoints[channel][3].y = result;
+                                _interpolationPoints[channel][3].y = 
+                                    getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel) * _crossfade 
+                                    +
+                                    getSourceBufferValue(_bufferPosition2-(i*_numChannels)+1+channel) * (1.0 -_crossfade);
                             }
-                            if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                            if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
                         }
-                    }
+                        _lastInterpolationPosition[channel] = _bufferPosition1 / _numChannels;
                 } 
                 else if (_playbackRate < 0) {                
-                    if (_remainder - _playbackRate > 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
-                        int numberOfSamplesToUpdate =  ceil(_remainder - _playbackRate);
+                        int numberOfSamplesToUpdate = delta;
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
@@ -379,40 +386,47 @@ public:
                                 _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel);
                             } else 
                             {
-                                _interpolationPoints[channel][3].y = result;
+                                _interpolationPoints[channel][3].y = 
+                                    getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel) * _crossfade 
+                                    +
+                                    getSourceBufferValue(_bufferPosition2+(i*_numChannels)-1+channel) * (1.0 - _crossfade); 
                             }
-                            if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+                            if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
+                            _lastInterpolationPosition[channel] = _bufferPosition1 / _numChannels;
                         }
-                    }
-                }
-                
-                if (_numInterpolationPoints >= 4) {
-                    //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
-                    int16_t interpolation 
-                        = fastinterpolate(
-                            _interpolationPoints[channel][0].y, 
-                            _interpolationPoints[channel][1].y, 
-                            _interpolationPoints[channel][2].y, 
-                            _interpolationPoints[channel][3].y, 
-                            1.0 + abs_remainder); 
-                    result = interpolation;
-                    //Serial.printf("[%f]\n", interpolation);
-                } else 
-                    result = 0;
+                }          
+            }
+            if (_remainder != 0.0) {
+                    if (_numInterpolationPoints[channel] >= 4) {
+                        //result = interpolate(_interpolationPoints[channel], _interpolationPoints[channel][0].x + ((_bufferPosition1 - _interpolationPoints[channel][0].x) * abs_remainder), 4);
+                        int16_t interpolation 
+                            = fastinterpolate(
+                                _interpolationPoints[channel][0].y, 
+                                _interpolationPoints[channel][1].y, 
+                                _interpolationPoints[channel][2].y, 
+                                _interpolationPoints[channel][3].y, 
+                                1.0 + abs(_remainder)); 
+                        /*
+                        Serial.printf("[%d %d %d %d] @ %f = %d \n",
+                                _interpolationPoints[channel][0].y, 
+                                _interpolationPoints[channel][1].y, 
+                                _interpolationPoints[channel][2].y, 
+                                _interpolationPoints[channel][3].y, 
+                                1.0 + abs(_remainder),
+                                interpolation
+                        );
+                        */
+                        result = interpolation;
+                    } else 
+                        result = 0;
             } else {
-                _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
-                _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                _interpolationPoints[channel][3].y = result;
-                if (_numInterpolationPoints < 4) {
-                    _numInterpolationPoints++;
+                if (_numInterpolationPoints[channel] < 4) {
                     result = 0;
                 } else 
                     result = _interpolationPoints[channel][1].y;
-                //Serial.printf("%f\n", result);
             }
         }
-  
+
         if (channel == _numChannels - 1) {
             _remainder += _playbackRate;
 
@@ -428,7 +442,7 @@ public:
                     _bufferPosition2 += (delta * _numChannels);
                 }
         }
-
+        //Serial.printf("ch: %d, index: %d, value: %d\n", channel, _bufferPosition1, result);
         *value = result;
         return true;
     }
@@ -498,7 +512,7 @@ public:
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
-        _numInterpolationPoints = 0;
+
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
             if (_play_start == play_start::play_start_sample)
@@ -512,6 +526,15 @@ public:
             else
                 _bufferPosition1 = _loop_finish - _numChannels;
         }
+        
+        for(int i=0;i<8;i++) {
+            _numInterpolationPoints[i] = 0;
+             if (_playbackRate > 0.0)
+                _lastInterpolationPosition[i] = _bufferPosition1 / _numChannels;
+            else 
+                _lastInterpolationPosition[i] = (_bufferPosition1 / _numChannels) + 1;
+        }
+
         _crossfade = 0.0;
     }
 
@@ -621,7 +644,7 @@ protected:
     TArray *_sourceBuffer = nullptr;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
-    unsigned int _numInterpolationPoints = 0;
+    unsigned int _numInterpolationPoints[8] = {0};
     InterpolationData **_interpolationPoints = nullptr;
     
     void initializeInterpolationPoints(void) {
