@@ -345,6 +345,7 @@ public:
         } 
         else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
             int delta = abs(_bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
+            //Serial.printf("delta %d %d:\n", delta, _bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
             if (_numInterpolationPoints[channel] == 0){
                  _interpolationPoints[channel][3].y = result;
                  _numInterpolationPoints[channel] = 1;
@@ -374,7 +375,7 @@ public:
                 } 
                 else if (_playbackRate < 0) {                
                         // we crossed over a whole number, make sure we update the samples for interpolation
-                        int numberOfSamplesToUpdate =  - delta;
+                        int numberOfSamplesToUpdate = delta;
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
@@ -390,8 +391,8 @@ public:
                                     +
                                     getSourceBufferValue(_bufferPosition2+(i*_numChannels)-1+channel) * (1.0 - _crossfade); 
                             }
-                            if (_lastInterpolationPosition[channel] < 4) _lastInterpolationPosition[channel]++;
-                            _lastInterpolationPosition[channel] = _bufferPosition1;
+                            if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
+                            _lastInterpolationPosition[channel] = _bufferPosition1 / _numChannels;
                         }
                 }          
             }
@@ -405,6 +406,16 @@ public:
                                 _interpolationPoints[channel][2].y, 
                                 _interpolationPoints[channel][3].y, 
                                 1.0 + abs(_remainder)); 
+                        /*
+                        Serial.printf("[%d %d %d %d] @ %f = %d \n",
+                                _interpolationPoints[channel][0].y, 
+                                _interpolationPoints[channel][1].y, 
+                                _interpolationPoints[channel][2].y, 
+                                _interpolationPoints[channel][3].y, 
+                                1.0 + abs(_remainder),
+                                interpolation
+                        );
+                        */
                         result = interpolation;
                     } else 
                         result = 0;
@@ -431,7 +442,7 @@ public:
                     _bufferPosition2 += (delta * _numChannels);
                 }
         }
-
+        //Serial.printf("ch: %d, index: %d, value: %d\n", channel, _bufferPosition1, result);
         *value = result;
         return true;
     }
@@ -501,10 +512,6 @@ public:
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
-        for(int i=0;i<8;i++) {
-            _numInterpolationPoints[i] = 0;
-            _lastInterpolationPosition[i] = _header_offset/_numChannels;
-        }
 
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
@@ -519,6 +526,15 @@ public:
             else
                 _bufferPosition1 = _loop_finish - _numChannels;
         }
+        
+        for(int i=0;i<8;i++) {
+            _numInterpolationPoints[i] = 0;
+             if (_playbackRate > 0.0)
+                _lastInterpolationPosition[i] = _bufferPosition1 / _numChannels;
+            else 
+                _lastInterpolationPosition[i] = (_bufferPosition1 / _numChannels) + 1;
+        }
+
         _crossfade = 0.0;
     }
 

@@ -51,7 +51,9 @@ if (DEFINED BUILD_FOR_LINUX)
             audio/output_test.cpp
 
             audio/array/AudioArrayFixture.h
+            audio/array/test_array_mono_loop_backward_playback.cpp
             audio/array/test_array_mono_loop_forward_playback.cpp
+            audio/array/test_array_stereo_loop_backward_playback.cpp
             audio/array/test_array_stereo_loop_forward_playback.cpp
 
             audio/wav/AudioWavFixture.h
