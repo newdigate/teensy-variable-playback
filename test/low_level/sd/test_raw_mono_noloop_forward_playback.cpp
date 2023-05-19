@@ -33,12 +33,12 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
-            printf("j:%d samplesRead: %d \n", j, samplesRead);
+            //printf("j:%d samplesRead: %d \n", j, samplesRead);
 
-            for (int i=0; i < samplesRead; i++) {
-                printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
-            }
-            printf("\n");
+            //for (int i=0; i < samplesRead; i++) {
+            //    printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
+            //}
+            //printf("\n");
             j++;
         } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
@@ -75,17 +75,17 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
-            printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i=0; i < samplesRead; i++) {
-                printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
-            }
-            printf("\n");
+            //printf("j:%d samplesRead: %d: ", j, samplesRead);
+            //for (int i=0; i < samplesRead; i++) {
+            //    printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
+            //}
+            //printf("\n");
             if (samplesRead != 0)
                 BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
 
             j++;
         } while (samplesRead > 0);
-        printf("total_bytes_read: %d \n", total_bytes_read);
+        //printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
     }

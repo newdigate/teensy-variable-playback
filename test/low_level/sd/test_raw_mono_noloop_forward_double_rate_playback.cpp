@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
     }
 
     void testReadForwardAtDoublePlaybackRate(const uint32_t size_of_datasource, newdigate::ResamplingSdReader *resamplingSdReader) {
-        printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
+        //printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
 
         int16_t dataSource[size_of_datasource];
         populateDataSourceAndSetSDCardMockData(size_of_datasource, dataSource);
@@ -41,11 +41,11 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256);
             total_bytes_read += samplesRead * 2;
-            printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i = 0; i < samplesRead; i++) {
-                printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
-            }
-            printf("\n");
+            //printf("j:%d samplesRead: %d: ", j, samplesRead);
+            //for (int i = 0; i < samplesRead; i++) {
+            //    printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
+            // }
+            //printf("\n");
             if (samplesRead != 0)
                 BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
             j++;
