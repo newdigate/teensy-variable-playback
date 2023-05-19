@@ -169,53 +169,56 @@ public:
         }
 
         while (count < nsamples) {
+            bool endOfFile = false;
             for (int channel=0; channel < _numChannels; channel++) {
                 if (readNextValue(index[channel], channel)) {
                     if (channel == _numChannels - 1)
                         count++;
                     index[channel]++;
-                }
-                else {
-                    // we have reached the end of the file
-
-                    switch (_loopType) {
-                        case looptype_repeat:
-                        {
-                            _crossfade = 0.0;
-                            if (_playbackRate >= 0.0) 
-                                _bufferPosition1 = _loop_start;
-                            else
-                                _bufferPosition1 = _loop_finish - _numChannels;
-
-                            break;
-                        }
-
-                        case looptype_pingpong:
-                        {
-                            if (_playbackRate >= 0.0) {
-                                _bufferPosition1 = _loop_finish - _numChannels;
-                            }
-                            else {
-                                if (_play_start == play_start::play_start_sample)
-                                    _bufferPosition1 = _header_offset;
-                                else
-                                    _bufferPosition1 = _loop_start;
-                            }
-                            _playbackRate = -_playbackRate;
-                            break;
-                        }            
-
-                        case looptype_none:            
-                        default:
-                        {
-                            //Serial.printf("end of loop...\n");
-                            /* no looping - return the number of (resampled) bytes returned... */
-                            close();
-                            return count;
-                        }
-                    }   
-                }
+                } else endOfFile = true;
             }
+
+            if (endOfFile)
+            {
+                // we have reached the end of the file
+                switch (_loopType) {
+                    case looptype_repeat:
+                    {
+                        _crossfade = 0.0;
+                        if (_playbackRate >= 0.0) 
+                            _bufferPosition1 = _loop_start;
+                        else
+                            _bufferPosition1 = _loop_finish - _numChannels;
+
+                        break;
+                    }
+
+                    case looptype_pingpong:
+                    {
+                        if (_playbackRate >= 0.0) {
+                            _bufferPosition1 = _loop_finish - _numChannels;
+                        }
+                        else {
+                            if (_play_start == play_start::play_start_sample)
+                                _bufferPosition1 = _header_offset;
+                            else
+                                _bufferPosition1 = _loop_start;
+                        }
+                        _playbackRate = -_playbackRate;
+                        break;
+                    }            
+
+                    case looptype_none:            
+                    default:
+                    {
+                        //Serial.printf("end of loop...\n");
+                        /* no looping - return the number of (resampled) bytes returned... */
+                        close();
+                        return count;
+                    }
+                }   
+            }
+        
         }
         return count;
     }
@@ -361,13 +364,13 @@ public:
                             _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                             _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
                             if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel);
+                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+channel);
                             } else 
                             {
                                 _interpolationPoints[channel][3].y = 
-                                    getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel) * _crossfade 
+                                    getSourceBufferValue(_bufferPosition1-(i*_numChannels)+channel) * _crossfade 
                                     +
-                                    getSourceBufferValue(_bufferPosition2-(i*_numChannels)+1+channel) * (1.0 -_crossfade);
+                                    getSourceBufferValue(_bufferPosition2-(i*_numChannels)+channel) * (1.0 -_crossfade);
                             }
                             if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
                         }
@@ -383,13 +386,13 @@ public:
                             _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                             _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
                             if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel);
+                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)+channel);
                             } else 
                             {
                                 _interpolationPoints[channel][3].y = 
-                                    getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel) * _crossfade 
+                                    getSourceBufferValue(_bufferPosition1+(i*_numChannels)+channel) * _crossfade 
                                     +
-                                    getSourceBufferValue(_bufferPosition2+(i*_numChannels)-1+channel) * (1.0 - _crossfade); 
+                                    getSourceBufferValue(_bufferPosition2+(i*_numChannels)+channel) * (1.0 - _crossfade); 
                             }
                             if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
                             _lastInterpolationPosition[channel] = _bufferPosition1 / _numChannels;

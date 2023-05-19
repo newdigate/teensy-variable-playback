@@ -11,14 +11,14 @@
 extern unsigned char stereo_souljah_raw[];
 extern unsigned int stereo_souljah_raw_len;
 
-BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
+BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_noloop_forward_playback)
 
     const uint16_t numberOfChannels = 2;
     const std::string referencePath = "test/resources/reference/";
     const std::string inputPath = "test/resources/input/";
     const std::string outputPath = "output/";
     
-    BOOST_FIXTURE_TEST_CASE(Array_fwd_1_0000_quadratic_stereo_loop, AudioArrayFixture) {
+    BOOST_FIXTURE_TEST_CASE(Array_fwd_1_0000_quadratic_stereo_noloop, AudioArrayFixture) {
 
         // GUItool: begin automatically generated code
         AudioPlayArrayResmp      memory;        //xy=306,225
@@ -28,16 +28,13 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_forward_playback)
         // GUItool: end automatically generated code
 
         const double playbackRate = 1.0;
-        const std::string testName = "Array_fwd_1_0000_quadratic_stereo_loop";
+        const std::string testName = "Array_fwd_1_0000_quadratic_stereo_noloop";
         const std::string outputFile = testName+".wav";
         const std::string outputFileName = outputPath + outputFile;
         const std::string referenceFileName = referencePath+testName+".wav";
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();
-        memory.setLoopStart(0); 
-        memory.setLoopFinish(1000);
-        memory.setLoopType(loop_type::looptype_pingpong);
         memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)stereo_souljah_raw, stereo_souljah_raw_len / 2, numberOfChannels);

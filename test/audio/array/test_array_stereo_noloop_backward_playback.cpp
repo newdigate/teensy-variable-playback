@@ -11,7 +11,7 @@
 extern unsigned char stereo_souljah_raw[];
 extern unsigned int stereo_souljah_raw_len;
 
-BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_loop_backward_playback)
+BOOST_AUTO_TEST_SUITE(test_audio_array_stereo_noloop_backward_playback)
 
     const uint16_t numberOfChannels = 2;
     const std::string referencePath = "test/resources/reference/";

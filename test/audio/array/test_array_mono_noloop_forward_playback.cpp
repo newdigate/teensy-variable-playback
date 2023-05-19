@@ -11,7 +11,7 @@
 extern unsigned char kick_raw[];
 extern unsigned int kick_raw_len; // in bytes, divide by 2 to get samples
 
-BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
+BOOST_AUTO_TEST_SUITE(test_audio_array_mono_noloop_forward_playback)
 
     const uint16_t numberOfChannels = 1;
 
