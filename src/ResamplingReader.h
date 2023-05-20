@@ -169,6 +169,11 @@ public:
         }
 
         while (count < nsamples) {
+			// only needs doing once per sample, not repeatedly for every channel
+			if (_useDualPlaybackHead)
+				_updateCrossfade();
+
+			// get a new sample for each channel
             for (int channel=0; channel < _numChannels; channel++) 
 			{
 				bool readOK = false;
@@ -223,9 +228,77 @@ public:
 					}
 				}
             }
+			
+			// All channels done: step buffer positions on
+            _remainder += _playbackRate;
+
+            auto delta = static_cast<signed int>(_remainder);
+            _remainder -= static_cast<double>(delta);
+            _bufferPosition1 += (delta * _numChannels);
+			if (0 != _crossfadeState)  // doing a cross-fade
+			{
+				if (_loopType == loop_type::looptype_pingpong) // bufferPosition2 is going opposite to bufferPosition1
+					_bufferPosition2 -= (delta * _numChannels);
+				else
+					_bufferPosition2 += (delta * _numChannels);
+			}
         }
         return count;
     }
+
+private:	
+	void _updateCrossfade(void)
+	{           
+		if (_playbackRate >= 0.0) {
+			// See if playback has reached start of crossfade zone
+			if (_crossfadeState == 0 && _bufferPosition1 >= (_loop_finish - _numChannels * _crossfadeDurationInSamples)) {
+				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
+											?_loop_finish
+											:_loop_start;
+				_crossfadeState = 1;
+			}
+			
+			//*/
+		} else {
+			// See if playback has reached start of crossfade zone
+			if (_crossfadeState == 0 && _bufferPosition1 <= (_loop_start + _numChannels * _crossfadeDurationInSamples)) {
+				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
+											?_loop_start
+											:_loop_finish;
+				_crossfadeState = 1;
+			}
+		}
+		
+		// Compute or terminate crossfade
+		if (_crossfadeState == 1) 
+		{
+			if ((_loopType == loop_type::looptype_pingpong) != (_playbackRate > 0.0)) // bufferPosition2 is going forwards from start
+			{
+				if (_bufferPosition2 > (_loop_start + _crossfadeDurationInSamples*_numChannels))
+				{
+					_bufferPosition1 = _bufferPosition2;
+					_crossfadeState = 0; // stop crossfade
+				}
+				else // amount of audio from _bufferPosition1 to use						
+					_crossfade = 1.0 - ((_bufferPosition2 - _loop_start ) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
+			}
+			else // bufferPosition2 is going backwards from finish
+			{
+				if (_bufferPosition2 < (_loop_finish - _crossfadeDurationInSamples*_numChannels))
+				{
+					_bufferPosition1 = _bufferPosition2;
+					_crossfadeState = 0; // stop crossfade
+				}
+				else // amount of audio from _bufferPosition1 to use						
+					_crossfade = 1.0 - ((_loop_finish - _bufferPosition2) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
+			}
+			
+			// We never cause the caller to reverse playback when using 
+			// crossfade, so we have to do it ourselves here
+			if (0 == _crossfadeState && _loopType == loop_type::looptype_pingpong)
+				_playbackRate = -_playbackRate;
+		}
+	}
 
     // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
     bool readNextValue(int16_t *value, uint16_t channel) {
@@ -244,56 +317,6 @@ public:
                         return false;    
                 }
             }
-        } else {
-            if (_playbackRate >= 0.0) {
-				// See if playback has reached start of crossfade zone
-                if (_crossfadeState == 0 && _bufferPosition1 >= (_loop_finish - _numChannels * _crossfadeDurationInSamples)) {
-                    _bufferPosition2 = _loopType == loop_type::looptype_pingpong
-												?_loop_finish
-												:_loop_start;
-                    _crossfadeState = 1;
-				}
-				
-				//*/
-            } else {
-				// See if playback has reached start of crossfade zone
-                if (_crossfadeState == 0 && _bufferPosition1 <= (_loop_start + _numChannels * _crossfadeDurationInSamples)) {
-                    _bufferPosition2 = _loopType == loop_type::looptype_pingpong
-												?_loop_start
-												:_loop_finish;
-                    _crossfadeState = 1;
-				}
-            }
-			
-			// Compute or terminate crossfade
-			if (_crossfadeState == 1) 
-			{
-				if ((_loopType == loop_type::looptype_pingpong) != (_playbackRate > 0.0)) // bufferPosition2 is going forwards from start
-				{
-					if (_bufferPosition2 > (_loop_start + _crossfadeDurationInSamples*_numChannels))
-					{
-						_bufferPosition1 = _bufferPosition2;
-						_crossfadeState = 0; // stop crossfade
-					}
-					else // amount of audio from _bufferPosition1 to use						
-						_crossfade = 1.0 - ((_bufferPosition2 - _loop_start ) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
-				}
-				else // bufferPosition2 is going backwards from finish
-				{
-					if (_bufferPosition2 < (_loop_finish - _crossfadeDurationInSamples*_numChannels))
-					{
-						_bufferPosition1 = _bufferPosition2;
-						_crossfadeState = 0; // stop crossfade
-					}
-					else // amount of audio from _bufferPosition1 to use						
-						_crossfade = 1.0 - ((_loop_finish - _bufferPosition2) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
-				}
-				
-				// We never cause the caller to reverse playback when using 
-				// crossfade, so we have to do it ourselves here
-				if (0 == _crossfadeState && _loopType == loop_type::looptype_pingpong)
-					_playbackRate = -_playbackRate;
-			}
         }
 
         int16_t result = 0, resx = -1;
@@ -415,29 +438,11 @@ public:
         }
   
         *value = result;
-		
-		// Assume caller reads channels in order: increment buffer positions
-		// when the last channel's data has been read.
-        if (channel == _numChannels - 1) {
-//*value = _bufferPosition1;
-			
-            _remainder += _playbackRate;
-
-            auto delta = static_cast<signed int>(_remainder);
-            _remainder -= static_cast<double>(delta);
-            _bufferPosition1 += (delta * _numChannels);
-			if (0 != _crossfadeState)  // doing a cross-fade
-			{
-				if (_loopType == loop_type::looptype_pingpong) // bufferPosition2 is going opposite to bufferPosition1
-					_bufferPosition2 -= (delta * _numChannels);
-				else
-					_bufferPosition2 += (delta * _numChannels);
-			}
-        }
 
         return true;
     }
-	
+
+public:	
     void setPlaybackRate(double f) {
         _playbackRate = f;
         if (!_useDualPlaybackHead) {
