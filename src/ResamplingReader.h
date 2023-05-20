@@ -7,6 +7,7 @@
 #include "interpolation.h"
 #include "waveheaderparser.h"
 
+
 namespace newdigate {
 
 template<class TArray, class TFile>
@@ -181,19 +182,30 @@ public:
         }
 
         while (count < nsamples) {
-            for (int channel=0; channel < _numChannels; channel++) {
-                if (readNextValue(index[channel], channel)) {
+			// only needs doing once per sample, not repeatedly for every channel
+			if (_useDualPlaybackHead)
+				_updateCrossfade();
+
+			// get a new sample for each channel
+            for (int channel=0; channel < _numChannels; channel++) 
+			{
+				bool readOK = false;
+				
+				while (!readOK)
+				{
+					readOK = readNextValue(index[channel], channel);
+					
+					if (readOK) {
                     if (channel == _numChannels - 1)
                         count++;
                     index[channel]++;
                 }
                 else {
                     // we have reached the end of the file
-
+						_crossfadeState = 0;
                     switch (_loopType) {
                         case looptype_repeat:
                         {
-                            _crossfade = 0.0;
                             if (_playbackRate >= 0.0) 
                                 _bufferPosition1 = _loop_start;
                             else
@@ -229,8 +241,77 @@ public:
                 }
             }
         }		
+			
+			// All channels done: step buffer positions on
+            _remainder += _playbackRate;
+
+            auto delta = static_cast<signed int>(_remainder);
+            _remainder -= static_cast<double>(delta);
+            _bufferPosition1 += (delta * _numChannels);
+			if (0 != _crossfadeState)  // doing a cross-fade
+			{
+				if (_loopType == loop_type::looptype_pingpong) // bufferPosition2 is going opposite to bufferPosition1
+					_bufferPosition2 -= (delta * _numChannels);
+				else
+					_bufferPosition2 += (delta * _numChannels);
+			}
+        }
         return count;
     }
+
+private:	
+	void _updateCrossfade(void)
+	{           
+		if (_playbackRate >= 0.0) {
+    // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
+			if (_crossfadeState == 0 && _bufferPosition1 >= (_loop_finish - _numChannels * _crossfadeDurationInSamples)) {
+				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
+											?_loop_finish
+											:_loop_start;
+				_crossfadeState = 1;
+			}
+			
+			//*/
+		} else {
+			// See if playback has reached start of crossfade zone
+			if (_crossfadeState == 0 && _bufferPosition1 <= (_loop_start + _numChannels * _crossfadeDurationInSamples)) {
+				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
+											?_loop_start
+											:_loop_finish;
+				_crossfadeState = 1;
+			}
+		}
+		
+		// Compute or terminate crossfade
+		if (_crossfadeState == 1) 
+		{
+			if ((_loopType == loop_type::looptype_pingpong) != (_playbackRate > 0.0)) // bufferPosition2 is going forwards from start
+			{
+				if (_bufferPosition2 > (_loop_start + _crossfadeDurationInSamples*_numChannels))
+				{
+					_bufferPosition1 = _bufferPosition2;
+					_crossfadeState = 0; // stop crossfade
+				}
+				else // amount of audio from _bufferPosition1 to use						
+					_crossfade = 1.0 - ((_bufferPosition2 - _loop_start ) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
+			}
+			else // bufferPosition2 is going backwards from finish
+			{
+				if (_bufferPosition2 < (_loop_finish - _crossfadeDurationInSamples*_numChannels))
+				{
+					_bufferPosition1 = _bufferPosition2;
+					_crossfadeState = 0; // stop crossfade
+				}
+				else // amount of audio from _bufferPosition1 to use						
+					_crossfade = 1.0 - ((_loop_finish - _bufferPosition2) / _numChannels / static_cast<double>(_crossfadeDurationInSamples));
+			}
+			
+			// We never cause the caller to reverse playback when using 
+			// crossfade, so we have to do it ourselves here
+			if (0 == _crossfadeState && _loopType == loop_type::looptype_pingpong)
+				_playbackRate = -_playbackRate;
+		}
+	}
 
     // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
     bool readNextValue(int16_t *value, uint16_t channel) {
@@ -249,63 +330,18 @@ public:
                         return false;    
                 }
             }
-        } else {
-            if (_playbackRate >= 0.0) {
-                if (_crossfade == 0.0 && _bufferPosition1 > (_loop_finish - _numChannels) - _crossfadeDurationInSamples) {
-                    _bufferPosition2 = _loop_start;
-                    _crossfade = 1.0 - (( (_loop_finish-_numChannels) - _bufferPosition1 ) / static_cast<double>(_crossfadeDurationInSamples));
-                    _crossfadeState = 1;
-                } else if (_crossfade == 1.0 && _bufferPosition2 > (_loop_finish - _numChannels)- _crossfadeDurationInSamples) {
-                    _bufferPosition1 = _loop_start;
-                    _crossfade = ((_loop_finish - _numChannels) - _bufferPosition2) / static_cast<double>(_crossfadeDurationInSamples);
-                    _crossfadeState = 2;
-                } else if (_crossfadeState == 1) {
-                    _crossfade = 1.0 - (((_loop_finish - _numChannels) - _bufferPosition1) / static_cast<double>(_crossfadeDurationInSamples));
-                    if (_crossfade >= 1.0) {
-                        _crossfadeState = 0;
-                        _crossfade = 1.0;
                     }
-                } else if (_crossfadeState == 2) {
-                    _crossfade = ( (_loop_finish - _numChannels) - _bufferPosition2 ) / static_cast<double>(_crossfadeDurationInSamples);
-                    if (_crossfade <= 0.0) {
-                        _crossfadeState = 0;
-                        _crossfade = 0.0;
-                    }
-                }
-            } else {
-                if (_crossfade == 0.0 && _bufferPosition1 < _crossfadeDurationInSamples + _header_offset) {
-                    _bufferPosition2 = _loop_finish - _numChannels;
-                    _crossfade = 1.0 - (_bufferPosition1 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
-                    _crossfadeState = 1;
-                } else if (_crossfade == 1.0 && _bufferPosition2 < _crossfadeDurationInSamples + _header_offset) {
-                    _bufferPosition1 = _loop_finish - _numChannels;
-                    _crossfade = (_bufferPosition2 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
-                    _crossfadeState = 2;
-                } else if (_crossfadeState == 1) {
-                    _crossfade = 1.0 - (_bufferPosition1 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
-                    if (_crossfade >= 1.0) {
-                        _crossfadeState = 0;
-                        _crossfade = 1.0;
-                    }
-                } else if (_crossfadeState == 2) {
-                    _crossfade = (_bufferPosition2 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
-                    if (_crossfade <= 0.0) {
-                        _crossfadeState = 0;
-                        _crossfade = 0.0;
-                    }
-                }
-            }
-        }
 
-        int16_t result = 0;
-        if (!_useDualPlaybackHead || _crossfade == 0.0) {
-            result =  getSourceBufferValue(_bufferPosition1 + channel);
-        } else if (_crossfade == 1.0){
-            result =  getSourceBufferValue(_bufferPosition2 + channel);
+        int16_t result = 0, resx = -1;
+        if (!_useDualPlaybackHead || _crossfadeState == 0) {
+			resx = _bufferPosition1+channel;
+            result =  _getSourceBufferValue(_bufferPosition1, 0, channel);
+        } else if (_crossfade == 0.0) {
+            result =  _getSourceBufferValue(_bufferPosition2, 0, channel);
         } else{
-            int result1 =  getSourceBufferValue(_bufferPosition1 + channel);
-            int result2 =  getSourceBufferValue(_bufferPosition2 + channel);
-            result = ((1.0 - _crossfade ) * result1) + ((_crossfade) * result2);
+            int result1 =  _getSourceBufferValue(_bufferPosition1, 0, channel);
+            int result2 =  _getSourceBufferValue(_bufferPosition2, 0, channel);
+            result = ((1.0 - _crossfade ) * result2) + ((_crossfade) * result1);
         }
 
         if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
@@ -319,13 +355,10 @@ public:
                         if (!_useDualPlaybackHead) {
                             if ( _numInterpolationPoints < 2 &&_playbackRate > 1.0 && _bufferPosition1 - _numChannels > _header_offset * 2 ) {
                                 // need to update last sample
-                                _interpolationPoints[channel][1].y = getSourceBufferValue(_bufferPosition1 - _numChannels);
+                                _interpolationPoints[channel][1].y = _getSourceBufferValue(_bufferPosition1, -1, channel);
                             }
                         }
-                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                        _interpolationPoints[channel][1].y = result;
-                        if (_numInterpolationPoints < 2)
-                            _numInterpolationPoints++;
+						_addInterpolationPoint(channel,-resx,result);
                     }
                 } 
                 else if (_playbackRate < 0) {
@@ -334,13 +367,10 @@ public:
                         if (!_useDualPlaybackHead) {
                             if (_numInterpolationPoints < 2  && _playbackRate < -1.0) {
                                 // need to update last sample
-                                _interpolationPoints[channel][1].y = getSourceBufferValue(_bufferPosition1 + _numChannels);
+                                _interpolationPoints[channel][1].y = _getSourceBufferValue(_bufferPosition1, 1, channel);
                             }
                         }
-                        _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                        _interpolationPoints[channel][1].y = result;
-                        if (_numInterpolationPoints < 2)
-                            _numInterpolationPoints++;
+						_addInterpolationPoint(channel,-resx,result);
                     }
                 }
 
@@ -348,37 +378,31 @@ public:
                     result = abs_remainder * _interpolationPoints[channel][1].y + (1.0 - abs_remainder) * _interpolationPoints[channel][0].y;
                 }
             } else {
-                _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                _interpolationPoints[channel][1].y = result;
-                if (_numInterpolationPoints < 2)
-                    _numInterpolationPoints++;
-
+				_addInterpolationPoint(channel,-resx,result);				
                 result =_interpolationPoints[channel][0].y;
             }
         } 
         else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
             double abs_remainder = abs(_remainder);
 //#undef abs			
-            if (abs_remainder > 0.0) {
+            if (true || abs_remainder > 0.0) {
                 if (_playbackRate > 0) {                
                     if (_remainder - _playbackRate < 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
-                        int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
+                        numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                            _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
-                            _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                            if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+1+channel);
-                            } else 
-                            {
-                                _interpolationPoints[channel][3].y = result;
+							int16_t y = _getSourceBufferValue(_bufferPosition1, 1-i, channel);
+							
+							if (_useDualPlaybackHead && 0 != _crossfadeState)
+								y = y * _crossfade
+									+ _getSourceBufferValue(_bufferPosition2, _loopType == loop_type::looptype_pingpong?(i-1):(1-i), channel) * (1.0 - _crossfade);
+									
+							_addInterpolationPoint(channel,_bufferPosition1 + (1-i)*_numChannels+channel,y);
+							
                             }
-                            if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
-                    }
                 } 
                 else if (_playbackRate < 0) {                
                     if (_remainder - _playbackRate > 0.0){
@@ -387,19 +411,16 @@ public:
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
-                            _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                            _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
-                            _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                            if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1+(i*_numChannels)-1+channel);
-                            } else 
-                            {
-                                _interpolationPoints[channel][3].y = result;
+							int16_t y = _getSourceBufferValue(_bufferPosition1, i-1, channel);
+							
+							if (_useDualPlaybackHead && 0 != _crossfadeState)
+								y = y * _crossfade
+									+ _getSourceBufferValue(_bufferPosition2, _loopType == loop_type::looptype_pingpong?(1-i):(i-1), channel) * (1.0 - _crossfade);
+									
+							_addInterpolationPoint(channel,_bufferPosition1 + (i-1)*_numChannels+channel,y);
                             }
-                            if (_numInterpolationPoints < 4) _numInterpolationPoints++;
                         }
                     }
-                }
                 
                 if (_numInterpolationPoints >= 4) {
                     //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
@@ -415,10 +436,13 @@ public:
                 } else 
                     result = 0;
             } else {
-                _interpolationPoints[channel][0].y = _interpolationPoints[channel][1].y;
-                _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
-                _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
-                _interpolationPoints[channel][3].y = result;
+                int numberOfSamplesToUpdate = (_playbackRate < 0.0)? ceil(_playbackRate) : floor(_playbackRate);
+                if (numberOfSamplesToUpdate > 4) 
+                    numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
+                for (int i=numberOfSamplesToUpdate; i > 0; i--) {
+					_addInterpolationPoint(channel,-resx,result);
+                }
+
                 if (_numInterpolationPoints < 4) {
                     _numInterpolationPoints++;
                     result = 0;
@@ -428,26 +452,12 @@ public:
             }
         }
   
-        if (channel == _numChannels - 1) {
-            _remainder += _playbackRate;
-
-            auto delta = static_cast<signed int>(_remainder);
-            _remainder -= static_cast<double>(delta);
-            if (!_useDualPlaybackHead) {
-                _bufferPosition1 += (delta * _numChannels);
-            } else {
-                if (_crossfade < 1.0)
-                    _bufferPosition1 += (delta * _numChannels);
-
-                if (_crossfade > 0.0)
-                    _bufferPosition2 += (delta * _numChannels);
-                }
-        }
-
         *value = result;
+
         return true;
     }
 
+public:	
     void setPlaybackRate(double f) {
         _playbackRate = f;
         if (!_useDualPlaybackHead) {
@@ -516,6 +526,7 @@ public:
             initializeInterpolationPoints();
         }
         _numInterpolationPoints = 0;
+		
         if (_playbackRate > 0.0) {
             // forward playabck - set _file_offset to first audio block in file
             if (_play_start == play_start::play_start_sample)
@@ -530,6 +541,7 @@ public:
                 _bufferPosition1 = _loop_finish - _numChannels;
         }
         _crossfade = 0.0;
+		_crossfadeState = 0;
     }
 
     void setLoopStart(uint32_t loop_start) {
@@ -628,6 +640,7 @@ public:
     
     
 protected:
+int numberOfSamplesToUpdate;
     volatile bool _playing = false;
 
     int32_t _file_size;
@@ -662,11 +675,11 @@ protected:
         deleteInterpolationPoints();
         _interpolationPoints = new InterpolationData*[_numChannels];
         for (int channel=0; channel < _numChannels; channel++) {        
-            InterpolationData *interpolation = new InterpolationData[4];
-            interpolation[0].y = 0.0;
-            interpolation[1].y = 0.0;    
-            interpolation[2].y = 0.0;    
-            interpolation[3].y = 0.0;
+            InterpolationData *interpolation = new InterpolationData[4], empty = {0,0};
+            interpolation[0] = empty;
+            interpolation[1] = empty;
+            interpolation[2] = empty;
+            interpolation[3] = empty;
             _interpolationPoints[channel] = interpolation ;
         }
         _numInterpolationPointsChannels = _numChannels;
@@ -682,6 +695,31 @@ protected:
         _interpolationPoints = nullptr;
         _numInterpolationPointsChannels = 0;
     }
+	
+	int16_t _getSourceBufferValue(int pos, int offset, uint16_t channel) 
+		{ return getSourceBufferValue(pos + offset*_numChannels + channel); }
+
+	void _addInterpolationPoint(uint16_t channel, uint32_t x, int16_t y)
+	{
+		switch (_interpolationType)
+		{
+			case resampleinterpolation_linear:
+				_interpolationPoints[channel][0] = _interpolationPoints[channel][1];
+				_interpolationPoints[channel][1].x = x;
+				_interpolationPoints[channel][1].y = y;
+				if (_numInterpolationPoints < 2) _numInterpolationPoints++;
+				break;
+				
+			case resampleinterpolation_quadratic:
+				_interpolationPoints[channel][0] = _interpolationPoints[channel][1];
+				_interpolationPoints[channel][1] = _interpolationPoints[channel][2];
+				_interpolationPoints[channel][2] = _interpolationPoints[channel][3];
+				_interpolationPoints[channel][3].x = x;
+				_interpolationPoints[channel][3].y = y;
+				if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+				break;
+		}
+	}
 
 };
 
