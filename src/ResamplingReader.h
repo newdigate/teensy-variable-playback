@@ -225,16 +225,30 @@ public:
 
     // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
     bool readNextValue(int16_t *value, uint16_t channel) {
+        bool endOfFile = false;
         if (!_useDualPlaybackHead) {
             if (_playbackRate >= 0 ) {
                 //forward playback
-                if (_bufferPosition1 >=  _loop_finish )
-                    return false;
+                if (_bufferPosition1 >=  _loop_finish ) {
+                    if (_interpolationType != ResampleInterpolationType::resampleinterpolation_quadratic)
+                        return false;
+
+                    endOfFile = true;
+                    if (_bufferPosition1/_numChannels > _loop_finish/_numChannels + 2) {
+                       return false;
+                    }
+                }
             } else if (_playbackRate < 0) {
                 // reverse playback
                 if (_play_start == play_start::play_start_sample) {
-                    if (_bufferPosition1 < _header_offset)
-                        return false;
+                    if (_bufferPosition1 < _header_offset) {
+                        if (_interpolationType != ResampleInterpolationType::resampleinterpolation_quadratic)
+                            return false;
+                        endOfFile = true;
+                        if (_bufferPosition1 < _header_offset - 2) {
+                            return false;
+                        }
+                    }
                 } else {
                     if (_bufferPosition1 < _loop_start)
                         return false;    
@@ -289,14 +303,16 @@ public:
         }
 
         int16_t result = 0;
-        if (!_useDualPlaybackHead || _crossfade == 0.0) {
-            result =  getSourceBufferValue(_bufferPosition1 + channel);
-        } else if (_crossfade == 1.0){
-            result =  getSourceBufferValue(_bufferPosition2 + channel);
-        } else{
-            int result1 =  getSourceBufferValue(_bufferPosition1 + channel);
-            int result2 =  getSourceBufferValue(_bufferPosition2 + channel);
-            result = ((1.0 - _crossfade ) * result1) + ((_crossfade) * result2);
+        if (!endOfFile) {
+            if (!_useDualPlaybackHead || _crossfade == 0.0) {
+                result =  getSourceBufferValue(_bufferPosition1 + channel);
+            } else if (_crossfade == 1.0){
+                result =  getSourceBufferValue(_bufferPosition2 + channel);
+            } else{
+                int result1 =  getSourceBufferValue(_bufferPosition1 + channel);
+                int result2 =  getSourceBufferValue(_bufferPosition2 + channel);
+                result = ((1.0 - _crossfade ) * result1) + ((_crossfade) * result2);
+            }
         }
 
         if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
@@ -350,8 +366,8 @@ public:
             int delta = abs(_bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
             //Serial.printf("delta %d %d:\n", delta, _bufferPosition1/_numChannels - _lastInterpolationPosition[channel]);
             if (_numInterpolationPoints[channel] == 0){
-                 _interpolationPoints[channel][3].y = result;
                  _numInterpolationPoints[channel] = 1;
+                Serial.printf("initial interpolation value ch:%d : %d = %d\n", channel, _bufferPosition1, 0);
             }
             if (delta > 0) {
                 if (_playbackRate > 0) {                
@@ -364,7 +380,10 @@ public:
                             _interpolationPoints[channel][1].y = _interpolationPoints[channel][2].y;
                             _interpolationPoints[channel][2].y = _interpolationPoints[channel][3].y;
                             if (!_useDualPlaybackHead) {
-                                _interpolationPoints[channel][3].y = getSourceBufferValue(_bufferPosition1-(i*_numChannels)+channel);
+                                int sampleIndex = _bufferPosition1 - ((numberOfSamplesToUpdate-1)*_numChannels) + channel;
+                                int sampleValue = (sampleIndex >= _loop_finish)? 0 : getSourceBufferValue(sampleIndex);
+                                //Serial.printf("interpolation value ch:%d : %d = %d\n", channel, sampleIndex, sampleValue);
+                                _interpolationPoints[channel][3].y = sampleValue;
                             } else 
                             {
                                 _interpolationPoints[channel][3].y = 
@@ -409,7 +428,7 @@ public:
                                 _interpolationPoints[channel][2].y, 
                                 _interpolationPoints[channel][3].y, 
                                 1.0 + abs(_remainder)); 
-                        /*
+                        
                         Serial.printf("[%d %d %d %d] @ %f = %d \n",
                                 _interpolationPoints[channel][0].y, 
                                 _interpolationPoints[channel][1].y, 
@@ -418,15 +437,27 @@ public:
                                 1.0 + abs(_remainder),
                                 interpolation
                         );
-                        */
+                        
                         result = interpolation;
-                    } else 
+                    } else if (_numInterpolationPoints[channel] >= 3) {
+
+                    } else
                         result = 0;
             } else {
-                if (_numInterpolationPoints[channel] < 4) {
+                if (_numInterpolationPoints[channel] < 2) {
                     result = 0;
-                } else 
-                    result = _interpolationPoints[channel][1].y;
+                } else { 
+                    //if (!endOfFile) {
+                        result = _interpolationPoints[channel][1].y;
+                        Serial.printf("result: ch:%d @1.0  = %d\n", channel, result);
+                    //}
+                    /*else {
+                        int overrun = (_bufferPosition1 - _loop_finish) / _numChannels;
+                        result = _interpolationPoints[channel][1 + overrun].y;
+                        Serial.printf("result: ch:%d @%f = %d\n", channel, 1.0 + overrun, result);
+                    }
+                    */
+                }
             }
         }
 
