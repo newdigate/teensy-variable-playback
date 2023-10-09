@@ -103,8 +103,8 @@ class AudioPlayResmp : public AudioStream, public EventResponder
             reader->setCrossfadeDurationInSamples(crossfadeDurationInSamples);
         }
 
-        void setPlayStart(play_start start) {
-            reader->setPlayStart(start);
+        void setPlayStart(play_start start, uint32_t playback_start = 0) {
+            reader->setPlayStart(start, playback_start);
         }
 
         void enableInterpolation(bool enable) {

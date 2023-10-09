@@ -292,8 +292,8 @@ public:
 	 */
 	indexedbuffer* findMaxBuffer(bool includeLoopEnds = false)
 	{
-		size_t max=0;
-		indexedbuffer* rv = nullptr;
+		indexedbuffer* rv = _buffers.at(0);
+		size_t max = rv->index;
 		
 		if (includeLoopEnds)
 		{
@@ -326,8 +326,8 @@ public:
 	 */
 	indexedbuffer* findMinBuffer(bool includeLoopEnds = false)
 	{
-		size_t min=-1; // actually will be maximum value, as size_t is unsigned
-		indexedbuffer* rv = nullptr;
+		indexedbuffer* rv = _buffers.at(0);
+		size_t min = rv->index;
 		
 		if (includeLoopEnds)
 		{
@@ -388,7 +388,6 @@ public:
 	TVP_DEBUG.print(buf->index);
 #endif // defined(TVP_DEBUG)
 		
-
 		return bytesRead;
 	}
 	
