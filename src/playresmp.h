@@ -33,7 +33,6 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 						break;
 						
 					case evClose:
-						readerClose();
 						reader->close();
 						break;
 				}

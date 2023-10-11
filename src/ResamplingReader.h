@@ -46,6 +46,7 @@ public:
         _file_size = length * 2;
         _loop_start = 0;
         _loop_finish = length;
+		_file_samples = length;
         setNumChannels(numChannels);
 
         reset();
@@ -112,11 +113,11 @@ public:
             }
 
             _header_offset = (44 + infoTagsSize) / 2;
-            _loop_finish = ((data_header.data_bytes) / 2) + _header_offset; 
+            _file_samples = ((data_header.data_bytes) / 2) + _header_offset; 
         } else 
-            _loop_finish = _file_size / 2;
-        
-        file.close();
+            _file_samples = _file_size / 2;
+		
+		file.close();
 
         if (_file_size <= _header_offset * sizeof(int16_t)) {
             _playing = false;
@@ -125,11 +126,19 @@ public:
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }
+        
+        _file_samples /= _numChannels; // make sample coount same basis as loop start/finish
 
-        _sourceBuffer = createSourceBuffer();
+		if (looptype_none == _loopType)
+		{
+			_loop_start = 0;
+			_loop_finish = _file_samples;
+		}
+        
+		_sourceBuffer = createSourceBuffer();
 		_sourceBuffer->setLoopType(_loopType);
-		_sourceBuffer->setLoopStart(_loop_start);
-		_sourceBuffer->setLoopFinish(_loop_finish);
+		_sourceBuffer->setLoopStart(_samples_to_start(_loop_start));
+		_sourceBuffer->setLoopFinish(_samples_to_start(_loop_finish));
         reset(); // sets _bufferPosition1 ready for playback
 		if (_playbackRate >= 0.0f)
 			_sourceBuffer->preLoadBuffers(_bufferPosition1, _bufferInPSRAM);
@@ -268,7 +277,7 @@ private:
 	{           
 		if (_playbackRate >= 0.0) {
     // read the sample value for given channel and store it at the location pointed to by the pointer 'value'
-			if (_crossfadeState == 0 && _bufferPosition1 >= (_loop_finish - _numChannels * _crossfadeDurationInSamples)) {
+			if (_crossfadeState == 0 && _bufferPosition1 >= (_samples_to_start(_loop_finish - _crossfadeDurationInSamples))) {
 				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
 											?_loop_finish
 											:_loop_start;
@@ -279,7 +288,7 @@ private:
 			//*/
 		} else {
 			// See if playback has reached start of crossfade zone
-			if (_crossfadeState == 0 && _bufferPosition1 <= (_loop_start + _numChannels * _crossfadeDurationInSamples)) {
+			if (_crossfadeState == 0 && _bufferPosition1 <= (_samples_to_start(_loop_start + _crossfadeDurationInSamples))) {
 				_bufferPosition2 = _loopType == loop_type::looptype_pingpong
 											?_loop_start
 											:_loop_finish;
@@ -293,7 +302,7 @@ private:
 		{
 			if ((_loopType == loop_type::looptype_pingpong) != (_playbackRate > 0.0)) // bufferPosition2 is going forwards from start
 			{
-				if (_bufferPosition2 > (_samples_to_start(_loop_start) + _crossfadeDurationInSamples*_numChannels))
+				if (_bufferPosition2 > _samples_to_start(_loop_start + _crossfadeDurationInSamples))
 				{
 					_bufferPosition1 = _bufferPosition2;
 					_crossfadeState = 0; // stop crossfade
@@ -303,7 +312,7 @@ private:
 			}
 			else // bufferPosition2 is going backwards from finish
 			{
-				if (_bufferPosition2 < (_samples_to_start(_loop_finish) - _crossfadeDurationInSamples*_numChannels))
+				if (_bufferPosition2 < _samples_to_start(_loop_finish - _crossfadeDurationInSamples))
 				{
 					_bufferPosition1 = _bufferPosition2;
 					_crossfadeState = 0; // stop crossfade
@@ -323,16 +332,24 @@ private:
     bool readNextValue(int16_t *value, uint16_t channel) {
         if (!_useDualPlaybackHead) {
             if (_playbackRate >= 0 ) {
-                //forward playback
-                if (_bufferPosition1 >=  _loop_finish )
-                    return false;
+                // forward playback ...
+                if (looptype_none == _loopType) // ...not looping
+				{
+					if (_bufferPosition1 >=  _samples_to_start(_file_samples) )
+						return false;
+				}
+				else // ... looping
+				{
+					if (_bufferPosition1 >=  _samples_to_start(_loop_finish) )
+						return false;
+				}
             } else if (_playbackRate < 0) {
                 // reverse playback
                 if (_play_start == play_start::play_start_sample) {
                     if (_bufferPosition1 < _header_offset)
                         return false;
                 } else {
-                    if (_bufferPosition1 < _loop_start)
+                    if (_bufferPosition1 < _samples_to_start(_loop_start))
                         return false;    
                 }
             }
@@ -470,16 +487,16 @@ public:
             if (f < 0.0) {
                 if  (_bufferPosition1 <= _header_offset) {
                     if (_play_start == play_start::play_start_sample)
-                        _bufferPosition1 = _file_size/2 - _numChannels;
+                        _bufferPosition1 = _samples_to_start(_file_samples - 1);
                     else
-                        _bufferPosition1 = _loop_finish - _numChannels;
+                        _bufferPosition1 = _samples_to_start(_loop_finish - 1);
                 } 
             } else {
                 if (f >= 0.0 && _bufferPosition1 < _header_offset) {
                     if (_play_start == play_start::play_start_sample) 
-                        _bufferPosition1 = _header_offset;
+                        _bufferPosition1 = _samples_to_start(0);
                     else
-                        _bufferPosition1 = _loop_start;
+                        _bufferPosition1 = _samples_to_start(_loop_start);
                 }
             }
         } else { 
@@ -488,9 +505,9 @@ public:
                 if (f < 0.0) { 
                     if( _bufferPosition1 <= _header_offset) {
                         if (_play_start == play_start::play_start_sample)
-                            _bufferPosition1 = _file_size/2 - _numChannels;
+                            _bufferPosition1 = _samples_to_start(_file_samples - 1);
                         else
-                            _bufferPosition1 = _loop_finish - _numChannels;
+                            _bufferPosition1 = _samples_to_start(_loop_finish - 1);
                     }
                 } else {
                     if (f >= 0.0 && _bufferPosition1 < _header_offset) {
@@ -507,8 +524,8 @@ public:
 
     void loop(uint32_t numSamples) {
         int bufferPosition = (_crossfade < 1.0)? _bufferPosition1 : _bufferPosition2;
-        _loop_start = bufferPosition;
-        _loop_finish = bufferPosition + numSamples * _numChannels;
+        _loop_start = bufferPosition / _numChannels;
+        _loop_finish = bufferPosition / _numChannels + numSamples;
         _loopType = loop_type::looptype_repeat;
     }
 
@@ -542,13 +559,13 @@ public:
 			switch (_play_start)
 			{
 				case play_start::play_start_sample: // first audio block in file
-					_bufferPosition1 = _header_offset;
+					_bufferPosition1 = _samples_to_start(0);
 					break;
 				case play_start::play_start_loop: 	// loop start
-					_bufferPosition1 = _loop_start;
+					_bufferPosition1 = _samples_to_start(_loop_start);
 					break;					
 				case play_start::play_start_arbitrary: // user-defined position
-					_bufferPosition1 = _playback_start;
+					_bufferPosition1 = _samples_to_start(_playback_start);
 					break;
 			}		
         } 
@@ -561,10 +578,10 @@ public:
 					_bufferPosition1 = _file_size/2 - _numChannels;
 					break;
 				case play_start::play_start_loop:
-					_bufferPosition1 = _loop_finish - _numChannels;
+					_bufferPosition1 = _samples_to_start(_loop_finish - _numChannels);
 					break;
 				case play_start::play_start_arbitrary: // user-defined position
-					_bufferPosition1 = _playback_start;
+					_bufferPosition1 = _samples_to_start(_playback_start);
 					break;
 			}
         }
@@ -695,6 +712,7 @@ int numberOfSamplesToUpdate;
 	int32_t _playback_start = 0;
     int32_t _loop_start = 0;
     int32_t _loop_finish = 0;
+	int32_t _file_samples = 0;
     int16_t _numChannels = -1;
     uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
