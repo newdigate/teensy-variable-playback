@@ -6,6 +6,8 @@
 #include "loop_type.h"
 #include "EventResponder.h"
 
+extern void readerClose(void);
+
 template <class TResamplingReader>
 class AudioPlayResmp : public AudioStream, public EventResponder
 {
@@ -31,6 +33,7 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 						break;
 						
 					case evClose:
+						readerClose();
 						reader->close();
 						break;
 				}

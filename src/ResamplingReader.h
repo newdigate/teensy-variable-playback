@@ -128,8 +128,8 @@ public:
 
         _sourceBuffer = createSourceBuffer();
 		_sourceBuffer->setLoopType(_loopType);
-		_sourceBuffer->setLoopStart(_samples_to_start(_loop_start));
-		_sourceBuffer->setLoopFinish(_samples_to_start(_loop_finish));
+		_sourceBuffer->setLoopStart(_loop_start);
+		_sourceBuffer->setLoopFinish(_loop_finish);
         reset(); // sets _bufferPosition1 ready for playback
 		if (_playbackRate >= 0.0f)
 			_sourceBuffer->preLoadBuffers(_bufferPosition1, _bufferInPSRAM);
@@ -180,7 +180,8 @@ public:
             index[channel] = (int16_t*)buf[channel];
         }
 
-        while (count < nsamples) {
+        while (count < nsamples) 
+		{
 			// only needs doing once per sample, not repeatedly for every channel
 			if (_useDualPlaybackHead)
 				_updateCrossfade();
@@ -194,52 +195,56 @@ public:
 				{
 					readOK = readNextValue(index[channel], channel);
 					
-					if (readOK) {
-                    if (channel == _numChannels - 1)
-                        count++;
-                    index[channel]++;
-                }
-                else {
-                    // we have reached the end of the file
+					if (readOK) 
+					{
+						if (channel == _numChannels - 1)
+							count++;
+						index[channel]++;
+					}
+					else 
+					{
+						// we have reached the end of the file: this is true for all channels
+						// so the early return if we're not looping doesn't fail to load
+						// data that it should
 						_crossfadeState = 0;
-                    switch (_loopType) {
-                        case looptype_repeat:
-                        {
-                            if (_playbackRate >= 0.0) 
-                                _bufferPosition1 = _samples_to_start(_loop_start);
-                            else
-                                _bufferPosition1 = _samples_to_start(_loop_finish) - _numChannels;
+						switch (_loopType) 
+						{
+							case looptype_repeat:
+							{
+								if (_playbackRate >= 0.0) 
+									_bufferPosition1 = _samples_to_start(_loop_start);
+								else
+									_bufferPosition1 = _samples_to_start(_loop_finish - _numChannels);
+								break;
+							}
 
-                            break;
-                        }
+							case looptype_pingpong:
+							{
+								if (_playbackRate >= 0.0) {
+									_bufferPosition1 = _samples_to_start(_loop_finish - _numChannels);
+								}
+								else {
+									if (_play_start == play_start::play_start_sample)
+										_bufferPosition1 = _header_offset;
+									else
+										_bufferPosition1 = _samples_to_start(_loop_start);
+								}
+								_playbackRate = -_playbackRate;
+								break;
+							}            
 
-                        case looptype_pingpong:
-                        {
-                            if (_playbackRate >= 0.0) {
-                                _bufferPosition1 = _samples_to_start(_loop_finish) - _numChannels;
-                            }
-                            else {
-                                if (_play_start == play_start::play_start_sample)
-                                    _bufferPosition1 = _header_offset;
-                                else
-                                    _bufferPosition1 = _samples_to_start(_loop_start);
-                            }
-                            _playbackRate = -_playbackRate;
-                            break;
-                        }            
-
-                        case looptype_none:            
-                        default:
-                        {
-                            //Serial.printf("end of loop...\n");
-                            /* no looping - return the number of (resampled) bytes returned... */
-                            // close(); // can't close(), called from update interrupt!
-                            return count;
-                        }
-                    }   
-                }
-            }
-        }		
+							case looptype_none:            
+							default:
+							{
+								//Serial.printf("end of loop...\n");
+								/* no looping - return the number of (resampled) bytes returned... */
+								// close(); // can't close(), called from update interrupt!
+								return count;
+							}
+						}   
+					}
+				}
+			}		
 			
 			// All channels done: step buffer positions on
             _remainder += _playbackRate;
@@ -319,7 +324,7 @@ private:
         if (!_useDualPlaybackHead) {
             if (_playbackRate >= 0 ) {
                 //forward playback
-                if (_bufferPosition1 >=  _samples_to_start(_loop_finish) )
+                if (_bufferPosition1 >=  _loop_finish )
                     return false;
             } else if (_playbackRate < 0) {
                 // reverse playback
@@ -327,11 +332,11 @@ private:
                     if (_bufferPosition1 < _header_offset)
                         return false;
                 } else {
-                    if (_bufferPosition1 < _samples_to_start(_loop_start))
+                    if (_bufferPosition1 < _loop_start)
                         return false;    
                 }
             }
-                    }
+        }
 
         int16_t result = 0, resx = -1;
         if (!_useDualPlaybackHead || _crossfadeState == 0) {
@@ -474,7 +479,7 @@ public:
                     if (_play_start == play_start::play_start_sample) 
                         _bufferPosition1 = _header_offset;
                     else
-                        _bufferPosition1 = _samples_to_start(_loop_start);
+                        _bufferPosition1 = _loop_start;
                 }
             }
         } else { 
@@ -485,7 +490,7 @@ public:
                         if (_play_start == play_start::play_start_sample)
                             _bufferPosition1 = _file_size/2 - _numChannels;
                         else
-                            _bufferPosition1 = _samples_to_start(_loop_finish) - _numChannels;
+                            _bufferPosition1 = _loop_finish - _numChannels;
                     }
                 } else {
                     if (f >= 0.0 && _bufferPosition1 < _header_offset) {
@@ -540,10 +545,10 @@ public:
 					_bufferPosition1 = _header_offset;
 					break;
 				case play_start::play_start_loop: 	// loop start
-					_bufferPosition1 = _samples_to_start(_loop_start);
+					_bufferPosition1 = _loop_start;
 					break;					
 				case play_start::play_start_arbitrary: // user-defined position
-					_bufferPosition1 = _samples_to_start(_playback_start);
+					_bufferPosition1 = _playback_start;
 					break;
 			}		
         } 
@@ -556,10 +561,10 @@ public:
 					_bufferPosition1 = _file_size/2 - _numChannels;
 					break;
 				case play_start::play_start_loop:
-					_bufferPosition1 = _samples_to_start(_loop_finish) - _numChannels;
+					_bufferPosition1 = _loop_finish - _numChannels;
 					break;
 				case play_start::play_start_arbitrary: // user-defined position
-					_bufferPosition1 = _samples_to_start(_playback_start);
+					_bufferPosition1 = _playback_start;
 					break;
 			}
         }

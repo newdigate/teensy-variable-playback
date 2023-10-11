@@ -495,7 +495,7 @@ protected:
 	// return pointer to correct indexedbuffer, or nullptr if not buffered
     indexedbuffer* find_with_index(uint32_t i) {
         for (auto && x : _buffers){
-            if (x->index == i) {
+            if (x->index == i && x->buffer_size > 0) {
                 return x;
             }
 			if (read != x->status)
