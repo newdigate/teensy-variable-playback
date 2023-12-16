@@ -54,6 +54,12 @@ class AudioPlayResmp : public AudioStream
             return playWav((int16_t *) data, fileSize);
         }
 
+        bool playWav(int16_t *data)
+        {
+            stop();
+            return reader->playWav(data);
+        }
+
         void setPlaybackRate(float f) {
             reader->setPlaybackRate(f);
         }
