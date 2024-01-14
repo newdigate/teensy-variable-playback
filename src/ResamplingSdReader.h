@@ -56,7 +56,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableSDFile<128, 4>* createSourceBuffer() override {

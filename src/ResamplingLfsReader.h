@@ -52,7 +52,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableLittleFSFile<128, 2>* createSourceBuffer() override {

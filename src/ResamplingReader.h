@@ -674,33 +674,12 @@ protected:
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
     unsigned int _numInterpolationPoints[8] = {0};
-    InterpolationData **_interpolationPoints = nullptr;
+    InterpolationData _interpolationPoints[8][4] = {0};
     
     void initializeInterpolationPoints(void) {
         if (_numChannels < 0)
             return;
             
-        deleteInterpolationPoints();
-        _interpolationPoints = new InterpolationData*[_numChannels];
-        for (int channel=0; channel < _numChannels; channel++) {        
-            InterpolationData *interpolation = new InterpolationData[4];
-            interpolation[0].y = 0.0;
-            interpolation[1].y = 0.0;    
-            interpolation[2].y = 0.0;    
-            interpolation[3].y = 0.0;
-            _interpolationPoints[channel] = interpolation ;
-        }
-        _numInterpolationPointsChannels = _numChannels;
-    }
-
-    void deleteInterpolationPoints(void)
-    {
-        if (!_interpolationPoints) return;
-        for (int i=0; i<_numInterpolationPointsChannels; i++) {
-            delete [] _interpolationPoints[i];
-        }
-        delete [] _interpolationPoints;
-        _interpolationPoints = nullptr;
         _numInterpolationPointsChannels = 0;
     }
 

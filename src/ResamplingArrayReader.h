@@ -34,7 +34,6 @@ public:
     void close(void) override {
         if (_playing) {
             stop();
-            deleteInterpolationPoints();
         }
     }
 

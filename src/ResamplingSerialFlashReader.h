@@ -56,7 +56,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableSerialFlashFile<128, 2>* createSourceBuffer() override {
