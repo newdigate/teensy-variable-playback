@@ -20,6 +20,20 @@ constexpr bool isPowerOf2(size_t value){
 
 template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
 class IndexableFile {
+protected:
+    TFile _file;
+    char *_filename;
+    std::vector<indexedbuffer*> _buffers;
+
+    indexedbuffer* find_with_index(uint32_t i) {
+        for (auto && x : _buffers){
+            if (x->index == i) {
+                return x;
+            }
+        }
+        return nullptr;
+    }
+
 public:
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
     
@@ -84,20 +98,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }    
-    }
-
-protected:
-    TFile _file;
-    char *_filename;
-    std::vector<indexedbuffer*> _buffers;
-
-    indexedbuffer* find_with_index(uint32_t i) {
-        for (auto && x : _buffers){
-            if (x->index == i) {
-                return x;
-            }
-        }
-        return nullptr;
     }
 };
 
