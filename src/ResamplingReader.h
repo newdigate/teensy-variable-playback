@@ -268,11 +268,11 @@ public:
             }
         } else {
             if (_playbackRate >= 0.0) {
-                if (_crossfade == 0.0 && _bufferPosition1 > (_loop_finish - _numChannels) - _crossfadeDurationInSamples) {
+                if (_crossfade == 0.0 && _bufferPosition1 > int32_t((_loop_finish - _numChannels) - _crossfadeDurationInSamples)) {
                     _bufferPosition2 = _loop_start;
                     _crossfade = 1.0 - (( (_loop_finish-_numChannels) - _bufferPosition1 ) / static_cast<double>(_crossfadeDurationInSamples));
                     _crossfadeState = 1;
-                } else if (_crossfade == 1.0 && _bufferPosition2 > (_loop_finish - _numChannels)- _crossfadeDurationInSamples) {
+                } else if (_crossfade == 1.0 && _bufferPosition2 > int32_t((_loop_finish - _numChannels)- _crossfadeDurationInSamples)) {
                     _bufferPosition1 = _loop_start;
                     _crossfade = ((_loop_finish - _numChannels) - _bufferPosition2) / static_cast<double>(_crossfadeDurationInSamples);
                     _crossfadeState = 2;
@@ -290,11 +290,11 @@ public:
                     }
                 }
             } else {
-                if (_crossfade == 0.0 && _bufferPosition1 < _crossfadeDurationInSamples + _header_offset) {
+                if (_crossfade == 0.0 && _bufferPosition1 < int32_t(_crossfadeDurationInSamples + _header_offset)) {
                     _bufferPosition2 = _loop_finish - _numChannels;
                     _crossfade = 1.0 - (_bufferPosition1 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
                     _crossfadeState = 1;
-                } else if (_crossfade == 1.0 && _bufferPosition2 < _crossfadeDurationInSamples + _header_offset) {
+                } else if (_crossfade == 1.0 && _bufferPosition2 < int32_t(_crossfadeDurationInSamples + _header_offset)) {
                     _bufferPosition1 = _loop_finish - _numChannels;
                     _crossfade = (_bufferPosition2 - _header_offset) / static_cast<double>(_crossfadeDurationInSamples);
                     _crossfadeState = 2;
@@ -659,8 +659,8 @@ protected:
     double _remainder = 0.0;
     loop_type _loopType = loop_type::looptype_none;
     play_start _play_start = play_start::play_start_sample;
-    int _bufferPosition1 = 0;
-    int _bufferPosition2 = 0;
+    int32_t _bufferPosition1 = 0;
+    int32_t _bufferPosition2 = 0;
     double _crossfade = 0.0;
     bool _useDualPlaybackHead = false;
     unsigned int _crossfadeDurationInSamples = 256; 
