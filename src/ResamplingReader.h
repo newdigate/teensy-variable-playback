@@ -20,6 +20,7 @@ public:
 
     virtual TFile open(char *filename) = 0;
     virtual TArray* createSourceBuffer() = 0;
+    virtual TArray* createSourceBuffer(File& file) {return nullptr;};
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
 
@@ -72,7 +73,9 @@ public:
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
 
+digitalWriteFast(36,1);
         TFile file = open(_filename);
+digitalWriteFast(36,0);
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
@@ -117,15 +120,15 @@ public:
         } else 
             _file_samples = _file_size / 2;
 		
-		file.close();
-
         if (_file_size <= _header_offset * sizeof(int16_t)) {
+			file.close();
             _playing = false;
             if (_filename) delete [] _filename;
             _filename =  nullptr;
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }
+//file.close(); //*** want to save this to createSourceBuffer() without re-opening ***
         
         _file_samples /= _numChannels; // make sample coount same basis as loop start/finish
 
@@ -135,7 +138,7 @@ public:
 			_loop_finish = _file_samples;
 		}
         
-		_sourceBuffer = createSourceBuffer();
+		_sourceBuffer = createSourceBuffer(file);
 		_sourceBuffer->setLoopType(_loopType);
 		_sourceBuffer->setLoopStart(_samples_to_start(_loop_start));
 		_sourceBuffer->setLoopFinish(_samples_to_start(_loop_finish));
