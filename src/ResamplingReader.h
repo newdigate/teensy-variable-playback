@@ -116,7 +116,7 @@ digitalWriteFast(36,0);
             }
 
             _header_offset = (44 + infoTagsSize) / 2;
-            _file_samples = ((data_header.data_bytes) / 2) + _header_offset; 
+            _file_samples = ((data_header.data_bytes) / 2);//*/ + _header_offset; 
         } else 
             _file_samples = _file_size / 2;
 		
@@ -130,7 +130,7 @@ digitalWriteFast(36,0);
         }
 //file.close(); //*** want to save this to createSourceBuffer() without re-opening ***
         
-        _file_samples /= _numChannels; // make sample coount same basis as loop start/finish
+        _file_samples /= _numChannels; // make sample count same basis as loop start/finish
 
 		if (looptype_none == _loopType)
 		{
@@ -548,9 +548,10 @@ public:
     }
 
     void reset(void) {
+		/*
 		if (_loop_start < _header_offset)
 			_loop_start = _header_offset;
-		
+		*/
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
