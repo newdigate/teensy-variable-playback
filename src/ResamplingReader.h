@@ -557,7 +557,7 @@ public:
         }
         _numInterpolationPoints = 0;
 		
-        if (_playbackRate > 0.0) 
+        if (_playbackRate >= 0.0) 
 		{
             // forward playback - set _file_offset to 
 			switch (_play_start)

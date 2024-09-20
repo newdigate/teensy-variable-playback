@@ -105,8 +105,8 @@ public:
 		
 		// check if pingpong has changed direction since last reload
 		if (loop_type::looptype_pingpong == _loop_type
-		 && ((playbackRate > 0.0f && prevPlaybackRate < 0.0f)
-		  || (playbackRate < 0.0f && prevPlaybackRate > 0.0f)))
+		 && ((playbackRate >= 0.0f && prevPlaybackRate <  0.0f)
+		  || (playbackRate <  0.0f && prevPlaybackRate >= 0.0f)))
 		{
 			// correct timing of buffer reverse vs.
 			// next index depends on check using
