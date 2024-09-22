@@ -127,7 +127,6 @@ public:
             Serial.printf("Wave file contains no samples: %s\n", filename);
             return false;
         }
-//file.close(); //*** want to save this to createSourceBuffer() without re-opening ***
         
         _file_samples /= _numChannels; // make sample count same basis as loop start/finish
 
@@ -547,10 +546,6 @@ public:
     }
 
     void reset(void) {
-		/*
-		if (_loop_start < _header_offset)
-			_loop_start = _header_offset;
-		*/
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
