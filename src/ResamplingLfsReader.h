@@ -13,8 +13,8 @@
 // Settings for LFS buffering
 #undef RESAMPLE_BUFFER_SAMPLE_SIZE
 #undef RESAMPLE_BUFFER_COUNT
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 128
-#define RESAMPLE_BUFFER_COUNT 		  2
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 2048
+#define RESAMPLE_BUFFER_COUNT 		  5
 
 #define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
 
@@ -59,8 +59,13 @@ public:
         deleteInterpolationPoints();
     }
 
-    IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {
-        return new IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_myFS, _filename);
+    IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {		
+		File f = open(_filename);
+        return new IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_myFS, _filename, f);
+    }
+
+    IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer(File& file) override {
+        return new IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_myFS, _filename, file);
     }
 
     uint32_t positionMillis(void) {

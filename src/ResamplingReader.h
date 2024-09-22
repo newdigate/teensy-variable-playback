@@ -20,7 +20,7 @@ public:
 
     virtual TFile open(char *filename) = 0;
     virtual TArray* createSourceBuffer() = 0;
-    virtual TArray* createSourceBuffer(File& file) {return nullptr;};
+    virtual TArray* createSourceBuffer(TFile& file) {return nullptr;};
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
 
@@ -73,9 +73,8 @@ public:
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
 
-digitalWriteFast(36,1);
         TFile file = open(_filename);
-digitalWriteFast(36,0);
+		
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;

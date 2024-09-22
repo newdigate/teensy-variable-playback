@@ -13,11 +13,11 @@ class IndexableLittleFSFile : public IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,
 public:
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
 
-    IndexableLittleFSFile(LittleFS &fs, const char *filename) : 
+    IndexableLittleFSFile(LittleFS &fs, const char *filename, File& file) : 
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS, File>(filename),
         _myFS(fs) 
     {
-        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>::_file = _myFS.open(filename);
+        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>::_file = file;
     }
     
     File open(const char *filename) override {

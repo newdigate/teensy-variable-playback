@@ -19,13 +19,12 @@ public:
     {
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,File>::_file = file;
     }
-/*    
-	// if we're not passed an open file, open it and then delegate the construction
-    IndexableSDFile(const char *filename, SDClass &sd) : 
-		IndexableSDFile(filename, sd, open(filename)) {} 
-*/    
+	
     File open(const char *filename) override {
-        return _sd.open(filename);
+digitalWriteFast(36,1);
+        File f = _sd.open(filename);
+digitalWriteFast(36,0);
+		return f;
     }
 
     virtual ~IndexableSDFile() {
