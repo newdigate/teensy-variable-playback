@@ -21,9 +21,7 @@ public:
     }
 	
     File open(const char *filename) override {
-digitalWriteFast(36,1);
         File f = _sd.open(filename);
-digitalWriteFast(36,0);
 		return f;
     }
 
