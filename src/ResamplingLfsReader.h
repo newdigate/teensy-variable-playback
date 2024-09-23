@@ -56,7 +56,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {		

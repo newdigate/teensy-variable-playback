@@ -406,7 +406,7 @@ private:
                     if (_remainder - _playbackRate < 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
                         if (!_useDualPlaybackHead) {
-                            if ( _numInterpolationPoints < 2 &&_playbackRate > 1.0 && _bufferPosition1 - _numChannels > _header_offset * 2 ) {
+                            if ( _numInterpolationPoints[channel] < 2 &&_playbackRate > 1.0 && _bufferPosition1 - _numChannels > _header_offset * 2 ) {
                                 // need to update last sample
                                 _interpolationPoints[channel][1].y = _getSourceBufferValue(_bufferPosition1, -1, channel);
                             }
@@ -418,7 +418,7 @@ private:
                     if (_remainder - _playbackRate > 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
                         if (!_useDualPlaybackHead) {
-                            if (_numInterpolationPoints < 2  && _playbackRate < -1.0) {
+                            if (_numInterpolationPoints[channel] < 2  && _playbackRate < -1.0) {
                                 // need to update last sample
                                 _interpolationPoints[channel][1].y = _getSourceBufferValue(_bufferPosition1, 1, channel);
                             }
@@ -427,7 +427,7 @@ private:
                     }
                 }
 
-                if (_numInterpolationPoints > 1) {
+                if (_numInterpolationPoints[channel] > 1) {
                     result = abs_remainder * _interpolationPoints[channel][1].y + (1.0 - abs_remainder) * _interpolationPoints[channel][0].y;
                 }
             } else {
@@ -475,7 +475,7 @@ private:
                         }
                     }
                 
-                if (_numInterpolationPoints >= 4) {
+                if (_numInterpolationPoints[channel] >= 4) {
                     //int16_t interpolation = interpolate(_interpolationPoints, 1.0 + abs_remainder, 4);
                     int16_t interpolation 
                         = fastinterpolate(
@@ -496,8 +496,8 @@ private:
 					_addInterpolationPoint(channel,-resx,result);
                 }
 
-                if (_numInterpolationPoints < 4) {
-                    _numInterpolationPoints++;
+                if (_numInterpolationPoints[channel] < 4) {
+                    _numInterpolationPoints[channel]++;
                     result = 0;
                 } else 
                     result = _interpolationPoints[channel][1].y;
@@ -578,7 +578,9 @@ public:
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
-        _numInterpolationPoints = 0;
+		
+		for (size_t i=0;i<MAX_CHANNELS;i++)
+			_numInterpolationPoints[i] = 0;
 		
         if (_playbackRate >= 0.0) 
 		{
@@ -741,42 +743,16 @@ int numberOfSamplesToUpdate;
     int32_t _loop_finish = 0;
 	int32_t _file_samples = 0;
     int16_t _numChannels = -1;
-    uint16_t _numInterpolationPointsChannels = 0;
     char *_filename = nullptr;
     TArray *_sourceBuffer = nullptr;
 	bool _bufferInPSRAM = false;
 
     ResampleInterpolationType _interpolationType = ResampleInterpolationType::resampleinterpolation_none;
-    unsigned int _numInterpolationPoints = 0;
-    InterpolationData **_interpolationPoints = nullptr;
+	static const size_t MAX_CHANNELS = 8;
+    unsigned int _numInterpolationPoints[MAX_CHANNELS] = {0};
+    InterpolationData _interpolationPoints[MAX_CHANNELS][4] = {0};
     
-    void initializeInterpolationPoints(void) {
-        if (_numChannels < 0)
-            return;
-            
-        deleteInterpolationPoints();
-        _interpolationPoints = new InterpolationData*[_numChannels];
-        for (int channel=0; channel < _numChannels; channel++) {        
-            InterpolationData *interpolation = new InterpolationData[4], empty = {0,0};
-            interpolation[0] = empty;
-            interpolation[1] = empty;
-            interpolation[2] = empty;
-            interpolation[3] = empty;
-            _interpolationPoints[channel] = interpolation ;
-        }
-        _numInterpolationPointsChannels = _numChannels;
-    }
-
-    void deleteInterpolationPoints(void)
-    {
-        if (!_interpolationPoints) return;
-        for (int i=0; i<_numInterpolationPointsChannels; i++) {
-            delete [] _interpolationPoints[i];
-        }
-        delete [] _interpolationPoints;
-        _interpolationPoints = nullptr;
-        _numInterpolationPointsChannels = 0;
-    }
+    void initializeInterpolationPoints(void) {}
 	
 	int16_t _getSourceBufferValue(int pos, int offset, uint16_t channel) 
 		{ return getSourceBufferValue(pos + offset*_numChannels + channel); }
@@ -792,7 +768,7 @@ int numberOfSamplesToUpdate;
 				_interpolationPoints[channel][0] = _interpolationPoints[channel][1];
 				_interpolationPoints[channel][1].x = x;
 				_interpolationPoints[channel][1].y = y;
-				if (_numInterpolationPoints < 2) _numInterpolationPoints++;
+				if (_numInterpolationPoints[channel] < 2) _numInterpolationPoints[channel]++;
 				break;
 				
 			case resampleinterpolation_quadratic:
@@ -801,7 +777,7 @@ int numberOfSamplesToUpdate;
 				_interpolationPoints[channel][2] = _interpolationPoints[channel][3];
 				_interpolationPoints[channel][3].x = x;
 				_interpolationPoints[channel][3].y = y;
-				if (_numInterpolationPoints < 4) _numInterpolationPoints++;
+				if (_numInterpolationPoints[channel] < 4) _numInterpolationPoints[channel]++;
 				break;
 		}
 	}
