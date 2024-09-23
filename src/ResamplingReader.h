@@ -83,7 +83,7 @@ public:
                 break;
                         
             result = playRaw((TArray*)((char*) array + (36 + infoTagsSize + sizeof wav_data_hdr)), 
-                             wav_data_hdr.data_bytes / 2, 
+                             wav_data_hdr.data_bytes / hdr.num_channels / 2, 
                              hdr.num_channels); 
         } while (0);
         
