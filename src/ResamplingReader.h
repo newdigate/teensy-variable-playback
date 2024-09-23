@@ -20,6 +20,7 @@ public:
 
     virtual TFile open(char *filename) = 0;
     virtual TArray* createSourceBuffer() = 0;
+    virtual TArray* createSourceBuffer(TFile& file) {return nullptr;};
     virtual int16_t getSourceBufferValue(long index) = 0;
     virtual void close(void) = 0;
 
@@ -62,6 +63,35 @@ public:
         return playRaw(array, true); 
     }
 
+    bool playWav(TArray *array) {
+        bool result = false;
+        
+        do
+        {
+            wav_header hdr;
+            unsigned infoTagsSize;
+            wav_data_header wav_data_hdr;           
+            WaveHeaderParser parser;
+            
+            if (!parser.readWaveHeaderFromBuffer((char*) array, hdr))
+                break;
+            
+            // make unwarranted assumptions about the header format
+            // by using a magic number...
+            if (!parser.readInfoTags((unsigned char*) array, 36, infoTagsSize))
+                break;
+            
+            if (!parser.readDataHeader((unsigned char*) array, 36 + infoTagsSize, wav_data_hdr))
+                break;
+                        
+            result = playRaw((TArray*)((char*) array + (36 + infoTagsSize + sizeof wav_data_hdr)), 
+                             wav_data_hdr.data_bytes / hdr.num_channels / 2, 
+                             hdr.num_channels); 
+        } while (0);
+        
+        return result;
+    }
+
     bool play(const char *filename, bool isWave, uint16_t numChannelsIfRaw = 0)
     {
         close();
@@ -73,6 +103,7 @@ public:
         memcpy(_filename, filename, strlen(filename) + 1);
 
         TFile file = open(_filename);
+		
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
@@ -113,13 +144,12 @@ public:
             }
 
             _header_offset = (44 + infoTagsSize) / 2;
-            _file_samples = ((data_header.data_bytes) / 2) + _header_offset; 
+            _file_samples = ((data_header.data_bytes) / 2);//*/ + _header_offset; 
         } else 
             _file_samples = _file_size / 2;
 		
-		file.close();
-
         if (_file_size <= _header_offset * sizeof(int16_t)) {
+			file.close();
             _playing = false;
             if (_filename) delete [] _filename;
             _filename =  nullptr;
@@ -127,7 +157,7 @@ public:
             return false;
         }
         
-        _file_samples /= _numChannels; // make sample coount same basis as loop start/finish
+        _file_samples /= _numChannels; // make sample count same basis as loop start/finish
 
 		if (looptype_none == _loopType)
 		{
@@ -135,7 +165,7 @@ public:
 			_loop_finish = _file_samples;
 		}
         
-		_sourceBuffer = createSourceBuffer();
+		_sourceBuffer = createSourceBuffer(file);
 		_sourceBuffer->setLoopType(_loopType);
 		_sourceBuffer->setLoopStart(_samples_to_start(_loop_start));
 		_sourceBuffer->setLoopFinish(_samples_to_start(_loop_finish));
@@ -545,15 +575,12 @@ public:
     }
 
     void reset(void) {
-		if (_loop_start < _header_offset)
-			_loop_start = _header_offset;
-		
         if (_interpolationType != ResampleInterpolationType::resampleinterpolation_none) {
             initializeInterpolationPoints();
         }
         _numInterpolationPoints = 0;
 		
-        if (_playbackRate > 0.0) 
+        if (_playbackRate >= 0.0) 
 		{
             // forward playback - set _file_offset to 
 			switch (_play_start)
