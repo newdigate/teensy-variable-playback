@@ -375,7 +375,7 @@ public:
 		
 		_bufInPSRAM = bufInPSRAM;
 		
-		for (int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
+		for (unsigned int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
 		{
 			indexedbuffer* buf;
 			if (bufn >= numInVector)
@@ -384,7 +384,8 @@ public:
 				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
 				AudioNoInterrupts();
 				_buffers.push_back(buf);
-				AudioInterrupts();
+				if (intEnabled)
+					AudioInterrupts();
 			}
 			else
 				buf = _buffers[bufn];

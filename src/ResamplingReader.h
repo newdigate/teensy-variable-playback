@@ -118,7 +118,7 @@ public:
 
             WaveHeaderParser wavHeaderParser;
             char buffer[36];
-            size_t bytesRead = file.read(buffer, 36);
+            file.read(buffer, 36);
             
             wavHeaderParser.readWaveHeaderFromBuffer((const char *) buffer, wav_header);
             if (wav_header.bit_depth != 16) {
@@ -127,7 +127,7 @@ public:
             }
             setNumChannels(wav_header.num_channels);
             
-            bytesRead = file.read(buffer, 8);
+            file.read(buffer, 8);
             unsigned infoTagsSize;
             if (!wavHeaderParser.readInfoTags((unsigned char *)buffer, 0, infoTagsSize))
             {
@@ -136,7 +136,7 @@ public:
             }
 
             file.seek(36 + infoTagsSize);
-            bytesRead = file.read(buffer, 8);
+            file.read(buffer, 8);
 
             if (!wavHeaderParser.readDataHeader((unsigned char *)buffer, 0, data_header)) {
                 Serial.println("Not able to read header! Aborting...");
@@ -148,7 +148,7 @@ public:
         } else 
             _file_samples = _file_size / 2;
 		
-        if (_file_size <= _header_offset * sizeof(int16_t)) {
+        if (uint32_t(_file_size) <= _header_offset * sizeof(int16_t)) {
 			file.close();
             _playing = false;
             if (_filename) delete [] _filename;
