@@ -7,7 +7,6 @@
 #include <algorithm> // to get std::reverse
 #include "loop_type.h"
 
-#define noTVP_DEBUG Serial6
 
 namespace newdigate {
 
@@ -96,12 +95,7 @@ public:
 	 */
 	void triggerReload(float playbackRate) //!< direction and speed of playback
 	{
-		char buf1[20],buf2[20];
 		float pbr = playbackRate;
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(_buffers[0]->bufInPSRAM ? 'P' : 'H');
-	TVP_DEBUG.print(playbackRate > 0.0f ? '>' : '<');
-#endif // defined(TVP_DEBUG)
 		
 		// check if pingpong has changed direction since last reload
 		if (loop_type::looptype_pingpong == _loop_type
@@ -114,10 +108,6 @@ public:
 			playbackRate = prevPlaybackRate; // say playback is in old direction
 		}
 		
-#if defined(TVP_DEBUG)
-	getStatus(buf2);
-#endif // defined(TVP_DEBUG)
-
 		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			int nextIdx=0;
@@ -131,9 +121,6 @@ public:
 
 			if (playbackRate >= 0.0f)
 			{
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print('>');
-#endif // defined(TVP_DEBUG)
 				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
 				switch (_loop_type)
 				{
@@ -171,9 +158,6 @@ public:
 			}
 			else
 			{
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print('<');
-#endif // defined(TVP_DEBUG)
 				nextIdx = findMinBuffer()->index - 1;	// might well be < 0
 				switch (_loop_type)
 				{
@@ -222,9 +206,6 @@ public:
 				switch (bufferAction)
 				{
 					case reverseBuffer: // reverse the order
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print("<->");
-#endif // defined(TVP_DEBUG)
 						std::reverse(_buffers.begin(), _buffers.end()); 
 						prevPlaybackRate = -prevPlaybackRate; // record new playback direction
 						break;
@@ -237,11 +218,7 @@ public:
 					default:
 						break;
 				}
-				
-#if defined(TVP_DEBUG)
-	getStatus(buf2);
-#endif // defined(TVP_DEBUG)
-				
+								
 				if (intEnabled)
 					AudioInterrupts(); // ===============================================
 			}
@@ -255,9 +232,6 @@ public:
 		resetStatus(); // reset ready for next update to mark blocks read
 		if (0.0f == prevPlaybackRate)
 			prevPlaybackRate = pbr;
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(buf2);
-#endif // defined(TVP_DEBUG)
 	}
 	
 	void resetStatus(void) 
@@ -384,9 +358,6 @@ public:
 		buf->status = loaded;
 		
 		bufs = _buffers[0];
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(buf->index);
-#endif // defined(TVP_DEBUG)
 		
 		return bytesRead;
 	}
