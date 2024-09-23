@@ -63,6 +63,35 @@ public:
         return playRaw(array, true); 
     }
 
+    bool playWav(TArray *array) {
+        bool result = false;
+        
+        do
+        {
+            wav_header hdr;
+            unsigned infoTagsSize;
+            wav_data_header wav_data_hdr;           
+            WaveHeaderParser parser;
+            
+            if (!parser.readWaveHeaderFromBuffer((char*) array, hdr))
+                break;
+            
+            // make unwarranted assumptions about the header format
+            // by using a magic number...
+            if (!parser.readInfoTags((unsigned char*) array, 36, infoTagsSize))
+                break;
+            
+            if (!parser.readDataHeader((unsigned char*) array, 36 + infoTagsSize, wav_data_hdr))
+                break;
+                        
+            result = playRaw((TArray*)((char*) array + (36 + infoTagsSize + sizeof wav_data_hdr)), 
+                             wav_data_hdr.data_bytes / hdr.num_channels / 2, 
+                             hdr.num_channels); 
+        } while (0);
+        
+        return result;
+    }
+
     bool play(const char *filename, bool isWave, uint16_t numChannelsIfRaw = 0)
     {
         close();
