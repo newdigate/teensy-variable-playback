@@ -39,8 +39,8 @@ class AudioEventResponder : public EventResponder
 		{
 			active_flags_copy = yield_active_check_flags;
 			yield_active_check_flags &= ~YIELD_CHECK_EVENT_RESPONDER;
-			disableCount++;
 		}
+		disableCount++;
 	}
 	
 	static void enableResponse(void) 

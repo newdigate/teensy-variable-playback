@@ -26,6 +26,7 @@ digitalWriteFast(33,1);
 			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
 			int status = evRef.getStatus();
 			
+			AudioEventResponder::disableResponse();
 			if (nullptr != reader)
 				switch (status)
 				{
@@ -37,6 +38,7 @@ digitalWriteFast(33,1);
 						reader->close();
 						break;
 				}
+			AudioEventResponder::enableResponse();
 digitalWriteFast(33,0);
 		}
 		
