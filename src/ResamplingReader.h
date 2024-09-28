@@ -7,6 +7,7 @@
 #include "interpolation.h"
 #include "waveheaderparser.h"
 
+extern "C" void play_failed(void);
 
 namespace newdigate {
 
@@ -105,6 +106,7 @@ public:
         TFile file = open(_filename);
 		
         if (!file) {
+			play_failed();
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
             _filename = nullptr;

@@ -4,12 +4,12 @@
 #include "Arduino.h"
 #include "Audio.h"
 #include "loop_type.h"
-#include "EventResponder.h"
+#include "AudioEventResponder.h"
 
 extern void readerClose(void);
 
 template <class TResamplingReader>
-class AudioPlayResmp : public AudioStream, public EventResponder
+class AudioPlayResmp : public AudioStream, public AudioEventResponder
 {
 		enum {evReload,evClose};
     public:
@@ -22,6 +22,7 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 
 		static void event_response(EventResponderRef evRef)
 		{
+digitalWriteFast(33,1);
 			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
 			int status = evRef.getStatus();
 			
@@ -36,6 +37,7 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 						reader->close();
 						break;
 				}
+digitalWriteFast(33,0);
 		}
 		
         void begin(void)
@@ -46,14 +48,20 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 
         bool playRaw(const char *filename, uint16_t numChannels)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, false, numChannels);
+            bool result = reader->play(filename, false, numChannels);
+			enableResponse();
+			return result;
         }
 
         bool playWav(const char *filename)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, true, 0);
+            bool result = reader->play(filename, true, 0);
+			enableResponse();
+			return result;
         }
         
         bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
@@ -135,8 +143,10 @@ class AudioPlayResmp : public AudioStream, public EventResponder
         }
 
         void stop() {
+			disableResponse();
 			clearEvent();
             reader->stop();
+			enableResponse();
         }
 		
 		size_t getBufferSize(void) { return reader->getBufferSize(); }
