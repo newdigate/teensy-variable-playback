@@ -45,11 +45,11 @@ digitalWriteFast(33,0);
         void begin(void)
         {
             reader->begin();
-			attach(event_response);
         }
 
         bool playRaw(const char *filename, uint16_t numChannels)
         {
+			attach(event_response);
 			disableResponse();
             stop();
             bool result = reader->play(filename, false, numChannels);
@@ -59,6 +59,7 @@ digitalWriteFast(33,0);
 
         bool playWav(const char *filename)
         {
+			attach(event_response);
 			disableResponse();
             stop();
             bool result = reader->play(filename, true, 0);
