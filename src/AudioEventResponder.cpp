@@ -27,6 +27,7 @@
 uint8_t AudioEventResponder::active_flags_copy;
 int AudioEventResponder::disableCount;
 AudioEventResponder::triggeredList AudioEventResponder::pollList;
+bool AudioEventResponder::forceResponse;
 
 void AudioEventResponder::addToList(void)
 {

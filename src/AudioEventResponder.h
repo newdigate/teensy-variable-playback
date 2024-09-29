@@ -32,7 +32,7 @@ class AudioEventResponder : public EventResponder
 {
 	static uint8_t active_flags_copy;
 	static int disableCount;
-	static bool forcePolled;
+	static bool forceResponse; // if true, we don't change yield_active_check_flags
 	bool _isPolled;
 	AudioEventResponder* _aprev,*_anext; // can't use base ones, protected
 	
@@ -47,7 +47,8 @@ class AudioEventResponder : public EventResponder
 		if (0 == disableCount)
 		{
 			active_flags_copy = yield_active_check_flags;
-			yield_active_check_flags &= ~YIELD_CHECK_EVENT_RESPONDER;
+			if (!forceResponse)
+				yield_active_check_flags &= ~YIELD_CHECK_EVENT_RESPONDER;
 		}
 		disableCount++;
 	}
@@ -57,10 +58,14 @@ class AudioEventResponder : public EventResponder
 		disableCount--;
 		if (disableCount <= 0)
 		{
-			yield_active_check_flags = active_flags_copy;
+			if (!forceResponse)
+				yield_active_check_flags = active_flags_copy;
 			disableCount = 0;
 		}
 	}
+	
+	static void setForceResponse(bool force) { forceResponse = force; }
+	static bool getForceResponse(void) { return forceResponse; }
 	
 	// Attach a function to be executed when polled from user code
 	void attachPolled(EventResponderFunction function) 
@@ -106,7 +111,12 @@ class AudioEventResponder : public EventResponder
 		}
 		else
 			EventResponder::triggerEvent(status, data);
+		
+		// fix bug in EventResponder
+		if (EventTypeDetached == _type)
+			_triggered = false;
 	}
+
 	
 	void _runPolled(void)
 	{
@@ -121,15 +131,20 @@ class AudioEventResponder : public EventResponder
 	
 	/*
 	 * Run event from polled list.
-	 * \return true if pending events remain
+	 * \return -1 if nothing to do, 0 for event run but none remain, or 1 if pending events remain
 	 */
-	static bool runPolled(void)
+	static int runPolled(void)
 	{
+		int result = -1;
+		
 		AudioEventResponder* toRun = (AudioEventResponder*) pollList.first;  // keep a pointer to it
 		if (toRun != nullptr) // we have something to run
+		{
 			toRun->_runPolled();
+			result = 0;
+		}
 		
-		return pollList.first != nullptr;
+		return pollList.first == nullptr?result:1;
 	}
 	
   protected:

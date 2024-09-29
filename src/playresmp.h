@@ -23,7 +23,8 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 		static void event_response(EventResponderRef evRef)
 		{
 digitalWriteFast(33,1);
-			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
+			AudioPlayResmp<TResamplingReader>* player = (AudioPlayResmp*) evRef.getData();
+			TResamplingReader* reader = (TResamplingReader*) player->reader;
 			int status = evRef.getStatus();
 			
 			AudioEventResponder::disableResponse();
@@ -36,6 +37,7 @@ digitalWriteFast(33,1);
 						
 					case evClose:
 						reader->close();
+						player->stop();
 						break;
 				}
 			AudioEventResponder::enableResponse();
@@ -49,9 +51,12 @@ digitalWriteFast(33,0);
 
         bool playRaw(const char *filename, uint16_t numChannels)
         {
-			attach(event_response);
 			disableResponse();
             stop();
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
             bool result = reader->play(filename, false, numChannels);
 			enableResponse();
 			return result;
@@ -59,9 +64,12 @@ digitalWriteFast(33,0);
 
         bool playWav(const char *filename)
         {
-			attach(event_response);
 			disableResponse();
             stop();
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
             bool result = reader->play(filename, true, 0);
 			enableResponse();
 			return result;
@@ -147,6 +155,7 @@ digitalWriteFast(33,0);
 
         void stop() {
 			disableResponse();
+			detach();
 			clearEvent();
             reader->stop();
 			enableResponse();
@@ -193,11 +202,11 @@ digitalWriteFast(33,0);
 					}
 					
 					if (AUDIO_BLOCK_SAMPLES == n) // got enough samples...
-						triggerEvent(evReload,reader); // ...load more if needed
+						triggerEvent(evReload,this); // ...load more if needed
 					else
-						triggerEvent(evClose,reader); // ...end of file, finish playing
+						triggerEvent(evClose,this); // ...end of file, finish playing
 				} else {
-					triggerEvent(evClose,reader);
+					triggerEvent(evClose,this);
 				}
 			}
 			
