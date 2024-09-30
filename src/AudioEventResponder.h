@@ -42,6 +42,8 @@ class AudioEventResponder : public EventResponder
 	static triggeredList pollList;
 	
   public:
+	// Stash EventResponder yield flag, then disable, 
+	// unless we're forcing the response not to be masked
 	static void disableResponse(void) 
 	{
 		if (0 == disableCount)
@@ -53,6 +55,7 @@ class AudioEventResponder : public EventResponder
 		disableCount++;
 	}
 	
+	// Restore the yield enable flag
 	static void enableResponse(void) 
 	{ 
 		disableCount--;
@@ -63,6 +66,17 @@ class AudioEventResponder : public EventResponder
 			disableCount = 0;
 		}
 	}
+
+	// Update the stashed enable flag after it might have changed,
+	// and re-disable yield response if we're expecting that
+	static void updateResponse(void) 
+	{
+		active_flags_copy |= yield_active_check_flags & YIELD_CHECK_EVENT_RESPONDER;
+		if (disableCount > 0 && !forceResponse)
+			yield_active_check_flags &= ~YIELD_CHECK_EVENT_RESPONDER;
+			
+	}
+
 	
 	static void setForceResponse(bool force) { forceResponse = force; }
 	static bool getForceResponse(void) { return forceResponse; }

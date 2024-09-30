@@ -56,6 +56,7 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 				attachPolled(event_response);
 			else
 				attach(event_response);
+			updateResponse();
             bool result = reader->play(filename, false, numChannels);
 			enableResponse();
 			return result;
@@ -69,6 +70,7 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 				attachPolled(event_response);
 			else
 				attach(event_response);
+			updateResponse();
             bool result = reader->play(filename, true, 0);
 			enableResponse();
 			return result;
