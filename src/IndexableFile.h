@@ -337,7 +337,7 @@ public:
 	size_t loadBuffer(indexedbuffer* buf,	//!< buffer to load
 					  int i)				//!< index of first sample
 	{		
-digitalWriteFast(35,1);
+// digitalWriteFast(35,1);
 		// figure out file position to load into the buffer
 		size_t basePos = i & buffer_mask;
 		size_t seekPos = basePos * element_size;
@@ -360,7 +360,7 @@ digitalWriteFast(35,1);
 		
 		bufs = _buffers[0];
 		
-digitalWriteFast(35,0);
+// digitalWriteFast(35,0);
 		return bytesRead;
 	}
 	

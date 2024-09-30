@@ -11,7 +11,7 @@ extern void readerClose(void);
 template <class TResamplingReader>
 class AudioPlayResmp : public AudioStream, public AudioEventResponder
 {
-		enum {evReload,evClose};
+		enum {evNothing,evReload,evClose};
     public:
         AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
         {
@@ -22,7 +22,7 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 
 		static void event_response(EventResponderRef evRef)
 		{
-digitalWriteFast(33,1);
+// digitalWriteFast(33,1);
 			AudioPlayResmp<TResamplingReader>* player = (AudioPlayResmp*) evRef.getData();
 			TResamplingReader* reader = (TResamplingReader*) player->reader;
 			int status = evRef.getStatus();
@@ -37,11 +37,10 @@ digitalWriteFast(33,1);
 						
 					case evClose:
 						reader->close();
-						player->stop();
 						break;
 				}
 			AudioEventResponder::enableResponse();
-digitalWriteFast(33,0);
+// digitalWriteFast(33,0);
 		}
 		
         void begin(void)
@@ -155,7 +154,6 @@ digitalWriteFast(33,0);
 
         void stop() {
 			disableResponse();
-			detach();
 			clearEvent();
             reader->stop();
 			enableResponse();

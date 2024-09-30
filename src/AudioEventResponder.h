@@ -59,7 +59,7 @@ class AudioEventResponder : public EventResponder
 		if (disableCount <= 0)
 		{
 			if (!forceResponse)
-				yield_active_check_flags = active_flags_copy;
+				yield_active_check_flags |= active_flags_copy;
 			disableCount = 0;
 		}
 	}
@@ -131,6 +131,10 @@ class AudioEventResponder : public EventResponder
 	
 	/*
 	 * Run event from polled list.
+	 * Return value is usually 0 or 1, because as things stand update() generates
+	 * an event on every execution - it would be more efficient if it only 
+	 * triggered a reload request if it knew there was an empty buffer. 
+	 *
 	 * \return -1 if nothing to do, 0 for event run but none remain, or 1 if pending events remain
 	 */
 	static int runPolled(void)
