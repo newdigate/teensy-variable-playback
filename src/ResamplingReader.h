@@ -7,7 +7,6 @@
 #include "interpolation.h"
 #include "waveheaderparser.h"
 
-extern "C" void play_failed(void);
 
 namespace newdigate {
 
