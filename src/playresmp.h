@@ -9,7 +9,7 @@
 extern void readerClose(void);
 
 template <class TResamplingReader>
-class AudioPlayResmp : public AudioStream, public AudioEventResponder
+class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 {
 		enum {evNothing,evReload,evClose};
     public:
@@ -27,7 +27,7 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 			TResamplingReader* reader = (TResamplingReader*) player->reader;
 			int status = evRef.getStatus();
 			
-			AudioEventResponder::disableResponse();
+			disableResponse();
 			if (nullptr != reader)
 				switch (status)
 				{
@@ -39,7 +39,7 @@ class AudioPlayResmp : public AudioStream, public AudioEventResponder
 						reader->close();
 						break;
 				}
-			AudioEventResponder::enableResponse();
+			enableResponse();
 // digitalWriteFast(33,0);
 		}
 		

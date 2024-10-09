@@ -102,10 +102,11 @@ public:
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
 
+// digitalWriteFast(36,1);
         TFile file = open(_filename);
+// digitalWriteFast(36,0);
 		
         if (!file) {
-			play_failed();
             Serial.printf("Not able to open file: %s\n", _filename);
             if (_filename) delete [] _filename;
             _filename = nullptr;

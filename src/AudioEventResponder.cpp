@@ -23,6 +23,8 @@
  */
 
 #include <AudioEventResponder.h>
+
+using namespace newdigate;
  
 uint8_t AudioEventResponder::active_flags_copy;
 int AudioEventResponder::disableCount;

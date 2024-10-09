@@ -19,7 +19,11 @@ public:
 		  bufInPSRAM(usePSRAM) 
 	{ 
 		if (usePSRAM)
+		{
+//digitalWriteFast(36,1);
 			buffer = (int16_t*) extmem_malloc(samples * sizeof *buffer); 
+//digitalWriteFast(36,0);
+		}
 		else
 			buffer = new int16_t[samples]; 
 	}
@@ -373,7 +377,7 @@ public:
 						 bool forwards = true) 	//!< true if playback is forwards (at the start)
 	{
 		size_t numInVector = _buffers.size();
-		size_t loaded = 0;
+		size_t total = 0, loaded;
 		
 		_bufInPSRAM = bufInPSRAM;
 		
@@ -382,7 +386,9 @@ public:
 			indexedbuffer* buf;
 			if (bufn >= numInVector)
 			{
+				// this is SLOW (~200us) - why? Only if in PSRAM?
 				buf = new indexedbuffer(BUFFER_SIZE, bufInPSRAM);
+				
 				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
 				AudioNoInterrupts();
 				_buffers.push_back(buf);
@@ -392,14 +398,18 @@ public:
 			else
 				buf = _buffers[bufn];
 			
-			loaded += loadBuffer(buf,i);
+			loaded = loadBuffer(buf,i);
+			total += loaded;
+			if (loaded < BUFFER_SIZE) // end of file, no more buffers needed
+				break;
+			
 			if (forwards)
 				i += BUFFER_SIZE;
 			else
 				i -= BUFFER_SIZE;
 		}
 		
-		return loaded;
+		return total;
 	}
 	
 	/*

@@ -23,7 +23,9 @@
  */
  
 #include <EventResponder.h>
- 
+
+namespace newdigate {
+	
 //#if defined(EventResponder_h)
 #if !defined(AudioEventResponder_h)
 #define AudioEventResponder_h
@@ -179,6 +181,7 @@ class AudioEventResponder : public EventResponder
   
 };
 
+} // namespace
 
 #endif // !defined(AudioEventResponder_h)
 //#endif // defined(EventResponder_h)
