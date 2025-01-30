@@ -19,11 +19,7 @@ public:
 		  bufInPSRAM(usePSRAM) 
 	{ 
 		if (usePSRAM)
-		{
-//digitalWriteFast(36,1);
 			buffer = (int16_t*) extmem_malloc(samples * sizeof *buffer); 
-//digitalWriteFast(36,0);
-		}
 		else
 			buffer = new int16_t[samples]; 
 	}
@@ -341,7 +337,6 @@ public:
 	size_t loadBuffer(indexedbuffer* buf,	//!< buffer to load
 					  int i)				//!< index of first sample
 	{		
-// digitalWriteFast(35,1);
 		// figure out file position to load into the buffer
 		size_t basePos = i & buffer_mask;
 		size_t seekPos = basePos * element_size;
@@ -364,7 +359,6 @@ public:
 		
 		bufs = _buffers[0];
 		
-// digitalWriteFast(35,0);
 		return bytesRead;
 	}
 	

@@ -22,7 +22,6 @@ class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 
 		static void event_response(EventResponderRef evRef)
 		{
-// digitalWriteFast(33,1);
 			AudioPlayResmp<TResamplingReader>* player = (AudioPlayResmp*) evRef.getData();
 			TResamplingReader* reader = (TResamplingReader*) player->reader;
 			int status = evRef.getStatus();
@@ -40,7 +39,6 @@ class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 						break;
 				}
 			enableResponse();
-// digitalWriteFast(33,0);
 		}
 		
         void begin(void)

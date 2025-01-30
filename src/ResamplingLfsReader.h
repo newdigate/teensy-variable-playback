@@ -16,8 +16,6 @@
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 1024
 #define RESAMPLE_BUFFER_COUNT 		  5
 
-#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
-
 namespace newdigate {
 
 class ResamplingLfsReader : public ResamplingReader< IndexableLittleFSFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>, File > {

@@ -25,6 +25,12 @@ disableResponse	KEYWORD2
 enableResponse	KEYWORD2
 
 
+loop_type	KEYWORD2
 looptype_none	LITERAL1
 looptype_repeat	LITERAL1
 looptype_pingpong	LITERAL1
+
+play_start	KEYWORD2
+play_start_sample	LITERAL1
+play_start_loop	LITERAL1
+play_start_arbitrary	LITERAL1
