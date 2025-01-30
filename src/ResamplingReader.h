@@ -168,17 +168,22 @@ public:
 		}
         
 		_sourceBuffer = createSourceBuffer(file);
-		_sourceBuffer->setLoopType(_loopType);
-		_sourceBuffer->setLoopStart(_samples_to_start(_loop_start));
-		_sourceBuffer->setLoopFinish(_samples_to_start(_loop_finish));
+		setLoopType(_loopType);
+		setLoopStart(_samples_to_start(_loop_start));
+		setLoopFinish(_samples_to_start(_loop_finish));
         reset(); // sets _bufferPosition1 ready for playback
 		if (_playbackRate >= 0.0f)
-			_sourceBuffer->preLoadBuffers(_bufferPosition1, _bufferInPSRAM);
+			preLoadBuffers(_bufferPosition1, _bufferInPSRAM);
 		else
-			_sourceBuffer->preLoadBuffers(_bufferPosition1, _bufferInPSRAM, false);
+			preLoadBuffers(_bufferPosition1, _bufferInPSRAM, false);
 
         _playing = true;
         return true;
+    }
+	
+    size_t preLoadBuffers(int firstSample, bool bufferInPSRAM, bool forwards = true)
+    {			
+        return _sourceBuffer->preLoadBuffers(firstSample, bufferInPSRAM, forwards);
     }
 	
 	size_t getBufferSize(void) { return _sourceBuffer?_sourceBuffer->getBufferSize():-1; }
@@ -795,6 +800,14 @@ template<>
 void ResamplingReader<short int,File>::getStatus(char* buf) { strcpy(buf,"int[]"); }
 template<>
 void ResamplingReader<short int,File>::triggerReload(void) {}
+template<>
+void ResamplingReader<short int,File>::setLoopType(loop_type) {}
+template<>
+void ResamplingReader<short int,File>::setLoopStart(uint32_t) {}
+template<>
+void ResamplingReader<short int,File>::setLoopFinish(uint32_t) {}
+template<>
+size_t ResamplingReader<short int,File>::preLoadBuffers(int , bool , bool) {return 0;}
 
 }
 
