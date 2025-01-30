@@ -6,6 +6,7 @@
 #define TEENSY_RESAMPLING_ARDUINO_SAMPLER_H
 
 #include "waveheaderparser.h"
+#include "AudioEventResponder.h"
 #include "ResamplingSdReader.h"
 #include "ResamplingArrayReader.h"
 #include "playsdresmp.h"

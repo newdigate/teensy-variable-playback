@@ -2,6 +2,7 @@ AudioPlayArrayResmp		KEYWORD2
 AudioPlaySdResmp	KEYWORD2
 AudioPlayLfsResmp	KEYWORD2
 AudioPlaySerialFlashResmp	KEYWORD2
+AudioEventResponder	KEYWORD2
 
 playRaw	KEYWORD2
 playWav	KEYWORD2
@@ -20,6 +21,9 @@ setCrossfadeDurationInSamples	KEYWORD2
 setPlayStart	KEYWORD2
 setBufferInPSRAM	KEYWORD2
 getBufferInPSRAM	KEYWORD2
+disableResponse	KEYWORD2
+enableResponse	KEYWORD2
+
 
 looptype_none	LITERAL1
 looptype_repeat	LITERAL1

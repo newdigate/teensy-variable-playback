@@ -24,7 +24,6 @@
  
 #include <EventResponder.h>
 	
-//#if defined(EventResponder_h)
 #if !defined(AudioEventResponder_h)
 #define AudioEventResponder_h
 
