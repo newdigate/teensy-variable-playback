@@ -23,12 +23,12 @@
  */
  
 #include <EventResponder.h>
-
-namespace newdigate {
 	
 //#if defined(EventResponder_h)
 #if !defined(AudioEventResponder_h)
 #define AudioEventResponder_h
+
+namespace newdigate {
 
 class AudioEventResponder : public EventResponder
 {
