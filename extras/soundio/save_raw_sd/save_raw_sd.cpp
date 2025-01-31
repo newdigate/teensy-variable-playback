@@ -133,7 +133,7 @@ void my_handler(sig_atomic_t i){
         printf("Caught signal %d\n",i);
     } else 
     {
-        cerr << "sig seg fault handler" << endl;
+        std::cerr << "sig seg fault handler" << std::endl;
         const int asize = 10;
         void *array[asize];
         size_t size;
@@ -142,15 +142,15 @@ void my_handler(sig_atomic_t i){
         size = backtrace(array, asize);
 
         // print out all the frames to stderr
-        cerr << "stack trace: " << endl;
+        std::cerr << "stack trace: " << std::endl;
         backtrace_symbols_fd(array, size, STDERR_FILENO);
-        cerr << "resend SIGSEGV to get core dump" << endl;
+        std::cerr << "resend SIGSEGV to get core dump" << std::endl;
         signal(i, SIG_DFL);
         kill(getpid(), i);
     }
 }
 void crash_handler(sig_atomic_t i){
-    cerr << "sig seg fault handler" << endl;
+    std::cerr << "sig seg fault handler" << std::endl;
     const int asize = 10;
     void *array[asize];
     size_t size;
@@ -159,9 +159,9 @@ void crash_handler(sig_atomic_t i){
     size = backtrace(array, asize);
 
     // print out all the frames to stderr
-    cerr << "stack trace: " << endl;
+    std::cerr << "stack trace: " << std::endl;
     backtrace_symbols_fd(array, size, STDERR_FILENO);
-    cerr << "resend SIGSEGV to get core dump" << endl;
+    std::cerr << "resend SIGSEGV to get core dump" << std::endl;
     signal(i, SIG_DFL);
     kill(getpid(), i);
 }

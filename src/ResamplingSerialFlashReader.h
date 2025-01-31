@@ -19,8 +19,6 @@
 #define RESAMPLE_BUFFER_SAMPLE_SIZE 128
 #define RESAMPLE_BUFFER_COUNT 		  2
 
-#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
-
 namespace newdigate {
 
 class ResamplingSerialFlashReader : public ResamplingReader< IndexableSerialFlashFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>, SerialFlashFile > {
@@ -60,7 +58,6 @@ public:
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableSerialFlashFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {

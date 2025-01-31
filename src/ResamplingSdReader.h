@@ -16,10 +16,8 @@
 // Settings for SD card buffering
 #undef RESAMPLE_BUFFER_SAMPLE_SIZE
 #undef RESAMPLE_BUFFER_COUNT
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 128
-#define RESAMPLE_BUFFER_COUNT 		  2
-
-#define B2M (uint32_t)((double)4294967296000.0 / AUDIO_SAMPLE_RATE_EXACT / 2.0) // 97352592
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 2048
+#define RESAMPLE_BUFFER_COUNT 		  7
 
 namespace newdigate {
 
@@ -53,16 +51,17 @@ public:
     {
         if (_playing)
             stop();
+		
         if (_sourceBuffer != nullptr) {
             _sourceBuffer->close();
             delete _sourceBuffer;
             _sourceBuffer = nullptr;
         }
+		
         if (_filename != nullptr) {
             delete [] _filename;
             _filename = nullptr;
         }
-        deleteInterpolationPoints();
     }
 
     IndexableSDFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>* createSourceBuffer() override {

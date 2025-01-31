@@ -4,14 +4,14 @@
 #include "Arduino.h"
 #include "Audio.h"
 #include "loop_type.h"
-#include "EventResponder.h"
+#include "AudioEventResponder.h"
 
 extern void readerClose(void);
 
 template <class TResamplingReader>
-class AudioPlayResmp : public AudioStream, public EventResponder
+class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 {
-		enum {evReload,evClose};
+		enum {evNothing,evReload,evClose};
     public:
         AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
         {
@@ -22,9 +22,11 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 
 		static void event_response(EventResponderRef evRef)
 		{
-			TResamplingReader* reader = (TResamplingReader*) evRef.getData();
+			AudioPlayResmp<TResamplingReader>* player = (AudioPlayResmp*) evRef.getData();
+			TResamplingReader* reader = (TResamplingReader*) player->reader;
 			int status = evRef.getStatus();
 			
+			disableResponse();
 			if (nullptr != reader)
 				switch (status)
 				{
@@ -36,24 +38,40 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 						reader->close();
 						break;
 				}
+			enableResponse();
 		}
 		
         void begin(void)
         {
             reader->begin();
-			attach(event_response);
         }
 
         bool playRaw(const char *filename, uint16_t numChannels)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, false, numChannels);
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
+			updateResponse();
+            bool result = reader->play(filename, false, numChannels);
+			enableResponse();
+			return result;
         }
 
         bool playWav(const char *filename)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, true, 0);
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
+			updateResponse();
+            bool result = reader->play(filename, true, 0);
+			enableResponse();
+			return result;
         }
         
         bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
@@ -135,8 +153,10 @@ class AudioPlayResmp : public AudioStream, public EventResponder
         }
 
         void stop() {
+			disableResponse();
 			clearEvent();
             reader->stop();
+			enableResponse();
         }
 		
 		size_t getBufferSize(void) { return reader->getBufferSize(); }
@@ -180,11 +200,11 @@ class AudioPlayResmp : public AudioStream, public EventResponder
 					}
 					
 					if (AUDIO_BLOCK_SAMPLES == n) // got enough samples...
-						triggerEvent(evReload,reader); // ...load more if needed
+						triggerEvent(evReload,this); // ...load more if needed
 					else
-						triggerEvent(evClose,reader); // ...end of file, finish playing
+						triggerEvent(evClose,this); // ...end of file, finish playing
 				} else {
-					triggerEvent(evClose,reader);
+					triggerEvent(evClose,this);
 				}
 			}
 			

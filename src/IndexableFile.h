@@ -7,7 +7,6 @@
 #include <algorithm> // to get std::reverse
 #include "loop_type.h"
 
-#define noTVP_DEBUG Serial6
 
 namespace newdigate {
 
@@ -96,12 +95,7 @@ public:
 	 */
 	void triggerReload(float playbackRate) //!< direction and speed of playback
 	{
-		char buf1[20],buf2[20];
 		float pbr = playbackRate;
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(_buffers[0]->bufInPSRAM ? 'P' : 'H');
-	TVP_DEBUG.print(playbackRate > 0.0f ? '>' : '<');
-#endif // defined(TVP_DEBUG)
 		
 		// check if pingpong has changed direction since last reload
 		if (loop_type::looptype_pingpong == _loop_type
@@ -114,10 +108,6 @@ public:
 			playbackRate = prevPlaybackRate; // say playback is in old direction
 		}
 		
-#if defined(TVP_DEBUG)
-	getStatus(buf2);
-#endif // defined(TVP_DEBUG)
-
 		while (!_buffers.empty() && unused == _buffers[0]->status)
 		{
 			int nextIdx=0;
@@ -131,9 +121,6 @@ public:
 
 			if (playbackRate >= 0.0f)
 			{
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print('>');
-#endif // defined(TVP_DEBUG)
 				nextIdx = findMaxBuffer()->index + 1; // could wrap, but unlikely...
 				switch (_loop_type)
 				{
@@ -171,9 +158,6 @@ public:
 			}
 			else
 			{
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print('<');
-#endif // defined(TVP_DEBUG)
 				nextIdx = findMinBuffer()->index - 1;	// might well be < 0
 				switch (_loop_type)
 				{
@@ -222,9 +206,6 @@ public:
 				switch (bufferAction)
 				{
 					case reverseBuffer: // reverse the order
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print("<->");
-#endif // defined(TVP_DEBUG)
 						std::reverse(_buffers.begin(), _buffers.end()); 
 						prevPlaybackRate = -prevPlaybackRate; // record new playback direction
 						break;
@@ -237,11 +218,7 @@ public:
 					default:
 						break;
 				}
-				
-#if defined(TVP_DEBUG)
-	getStatus(buf2);
-#endif // defined(TVP_DEBUG)
-				
+								
 				if (intEnabled)
 					AudioInterrupts(); // ===============================================
 			}
@@ -255,9 +232,6 @@ public:
 		resetStatus(); // reset ready for next update to mark blocks read
 		if (0.0f == prevPlaybackRate)
 			prevPlaybackRate = pbr;
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(buf2);
-#endif // defined(TVP_DEBUG)
 	}
 	
 	void resetStatus(void) 
@@ -384,9 +358,6 @@ public:
 		buf->status = loaded;
 		
 		bufs = _buffers[0];
-#if defined(TVP_DEBUG)
-	TVP_DEBUG.print(buf->index);
-#endif // defined(TVP_DEBUG)
 		
 		return bytesRead;
 	}
@@ -400,32 +371,39 @@ public:
 						 bool forwards = true) 	//!< true if playback is forwards (at the start)
 	{
 		size_t numInVector = _buffers.size();
-		size_t loaded = 0;
+		size_t total = 0, loaded;
 		
 		_bufInPSRAM = bufInPSRAM;
 		
-		for (int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
+		for (unsigned int bufn = 0; bufn < MAX_NUM_BUFFERS; bufn++)
 		{
 			indexedbuffer* buf;
 			if (bufn >= numInVector)
 			{
+				// this is SLOW (~200us) - why? Only if in PSRAM?
 				buf = new indexedbuffer(BUFFER_SIZE, bufInPSRAM);
+				
 				bool intEnabled = NVIC_IS_ENABLED(IRQ_SOFTWARE) != 0; 
 				AudioNoInterrupts();
 				_buffers.push_back(buf);
-				AudioInterrupts();
+				if (intEnabled)
+					AudioInterrupts();
 			}
 			else
 				buf = _buffers[bufn];
 			
-			loaded += loadBuffer(buf,i);
+			loaded = loadBuffer(buf,i);
+			total += loaded;
+			if (loaded < BUFFER_SIZE) // end of file, no more buffers needed
+				break;
+			
 			if (forwards)
 				i += BUFFER_SIZE;
 			else
 				i -= BUFFER_SIZE;
 		}
 		
-		return loaded;
+		return total;
 	}
 	
 	/*

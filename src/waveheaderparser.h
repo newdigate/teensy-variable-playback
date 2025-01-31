@@ -9,8 +9,6 @@
 #include <SD.h>
 #include "spi_interrupt.h"
 
-using namespace std;
-
 // from https://gist.github.com/Jon-Schneider/8b7c53d27a7a13346a643dac9c19d34f
 struct wav_header {
     // RIFF Header
