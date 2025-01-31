@@ -102,9 +102,7 @@ public:
         _filename = new char[strlen(filename)+1] {0};
         memcpy(_filename, filename, strlen(filename) + 1);
 
-// digitalWriteFast(36,1);
         TFile file = open(_filename);
-// digitalWriteFast(36,0);
 		
         if (!file) {
             Serial.printf("Not able to open file: %s\n", _filename);
@@ -405,8 +403,7 @@ private:
         }
 
         if (_interpolationType == ResampleInterpolationType::resampleinterpolation_linear) {
-//#define abs(d) (d<0.0?-d:d)
-            double abs_remainder = abs(_remainder);
+            double abs_remainder = fabs(_remainder);
             if (abs_remainder > 0.0) {
 
                 if (_playbackRate > 0) {
@@ -443,13 +440,12 @@ private:
             }
         } 
         else if (_interpolationType == ResampleInterpolationType::resampleinterpolation_quadratic) {
-            double abs_remainder = abs(_remainder);
-//#undef abs			
+            double abs_remainder = fabs(_remainder);
             if (true || abs_remainder > 0.0) {
                 if (_playbackRate > 0) {                
                     if (_remainder - _playbackRate < 0.0){
                         // we crossed over a whole number, make sure we update the samples for interpolation
-                        numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
+                        int numberOfSamplesToUpdate = - floor(_remainder - _playbackRate);
                         if (numberOfSamplesToUpdate > 4) 
                             numberOfSamplesToUpdate = 4; // if playbackrate > 4, only need to pop last 4 samples
                         for (int i=numberOfSamplesToUpdate; i > 0; i--) {
@@ -729,7 +725,6 @@ public:
     
     
 protected:
-int numberOfSamplesToUpdate;
     volatile bool _playing = false;
 
     int32_t _file_size;
@@ -801,11 +796,11 @@ void ResamplingReader<short int,File>::getStatus(char* buf) { strcpy(buf,"int[]"
 template<>
 void ResamplingReader<short int,File>::triggerReload(void) {}
 template<>
-void ResamplingReader<short int,File>::setLoopType(loop_type) {}
+void ResamplingReader<short int,File>::setLoopType(loop_type loopType) { _loopType = loopType; }
 template<>
-void ResamplingReader<short int,File>::setLoopStart(uint32_t) {}
+void ResamplingReader<short int,File>::setLoopStart(uint32_t loop_start) { _loop_start = loop_start; }
 template<>
-void ResamplingReader<short int,File>::setLoopFinish(uint32_t) {}
+void ResamplingReader<short int,File>::setLoopFinish(uint32_t loop_finish) { _loop_finish = loop_finish; }
 template<>
 size_t ResamplingReader<short int,File>::preLoadBuffers(int , bool , bool) {return 0;}
 

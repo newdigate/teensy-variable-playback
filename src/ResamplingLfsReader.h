@@ -13,8 +13,8 @@
 // Settings for LFS buffering
 #undef RESAMPLE_BUFFER_SAMPLE_SIZE
 #undef RESAMPLE_BUFFER_COUNT
-#define RESAMPLE_BUFFER_SAMPLE_SIZE 1024
-#define RESAMPLE_BUFFER_COUNT 		  5
+#define RESAMPLE_BUFFER_SAMPLE_SIZE 2048
+#define RESAMPLE_BUFFER_COUNT 		  7
 
 namespace newdigate {
 
