@@ -82,6 +82,8 @@ AudioControlSGTL5000     sgtl5000;     //xy=994,461
 /*
  * Samples at 6-semitone intervals: we allow ourselves to change
  * playback speed to flatten by 3 semitones, or sharpen by 2
+ * 
+ * You need to put these on your SD card!
  */
 const char* samples[] = 
 {
@@ -169,6 +171,7 @@ bool Voice::noteOn(int note, int velocity)
     // change playback rate as needed
     double rate = pow(semitone, note % 6 - 3);
     
+    // playWav.enableInterpolation(true); // uncomment for better quality but more CPU usage!
     playWav.playWav(samples[idx]);
     playWav.setPlaybackRate(rate);
     envL.noteOn();
