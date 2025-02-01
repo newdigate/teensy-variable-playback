@@ -279,7 +279,7 @@ void setup()
 
     AudioMemory(20);
 
-    sgtl5000.setAddress(HIGH);
+    // sgtl5000.setAddress(HIGH);
     sgtl5000.enable();
     sgtl5000.volume(0.2);
 
