@@ -14,7 +14,7 @@ In order to avoid crashes if your application tries to access the same filesyste
 All the methods described below *must only* be called from normal foreground code, i.e. `setup()` or `loop()`. **DO NOT** call them from interrupt, it will almost certainly result in a crash or other misbehaviour. Eventually, if not sooner. Trust me on this.
 
 ### EventResponder masking
-This technique temporarily masks execution of *all* EventResponder responses from within the `yield()` function, not just those relevant to the Teensy Variable Playback and/or filesystem access. Hence you should try to minimise the time spent with responses masked. 
+This technique temporarily masks execution of *all* EventResponder responses from within the `yield()` function, not just those relevant to the Teensy Variable Playback and/or filesystem access. Hence you should try to minimise the time spent with responses masked. See the `FileAccess` example sketch for an example of how this can be used.
 #### `AudioEventResponder::disableResponse()`
 Call this function before your code accesses the filesystem: this includes `open()`, `write()`, `read()`, `mkdir()` etc.  **EVERYTHING**
 #### `AudioEventResponder::enableResponse()`
