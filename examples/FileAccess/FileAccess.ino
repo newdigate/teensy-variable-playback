@@ -139,7 +139,7 @@ void setup()
 
   AudioMemory(24);
 
-  audioShield.setAddress(HIGH);
+  // audioShield.setAddress(HIGH);
   audioShield.enable();
   audioShield.volume(0.1);
 
