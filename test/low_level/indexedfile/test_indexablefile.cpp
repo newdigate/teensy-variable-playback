@@ -8,6 +8,7 @@ BOOST_AUTO_TEST_SUITE(test_indexablefile)
 
     BOOST_FIXTURE_TEST_CASE(basic_test, IndexableFileFixture) {
 
+        File f;
         const uint16_t sample_size = 30;
         int16_t file_contents[sample_size] = {0};
         for (int i=0; i<sample_size; i++) {
@@ -15,7 +16,7 @@ BOOST_AUTO_TEST_SUITE(test_indexablefile)
         }
         SD.setSDCardFileData((char*)file_contents, sample_size * 2);
 
-        newdigate::IndexableSDFile<16, 2> indexable("blah.h", SD);               // use max 2 buffers, with 16 elements each....
+        newdigate::IndexableSDFile<16, 2> indexable("blah.h", SD, f);               // use max 2 buffers, with 16 elements each....
 
         /*
         for (int i=0; i<sample_size; i++) {

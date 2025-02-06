@@ -5,6 +5,7 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 #define TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 
+#include "Audio.h"
 #include "ResamplingSdReader.h"
 
 struct ResamplingReaderFixture {

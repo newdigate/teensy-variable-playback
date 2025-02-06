@@ -789,6 +789,7 @@ protected:
 // Explicitly specialize some instantiations of functions where
 // they need to be different for the supplied type. e.g. it makes
 // no sense to track buffer statuses for an in-memory "file".
+/*
 template<>
 void ResamplingReader<short int,File>::resetStatus(void) {}
 template<>
@@ -803,7 +804,7 @@ template<>
 void ResamplingReader<short int,File>::setLoopFinish(uint32_t loop_finish) { _loop_finish = loop_finish; }
 template<>
 size_t ResamplingReader<short int,File>::preLoadBuffers(int , bool , bool) {return 0;}
-
+*/
 }
 
 #endif //TEENSYAUDIOLIBRARY_RESAMPLINGREADER_H

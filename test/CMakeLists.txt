@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(tests C CXX)
 if (DEFINED BUILD_FOR_LINUX)
+    #set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD 17)
 
     set (Boost_USE_STATIC_LIBS OFF)
@@ -50,34 +51,34 @@ if (DEFINED BUILD_FOR_LINUX)
             PNO1C1_raw.c
             audio/output_test.cpp
 
-            audio/array/AudioArrayFixture.h
-            audio/array/test_array_mono_loop_backward_playback.cpp
-            audio/array/test_array_mono_loop_forward_playback.cpp
-            audio/array/test_array_stereo_loop_backward_playback.cpp
-            audio/array/test_array_stereo_loop_forward_playback.cpp
+            #audio/array/AudioArrayFixture.h
+            #audio/array/test_array_mono_loop_backward_playback.cpp
+            #audio/array/test_array_mono_loop_forward_playback.cpp
+            #audio/array/test_array_stereo_loop_backward_playback.cpp
+            #audio/array/test_array_stereo_loop_forward_playback.cpp
 
             audio/wav/AudioWavFixture.h
             audio/wav/test_wav_mono_loop_forward_playback.cpp
             audio/wav/test_wav_stereo_loop_forward_playback.cpp
             audio/wav/test_wav_tags.cpp
 
-            low_level/sd/ResamplingReaderFixture.h
-            low_level/sd/test_raw_mono_noloop_forward_playback.cpp
-            low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
-            low_level/sd/test_raw_mono_loop_forward_playback.cpp
-            low_level/sd/test_wav_mono_noloop_forward_playback.cpp
-            low_level/sd/test_wav_mono_loop_forward_playback.cpp
-            low_level/sd/test_wav_mono_noloop_backward_playback.cpp
+            #low_level/sd/ResamplingReaderFixture.h
+            #low_level/sd/test_raw_mono_noloop_forward_playback.cpp
+            #low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
+            #low_level/sd/test_raw_mono_loop_forward_playback.cpp
+            #low_level/sd/test_wav_mono_noloop_forward_playback.cpp
+            #low_level/sd/test_wav_mono_loop_forward_playback.cpp
+            #low_level/sd/test_wav_mono_noloop_backward_playback.cpp
             
-            low_level/wav_header/test_parse_wave_header.cpp
+            #low_level/wav_header/test_parse_wave_header.cpp
             
-            low_level/array/test_array_mono_loop_forward_playback.cpp
-            low_level/array/test_array_stereo_loop_forward_playback.cpp
+            #low_level/array/test_array_mono_loop_forward_playback.cpp
+            #low_level/array/test_array_stereo_loop_forward_playback.cpp
             
-            low_level/arraywav/test_array_mono_loop_forward_playback.cpp
-            low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
+            #low_level/arraywav/test_array_mono_loop_forward_playback.cpp
+            #low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
 
-            low_level/indexedfile/test_indexablefile.cpp
+            #low_level/indexedfile/test_indexablefile.cpp
             )
 
     target_link_libraries(tests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})

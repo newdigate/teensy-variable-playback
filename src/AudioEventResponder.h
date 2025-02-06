@@ -168,10 +168,14 @@ class AudioEventResponder : public EventResponder
 	
   protected:
 	static bool disableInterrupts() {
+#if !defined(BUILD_FOR_LINUX)
 		uint32_t primask;
 		__asm__ volatile("mrs %0, primask\n" : "=r" (primask)::);
-		__disable_irq();
+		__disable_irq();		
 		return (primask == 0) ? true : false;
+#else
+		return false;
+#endif // !defined(BUILD_FOR_LINUX)
 	}
 	static void enableInterrupts(bool doit) {
 		if (doit) __enable_irq();
