@@ -19,7 +19,8 @@ void printTest(uint32_t expectedDataSize,double rate)
               << p_file_name 
               << "::" 
               << theCase().p_name 
-              << "(" << expectedDataSize  
+              << "(" 
+              << (0 == expectedDataSize?"":std::to_string(expectedDataSize))  
               << (NO_RATE == rate?"":" @ ")
               << (NO_RATE == rate?"":std::to_string(rate))
               << ")"

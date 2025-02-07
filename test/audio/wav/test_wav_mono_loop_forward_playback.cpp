@@ -7,17 +7,19 @@
 
 #include <boost/test/unit_test.hpp>
 #include "AudioWavFixture.h"
+#include "utils.h"
 
 BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
     const uint16_t numberOfChannels = 1;
 
-    const std::string referencePath = "test/resources/reference/";
-    const std::string inputPath = "test/resources/input/";
+    const std::string referencePath = REFERENCE_PATH;
+    const std::string inputPath = INPUT_PATH;
     const std::string outputPath = "output/";
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_0000_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -47,14 +49,15 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
         
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_5000_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -82,14 +85,15 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_2_0000_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -118,14 +122,15 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_0_7437_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -154,8 +159,8 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
 
@@ -163,6 +168,7 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_1_7437_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -191,14 +197,15 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }
 
     BOOST_FIXTURE_TEST_CASE(Wav_fwd_8_7437_quadratic_mono_noloop, AudioWavFixture) {
 
+        printTest(0);
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -227,8 +234,8 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_mono_loop_forward_playback)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }

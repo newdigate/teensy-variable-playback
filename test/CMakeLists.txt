@@ -45,17 +45,6 @@ if (DEFINED BUILD_FOR_LINUX)
     )
 
     add_executable(tests
-            low_level/sd/ResamplingReaderFixture.h
-            low_level/sd/test_raw_mono_noloop_forward_playback.cpp
-            
-            kick_raw.c
-            stereo_souljah_raw.c
-            stereo_souljah_wav.c
-            mono_souljah_wav.c
-            PNO1C1_raw.c
-
-            utils.cpp
-
             audio/output_test.cpp
 
             #audio/array/AudioArrayFixture.h
@@ -64,20 +53,20 @@ if (DEFINED BUILD_FOR_LINUX)
             #audio/array/test_array_stereo_loop_backward_playback.cpp
             #audio/array/test_array_stereo_loop_forward_playback.cpp
 
-            #audio/wav/AudioWavFixture.h
-            #audio/wav/test_wav_mono_loop_forward_playback.cpp
-            #audio/wav/test_wav_stereo_loop_forward_playback.cpp
-            #audio/wav/test_wav_tags.cpp
+            audio/wav/AudioWavFixture.h
+            audio/wav/test_wav_mono_loop_forward_playback.cpp
+            audio/wav/test_wav_stereo_loop_forward_playback.cpp
+            audio/wav/test_wav_tags.cpp
 
-            #low_level/sd/ResamplingReaderFixture.h
-            #low_level/sd/test_raw_mono_noloop_forward_playback.cpp
+            low_level/sd/ResamplingReaderFixture.h
+            low_level/sd/test_raw_mono_noloop_forward_playback.cpp
             low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
             low_level/sd/test_raw_mono_loop_forward_playback.cpp
             low_level/sd/test_wav_mono_noloop_forward_playback.cpp
             low_level/sd/test_wav_mono_loop_forward_playback.cpp
             low_level/sd/test_wav_mono_noloop_backward_playback.cpp
             
-            #low_level/wav_header/test_parse_wave_header.cpp
+            low_level/wav_header/test_parse_wave_header.cpp
             
             #low_level/array/test_array_mono_loop_forward_playback.cpp
             #low_level/array/test_array_stereo_loop_forward_playback.cpp
@@ -86,6 +75,15 @@ if (DEFINED BUILD_FOR_LINUX)
             #low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
 
             #low_level/indexedfile/test_indexablefile.cpp
+
+            # these should always compile OK
+            kick_raw.c
+            stereo_souljah_raw.c
+            stereo_souljah_wav.c
+            mono_souljah_wav.c
+            PNO1C1_raw.c
+
+            utils.cpp
             )
 
     target_link_libraries(tests ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
