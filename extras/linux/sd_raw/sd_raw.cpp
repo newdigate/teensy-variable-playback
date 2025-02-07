@@ -15,7 +15,7 @@ AudioConnection          patchCord2(playSdRaw1, 0, i2s2, 1);
 // GUItool: end automatically generated code
 
 #define A14 10
-#define BUILTIN_SDCARD 10
+// #define BUILTIN_SDCARD 10
 
 const char* _filename = "DEMO.RAW";
 const int analogInPin = A14;
@@ -65,10 +65,11 @@ void loop() {
 #ifdef BUILD_FOR_LINUX
 int main() {
     initialize_mock_arduino();
-    SD.setSDCardFileData("234234234", 5);
+    SD.setSDCardFileData((char*) "234234234", 5);
     setup();
     while(true){
         loop();
+        yield();
     }
 }
 #endif

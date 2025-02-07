@@ -724,7 +724,7 @@ public:
     }
     
     
-protected:
+//protected:
     volatile bool _playing = false;
 
     int32_t _file_size;

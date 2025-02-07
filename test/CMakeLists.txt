@@ -18,6 +18,7 @@ if (DEFINED BUILD_FOR_LINUX)
     find_package(teensy_x86_sd_stubs)
     include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
 
+    include_directories(.)
     include_directories(../src)
     include_directories(../test/audio)
 
@@ -49,7 +50,10 @@ if (DEFINED BUILD_FOR_LINUX)
             stereo_souljah_wav.c
             mono_souljah_wav.c
             PNO1C1_raw.c
-            audio/output_test.cpp
+
+            utils.cpp
+
+            #audio/output_test.cpp
 
             #audio/array/AudioArrayFixture.h
             #audio/array/test_array_mono_loop_backward_playback.cpp
@@ -57,18 +61,18 @@ if (DEFINED BUILD_FOR_LINUX)
             #audio/array/test_array_stereo_loop_backward_playback.cpp
             #audio/array/test_array_stereo_loop_forward_playback.cpp
 
-            audio/wav/AudioWavFixture.h
-            audio/wav/test_wav_mono_loop_forward_playback.cpp
-            audio/wav/test_wav_stereo_loop_forward_playback.cpp
-            audio/wav/test_wav_tags.cpp
+            #audio/wav/AudioWavFixture.h
+            #audio/wav/test_wav_mono_loop_forward_playback.cpp
+            #audio/wav/test_wav_stereo_loop_forward_playback.cpp
+            #audio/wav/test_wav_tags.cpp
 
-            #low_level/sd/ResamplingReaderFixture.h
-            #low_level/sd/test_raw_mono_noloop_forward_playback.cpp
+            low_level/sd/ResamplingReaderFixture.h
+            low_level/sd/test_raw_mono_noloop_forward_playback.cpp
             #low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
             #low_level/sd/test_raw_mono_loop_forward_playback.cpp
             #low_level/sd/test_wav_mono_noloop_forward_playback.cpp
             #low_level/sd/test_wav_mono_loop_forward_playback.cpp
-            #low_level/sd/test_wav_mono_noloop_backward_playback.cpp
+            low_level/sd/test_wav_mono_noloop_backward_playback.cpp
             
             #low_level/wav_header/test_parse_wave_header.cpp
             
