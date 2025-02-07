@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         int j = 0, samplesRead = 0, total_bytes_read = 0;
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
-            resamplingSdReader->_sourceBuffer->triggerReload(-0.5);
+            resamplingSdReader->forceTriggerReload(-0.5);
             total_bytes_read += samplesRead;
             printf("j:%d samplesRead: %d: ", j, samplesRead);
             for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
