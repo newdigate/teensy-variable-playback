@@ -13,6 +13,7 @@ void TestAudioOutput::begin(void)
 void TestAudioOutput::isr(void)
 {
     if (TestAudioOutput::update_responsibility) AudioStream::update_all();
+	yield();
 }
 
 void TestAudioOutput::update(void)

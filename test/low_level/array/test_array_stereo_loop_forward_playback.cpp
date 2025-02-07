@@ -8,6 +8,7 @@
 #include <boost/test/unit_test.hpp>
 #include "ResamplingArrayFixture.h"
 #include "AudioStream.h"
+#include "utils.h"
 
 extern unsigned char stereo_souljah_raw[];
 extern unsigned int stereo_souljah_raw_len;
@@ -26,11 +27,13 @@ BOOST_AUTO_TEST_SUITE(test_array_stereo_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayFixture) {
 
         const uint32_t expectedDataSize = stereo_souljah_raw_len; // 32 16bit samples = 64 bytes of space
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(0.5f);
         resamplingArrayReader->playRaw((int16_t*)stereo_raw, stereo_raw_length/4, 1);
+        BOOST_CHECK_EQUAL(resamplingArrayReader->isPlaying(), true);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
         int16_t actual_left[256];
         int16_t actual_right[256];

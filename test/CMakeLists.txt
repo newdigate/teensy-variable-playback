@@ -53,7 +53,7 @@ if (DEFINED BUILD_FOR_LINUX)
 
             utils.cpp
 
-            #audio/output_test.cpp
+            audio/output_test.cpp
 
             #audio/array/AudioArrayFixture.h
             #audio/array/test_array_mono_loop_backward_playback.cpp
@@ -68,10 +68,10 @@ if (DEFINED BUILD_FOR_LINUX)
 
             low_level/sd/ResamplingReaderFixture.h
             low_level/sd/test_raw_mono_noloop_forward_playback.cpp
-            #low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
-            #low_level/sd/test_raw_mono_loop_forward_playback.cpp
-            #low_level/sd/test_wav_mono_noloop_forward_playback.cpp
-            #low_level/sd/test_wav_mono_loop_forward_playback.cpp
+            low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
+            low_level/sd/test_raw_mono_loop_forward_playback.cpp
+            low_level/sd/test_wav_mono_noloop_forward_playback.cpp
+            low_level/sd/test_wav_mono_loop_forward_playback.cpp
             low_level/sd/test_wav_mono_noloop_backward_playback.cpp
             
             #low_level/wav_header/test_parse_wave_header.cpp

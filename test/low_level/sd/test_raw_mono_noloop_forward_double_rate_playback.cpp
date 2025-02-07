@@ -7,6 +7,7 @@
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
 #include <cmath>
+#include "utils.h"
 
 BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
     const double playBackRate = 2.0;
@@ -19,7 +20,8 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
     }
 
     void testReadForwardAtDoublePlaybackRate(const uint32_t size_of_datasource, newdigate::ResamplingSdReader *resamplingSdReader) {
-        printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
+        printTest(size_of_datasource,playBackRate);
+        //printf("test_raw_mono_noloop_forward_double_rate_playback::testReadForwardAtDoublePlaybackRate(rate:%.2f\tsamples:%d)\n", playBackRate, size_of_datasource);
 
         int16_t dataSource[size_of_datasource];
         populateDataSourceAndSetSDCardMockData(size_of_datasource, dataSource);
@@ -33,6 +35,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(playBackRate);
         resamplingSdReader->playRaw("test2.bin", 1);
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), size_of_datasource != 0);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[256];
         int16_t *buffers[1] = { actual };
@@ -42,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
             samplesRead = resamplingSdReader->read((void**)buffers, 256);
             total_bytes_read += samplesRead * 2;
             printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i = 0; i < samplesRead; i++) {
+            for (int i = 0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");

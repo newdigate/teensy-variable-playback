@@ -7,6 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ResamplingArrayWavFixture.h"
+#include "utils.h"
 
 extern unsigned char stereo_souljah_wav[];
 extern unsigned int stereo_souljah_wav_len;
@@ -16,11 +17,13 @@ BOOST_AUTO_TEST_SUITE(test_array_stereo)
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayWavFixture) {
 
         const uint32_t expectedDataSize = stereo_souljah_wav_len; // 32 16bit samples = 64 bytes of space
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(1.0f);
         resamplingArrayReader->playWav((int16_t*)stereo_souljah_wav, stereo_souljah_wav_len/2);
+        BOOST_CHECK_EQUAL(resamplingArrayReader->isPlaying(), true);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
         int16_t actualLeft[256], actualRight[256];
         int16_t *buffers[2] = { actualLeft, actualRight };

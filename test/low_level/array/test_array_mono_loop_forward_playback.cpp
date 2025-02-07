@@ -7,6 +7,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ResamplingArrayFixture.h"
+#include "utils.h"
+
 extern unsigned char kick_raw[];
 extern unsigned int kick_raw_len; // in bytes, divide by 2 to get samples
 
@@ -15,11 +17,13 @@ BOOST_AUTO_TEST_SUITE(test_array_mono_loop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayFixture) {
 
         const uint32_t expectedDataSize = kick_raw_len; // 32 16bit samples = 64 bytes of space
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(1.0f);
         resamplingArrayReader->playRaw((int16_t*)kick_raw, kick_raw_len/2, 1);
+        BOOST_CHECK_EQUAL(resamplingArrayReader->isPlaying(), true);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
         int16_t actual[256];
         int16_t *buffers[1] = { actual };

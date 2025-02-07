@@ -167,8 +167,8 @@ public:
         
 		_sourceBuffer = createSourceBuffer(file);
 		setLoopType(_loopType);
-		setLoopStart(_samples_to_start(_loop_start));
-		setLoopFinish(_samples_to_start(_loop_finish));
+		setLoopStart(/*_samples_to_start*/(_loop_start));
+		setLoopFinish(/*_samples_to_start*/(_loop_finish));
         reset(); // sets _bufferPosition1 ready for playback
 		if (_playbackRate >= 0.0f)
 			preLoadBuffers(_bufferPosition1, _bufferInPSRAM);

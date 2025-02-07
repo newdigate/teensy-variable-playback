@@ -6,6 +6,7 @@
 #define TEENSY_RESAMPLING_WAVSDREADER_READER_MONO_LOOP_FORWARD_TESTS_CPP
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
+#include "utils.h"
 
 BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
     uint16_t test_sndhdrdata_sndhdr_wav[] = {
@@ -15,12 +16,14 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
             0x6164, 0x6174, 0x0014, 0x0000
     };
     unsigned int test_sndhdrdata_sndhdr_wav_len = 22; // 22 int16_t = 44 bytes = size of wave header
-
+    const unsigned int LOOP_LENGTH =  8; // size of loop to test (samples)
+    
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t expectedDataSize = 32;  // = 64 bytes
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
-        printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
             mockFileBytes[i] = test_sndhdrdata_sndhdr_wav[i];
@@ -33,6 +36,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(1.0);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_repeat);
         int16_t actual[256];
         int16_t *buffers[1] = { actual };
@@ -41,10 +45,10 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         do {
             bytesRead = resamplingSdReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += bytesRead;
-            //printf("j:%d bytesRead: %d \n", j, bytesRead);
+            printf("j:%d bytesRead: %d:", j, bytesRead);
 
             for (int i=0; i < bytesRead/2; i++) {
-                printf("\t\t[%x]:%x", currentExpected, actual[i]);
+                if (PRINT_ALL_SAMPLES) printf("\t\t[%x]:%x", currentExpected, actual[i]);
 
                 if (currentExpected != actual[i]) {
                     assertionsPass = false;
@@ -57,7 +61,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
 
             printf("\n");
             j++;
-        } while (j < 100);
+        } while (j < LOOP_BLOCKS);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
@@ -70,7 +74,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         const uint32_t expectedDataSize = 32;  // = 64 bytes
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
 
-        printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
             mockFileBytes[i] = test_sndhdrdata_sndhdr_wav[i];
@@ -83,8 +88,9 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(1.0);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_repeat);
-        resamplingSdReader->setLoopFinish(8);
+        resamplingSdReader->setLoopFinish(LOOP_LENGTH);
 
         int16_t actual[256];
         int16_t *buffers[1] = { actual };
@@ -93,10 +99,10 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += samplesRead * 2;
-            printf("j:%d samplesRead: %d \n", j, samplesRead);
+            printf("j:%d samplesRead: %d:", j, samplesRead);
 
             for (int i=0; i < samplesRead; i++) {
-                printf("\t\t[%x]:%x", currentExpected, actual[i]);
+                if (PRINT_ALL_SAMPLES) printf("\t\t[%x]:%x", currentExpected, actual[i]);
 
                 if (currentExpected != actual[i]) {
                     assertionsPass = false;
@@ -104,12 +110,12 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
                 }
 
                 currentExpected++;
-                currentExpected %= 8;
+                currentExpected %= LOOP_LENGTH;
             }
 
             printf("\n");
             j++;
-        } while (j < 100);
+        } while (j < LOOP_BLOCKS);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
@@ -121,7 +127,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
 
         const uint32_t expectedDataSize = 32;  // = 64 bytes
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
-        printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("test_wav_mono_loop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
             mockFileBytes[i] = test_sndhdrdata_sndhdr_wav[i];
@@ -134,8 +141,9 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(1.0);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_repeat);
-        resamplingSdReader->setLoopFinish(8);
+        resamplingSdReader->setLoopFinish(LOOP_LENGTH);
 
         int16_t actual[256];
         int16_t *buffers[1] = { actual };
@@ -144,10 +152,10 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 ); // 256 samples
             total_bytes_read += samplesRead * 2;
-            printf("j:%d bytesRead: %d \n", j, total_bytes_read);
+            printf("j:%d bytesRead: %d:", j, total_bytes_read);
 
             for (int i=0; i < samplesRead; i++) {
-                printf("\t\t[%x]:%x", currentExpected, actual[i]);
+                if (PRINT_ALL_SAMPLES) printf("\t\t[%x]:%x", currentExpected, actual[i]);
 
                 if (currentExpected != actual[i]) {
                     assertionsPass = false;
@@ -155,12 +163,12 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
                 }
 
                 currentExpected++;
-                currentExpected %= 8;
+                currentExpected %= LOOP_LENGTH;
             }
 
             printf("\n");
             j++;
-        } while (j < 100);
+        } while (j < LOOP_BLOCKS);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
 
@@ -172,12 +180,16 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
 
         const uint32_t size_of_datasource = 800;
         test_sndhdrdata_sndhdr_wav[20] = size_of_datasource * 2;
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", size_of_datasource);
-        int16_t dataSource[size_of_datasource];
-        for (int16_t i = 0; i < size_of_datasource; i++) {
-            dataSource[i] = i;
+        printTest(size_of_datasource);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", size_of_datasource);
+        int16_t dataSource[test_sndhdrdata_sndhdr_wav_len + size_of_datasource];
+        for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
+            dataSource[i] = test_sndhdrdata_sndhdr_wav[i];
         }
-        SD.setSDCardFileData((char*) dataSource, size_of_datasource * 2);
+        for (int16_t i = 0; i < size_of_datasource; i++) {
+            dataSource[i + test_sndhdrdata_sndhdr_wav_len] = i;
+        }
+        SD.setSDCardFileData((char*) dataSource, (test_sndhdrdata_sndhdr_wav_len + size_of_datasource) * 2);
 
         const int16_t expectedSize = size_of_datasource * 2;
         int16_t expected[expectedSize];
@@ -188,6 +200,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(0.5);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[expectedSize];
         int16_t *buffers[1] = { actual };
@@ -196,7 +209,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_loop_forward_playback)
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
             printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i=0; i < samplesRead; i++) {
+            for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");

@@ -39,6 +39,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(-1.0);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[1024];
         int16_t *buffers[1] = { actual };
@@ -69,7 +70,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
 
         const uint32_t expectedDataSize = 258;
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
-        printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        //printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize * 2];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
@@ -87,6 +89,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(-0.5);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[expectedDataSize*2];
         int16_t *buffers[1] = { actual };
