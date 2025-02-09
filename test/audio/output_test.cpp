@@ -13,7 +13,10 @@ void TestAudioOutput::begin(void)
 void TestAudioOutput::isr(void)
 {
     if (TestAudioOutput::update_responsibility) AudioStream::update_all();
-	yield();
+	
+	// Run event responses if any; needs changes to teensy-x86-stubs
+	// to add EventResponder and code to call it from yield()
+	yield(); 
 }
 
 void TestAudioOutput::update(void)

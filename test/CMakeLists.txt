@@ -14,9 +14,11 @@ if (DEFINED BUILD_FOR_LINUX)
 
     find_package(teensy_audio_x86_stubs)
     include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
+    message(STATUS "include-dir: teensy_audio_x86_stubs: ${teensy_audio_x86_stubs_INCLUDE_DIR}")
 
     find_package(teensy_x86_sd_stubs)
     include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
+    message(STATUS "include-dir: teensy_x86_sd_stubs: ${teensy_x86_sd_stubs_INCLUDE_DIR}")
 
     include_directories(.)
     include_directories(../src)
@@ -47,11 +49,11 @@ if (DEFINED BUILD_FOR_LINUX)
     add_executable(tests
             audio/output_test.cpp
 
-            #audio/array/AudioArrayFixture.h
-            #audio/array/test_array_mono_loop_backward_playback.cpp
-            #audio/array/test_array_mono_loop_forward_playback.cpp
-            #audio/array/test_array_stereo_loop_backward_playback.cpp
-            #audio/array/test_array_stereo_loop_forward_playback.cpp
+            audio/array/AudioArrayFixture.h
+            audio/array/test_array_mono_loop_backward_playback.cpp
+            audio/array/test_array_mono_loop_forward_playback.cpp
+            audio/array/test_array_stereo_loop_backward_playback.cpp
+            audio/array/test_array_stereo_loop_forward_playback.cpp
 
             audio/wav/AudioWavFixture.h
             audio/wav/test_wav_mono_loop_forward_playback.cpp
@@ -68,13 +70,13 @@ if (DEFINED BUILD_FOR_LINUX)
             
             low_level/wav_header/test_parse_wave_header.cpp
             
-            #low_level/array/test_array_mono_loop_forward_playback.cpp
-            #low_level/array/test_array_stereo_loop_forward_playback.cpp
+            low_level/array/test_array_mono_loop_forward_playback.cpp
+            low_level/array/test_array_stereo_loop_forward_playback.cpp
             
-            #low_level/arraywav/test_array_mono_loop_forward_playback.cpp
-            #low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
+            low_level/arraywav/test_array_mono_loop_forward_playback.cpp
+            low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
 
-            #low_level/indexedfile/test_indexablefile.cpp
+            low_level/indexedfile/test_indexablefile.cpp
 
             # these should always compile OK
             kick_raw.c

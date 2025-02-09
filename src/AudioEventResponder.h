@@ -34,7 +34,7 @@ class AudioEventResponder : public EventResponder
 	static uint8_t active_flags_copy;
 	static int disableCount;
 	static bool forceResponse; // if true, we don't change yield_active_check_flags
-	bool _isPolled;
+	bool _isPolled = 0;
 	AudioEventResponder* _aprev,*_anext; // can't use base ones, protected
 	
 	struct triggeredList {AudioEventResponder* first, *last;};

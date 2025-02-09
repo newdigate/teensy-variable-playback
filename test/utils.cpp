@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include "utils.h"
 
+static int count;
 void printTest(uint32_t expectedDataSize,double rate)
 {
     auto theCase = boost::unit_test::framework::current_test_case;
@@ -14,7 +15,9 @@ void printTest(uint32_t expectedDataSize,double rate)
 //*/
 
     std::cout << std::endl
-              << "==========================================="
+              << "================================== "
+              << ++count
+              << " =================================="
               << std::endl
               << p_file_name 
               << "::" 
