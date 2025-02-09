@@ -3,8 +3,12 @@
 #define LOOP_BLOCKS 42 // number of blocks to generate when looping
 #define WAV_HEADER_SIZE 44 // sleazy hack...
 
+/*
 #define REFERENCE_PATH "../../test/resources/reference/"
 #define INPUT_PATH "../../test/resources/input"
+*/
+#define REFERENCE_PATH "test/resources/reference/"
+#define INPUT_PATH "test/resources/input"
 
 extern void printTest(uint32_t expectedDataSize = 0, 
                       double rate = NO_RATE);
