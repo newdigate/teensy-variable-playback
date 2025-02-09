@@ -100,7 +100,7 @@ jobs:
     - name: build
       run: mkdir cmake-build-debug && cd cmake-build-debug && cmake .. -DCMAKE_TOOLCHAIN_FILE:FILEPATH="${{github.workspace}}/cmake/toolchains/teensy41.cmake" && make sd_wav_hex
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: hex file
         path: examples/sd_wav/cmake-build-debug/sd_wav.hex
