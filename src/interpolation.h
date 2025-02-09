@@ -16,7 +16,8 @@ enum ResampleInterpolationType {
 
 struct InterpolationData
 {
-    int16_t x, y;
+    uint32_t x;
+	int16_t y;
 };
 
 // https://en.wikipedia.org/wiki/Lagrange_polynomial

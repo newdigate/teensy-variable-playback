@@ -1,4 +1,4 @@
-# variable rate playback for teensy audio library
+# Variable rate playback for Teensy Audio library
 [![Teensy 4.1](https://img.shields.io/badge/project-4.1-brightgreen.svg?label=Teensy&colorA=555555&colorB=ff8aff&logo=)](https://www.pjrc.com/store/teensy41.html)
 [![lib-teensy41](https://github.com/newdigate/teensy-variable-playback/actions/workflows/teensy41_lib.yml/badge.svg)](https://github.com/newdigate/teensy-variable-playback/actions/workflows/teensy41_lib.yml)
 [![Ubuntu-x64](https://github.com/newdigate/teensy-variable-playback/workflows/Ubuntu-x64/badge.svg)](https://github.com/newdigate/teensy-variable-playback/actions)
@@ -9,15 +9,22 @@
 [![Commits](https://img.shields.io/github/commit-activity/m/newdigate/teensy-variable-playback)](https://github.com/newdigate/teensy-variable-playback/graphs/contributors)
 ![s](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4105381)
 
-play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
+Play 16-bit PCM RAW or WAV audio samples at variable playback rates on Teensy
 * **Note** : this library only works with signed 16-bit integer samples. Floating point samples will not play. 
 
-* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro sd-card. 
-  * [sd classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
+* for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro SD-card. 
+  * [SD classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 2025-02-02: v1.1.0
+  * wide-ranging changes to allow more robust playback of multiple files
+    * buffers in heap or PSRAM, re-loaded by EventResponder rather than in interrupt
+    * mechanism to prevent attempted simultaneous filesystem accesses from playback and user code
+  * examples added: PlayPiano and FileAccess
+  * start playback at arbitrary point in file (`play_start::play_start_arbitrary`)
+  
 * 26/02/2022: v1.0.16:
-  * add option for starting sample at begining or at loop start
+  * add option for starting sample at beginning or at loop start
   ``` c
   typedef enum play_start {
       play_start_sample,
@@ -27,7 +34,7 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   wave.setPlayStart(play_start::play_start_loop); 
   ```
 * 26/02/2022: v1.0.15:
-  * added support for dual playback head for seemless looping
+  * added support for dual playback head for seamless looping
     * enable dual playback using linear crossfading
     * set crossfade duration in number of samples
   ``` c
@@ -42,7 +49,7 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   * refactored code to generic classes
   * improve memory leaks
   * remove calls to StartUsingSPI(), StopUsingSPI(), __disable_irq(), __enable_irq()
-  * intergated with SerialFlash and LittleFS 
+  * integrated with SerialFlash and LittleFS 
 * 25/09/2021: v1.0.13: positionMillis() implemented for AudioPlaySdResmp
 * 25/08/2021: v1.0.12: Skip over RIFF tags in .wav header
 * 12/08/2021: v1.0.11: When playing a mono sample, transmit on both channels (credit to @atoktoto) 
@@ -79,7 +86,7 @@ play 16-bit PCM raw or wav audio samples at variable playback rates on teensy
   <summary>with Teensyduino</summary>  
 
 ```Teensyduino```[^](https://www.pjrc.com/teensy/teensyduino.html)
-* This library is built on top of teensy audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
+* This library is built on top of Teensy Audio library,  intended for use with Teensy 3.x and Teensy 4.x boards.
 * Install using arduino/teensyduino library manager gui - search ```TeensyVariablePlayback```
   * ![install using arduino library manager](docs/InstallArduino.gif)
 </details>

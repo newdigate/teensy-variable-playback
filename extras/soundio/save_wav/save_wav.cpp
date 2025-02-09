@@ -107,6 +107,7 @@ int main() {
     setup();
     while(!arduino_should_exit){
         loop();
+        yield();
     }
     delay(1000);
     frec.close();

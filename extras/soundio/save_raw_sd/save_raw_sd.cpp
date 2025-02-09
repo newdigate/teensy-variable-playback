@@ -122,6 +122,7 @@ int main(int numArgs, char **args) {
     setup();
     while(!arduino_should_exit){
         loop();
+        yield();
     }
     delay(1000);
     frec.close();

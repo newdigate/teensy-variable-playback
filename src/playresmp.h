@@ -4,10 +4,14 @@
 #include "Arduino.h"
 #include "Audio.h"
 #include "loop_type.h"
+#include "AudioEventResponder.h"
+
+extern void readerClose(void);
 
 template <class TResamplingReader>
-class AudioPlayResmp : public AudioStream
+class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 {
+		enum {evNothing,evReload,evClose};
     public:
         AudioPlayResmp(): AudioStream(0, NULL), reader(nullptr)
         {
@@ -16,6 +20,27 @@ class AudioPlayResmp : public AudioStream
         virtual ~AudioPlayResmp() {
         }
 
+		static void event_response(EventResponderRef evRef)
+		{
+			AudioPlayResmp<TResamplingReader>* player = (AudioPlayResmp*) evRef.getData();
+			TResamplingReader* reader = (TResamplingReader*) player->reader;
+			int status = evRef.getStatus();
+			
+			disableResponse();
+			if (nullptr != reader)
+				switch (status)
+				{
+					case evReload:
+						reader->triggerReload();
+						break;
+						
+					case evClose:
+						reader->close();
+						break;
+				}
+			enableResponse();
+		}
+		
         void begin(void)
         {
             reader->begin();
@@ -23,14 +48,30 @@ class AudioPlayResmp : public AudioStream
 
         bool playRaw(const char *filename, uint16_t numChannels)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, false, numChannels);
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
+			updateResponse();
+            bool result = reader->play(filename, false, numChannels);
+			enableResponse();
+			return result;
         }
 
         bool playWav(const char *filename)
         {
+			disableResponse();
             stop();
-            return reader->play(filename, true, 0);
+			if (getForceResponse())
+				attachPolled(event_response);
+			else
+				attach(event_response);
+			updateResponse();
+            bool result = reader->play(filename, true, 0);
+			enableResponse();
+			return result;
         }
         
         bool playRaw(int16_t *data, uint32_t numSamples, uint16_t numChannels)
@@ -68,6 +109,10 @@ class AudioPlayResmp : public AudioStream
             reader->setLoopType(t);
         }
 
+        loop_type getLoopType(void) {
+            return reader->getLoopType();
+        }
+
         void setLoopStart(uint32_t loop_start) {
             reader->setLoopStart(loop_start);
         }
@@ -84,8 +129,8 @@ class AudioPlayResmp : public AudioStream
             reader->setCrossfadeDurationInSamples(crossfadeDurationInSamples);
         }
 
-        void setPlayStart(play_start start) {
-            reader->setPlayStart(start);
+        void setPlayStart(play_start start, uint32_t playback_start = 0) {
+            reader->setPlayStart(start, playback_start);
         }
 
         void enableInterpolation(bool enable) {
@@ -97,11 +142,26 @@ class AudioPlayResmp : public AudioStream
 
         bool isPlaying(void) {
             return reader->isPlaying();
-        };
+        }
+
+        bool getBufferInPSRAM(void) {
+            return reader->getBufferInPSRAM();
+        }
+
+        void setBufferInPSRAM(bool flag) {
+            reader->setBufferInPSRAM(flag);
+        }
 
         void stop() {
+			disableResponse();
+			clearEvent();
             reader->stop();
+			enableResponse();
         }
+		
+		size_t getBufferSize(void) { return reader->getBufferSize(); }
+		void getStatus(char* buf)  { return reader->getStatus(buf); }
+		void triggerReload()  { return reader->triggerReload(this); }
 
         void update()
         {
@@ -138,9 +198,13 @@ class AudioPlayResmp : public AudioStream
 					if(_numChannels == 1) {
 						transmit(blocks[0], 1);
 					}
-
+					
+					if (AUDIO_BLOCK_SAMPLES == n) // got enough samples...
+						triggerEvent(evReload,this); // ...load more if needed
+					else
+						triggerEvent(evClose,this); // ...end of file, finish playing
 				} else {
-					reader->close();
+					triggerEvent(evClose,this);
 				}
 			}
 			

@@ -12,8 +12,9 @@ typedef enum loop_type {
 } loop_type;
 
 typedef enum play_start {
-    play_start_sample,
-    play_start_loop,
+    play_start_sample,  	// play starts at sample start
+    play_start_loop,		// play starts at loop start
+	play_start_arbitrary,	// play starts at arbitrary point set by user
 } play_start;
 
 #endif //TEENSY_RESAMPLING_LOOP_TYPE_H

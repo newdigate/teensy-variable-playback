@@ -13,11 +13,11 @@ class IndexableSerialFlashFile : public IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFE
 public:
     static_assert(isPowerOf2(BUFFER_SIZE), "BUFFER_SIZE must be a power of 2");
 
-    IndexableSerialFlashFile(SerialFlashChip &fs, const char *filename) : 
+    IndexableSerialFlashFile(SerialFlashChip &fs, const char *filename, SerialFlashFile& file) : 
         IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,SerialFlashFile>(filename),
         _myFS(fs) 
     {
-        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,SerialFlashFile>::_file = _myFS.open(filename);
+        IndexableFile<BUFFER_SIZE, MAX_NUM_BUFFERS,SerialFlashFile>::_file = file;
     }
     
     SerialFlashFile open(const char *filename) override {

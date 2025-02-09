@@ -1,12 +1,36 @@
-AudioPlayArrayResmp	    KEYWORD2
-AudioPlaySdResmp        KEYWORD2
-playRaw                 KEYWORD2
-playWav                 KEYWORD2
-isPlaying               KEYWORD2
-setPlaybackRate         KEYWORD2
-setLoopType             KEYWORD2
-startLoop               KEYWORD2
-enableInterpolation     KEYWORD2
-looptype_none           LITERAL1
-looptype_repeat         LITERAL1
-looptype_pingpong       LITERAL1
+AudioPlayArrayResmp		KEYWORD2
+AudioPlaySdResmp	KEYWORD2
+AudioPlayLfsResmp	KEYWORD2
+AudioPlaySerialFlashResmp	KEYWORD2
+AudioEventResponder	KEYWORD2
+
+playRaw	KEYWORD2
+playWav	KEYWORD2
+isPlaying	KEYWORD2
+setPlaybackRate	KEYWORD2
+setLoopType	KEYWORD2
+getLoopType	KEYWORD2
+setLoopStart	KEYWORD2
+setLoopFinish	KEYWORD2
+getLoopFinish	KEYWORD2
+startLoop	KEYWORD2
+setUseDualPlaybackHead	KEYWORD2
+getUseDualPlaybackHead	KEYWORD2
+enableInterpolation	KEYWORD2
+setCrossfadeDurationInSamples	KEYWORD2
+setPlayStart	KEYWORD2
+setBufferInPSRAM	KEYWORD2
+getBufferInPSRAM	KEYWORD2
+disableResponse	KEYWORD2
+enableResponse	KEYWORD2
+
+
+loop_type	KEYWORD2
+looptype_none	LITERAL1
+looptype_repeat	LITERAL1
+looptype_pingpong	LITERAL1
+
+play_start	KEYWORD2
+play_start_sample	LITERAL1
+play_start_loop	LITERAL1
+play_start_arbitrary	LITERAL1
