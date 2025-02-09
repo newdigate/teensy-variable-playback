@@ -6,6 +6,7 @@
 #define TEENSY_RESAMPLING_WAVSDREADER_READER_MONO_NOLOOP_BACKWARD_TESTS_CPP
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
+#include "utils.h"
 
 BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
 
@@ -22,7 +23,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         const uint32_t expectedDataSize = 258;
 
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
-        printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        //printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
@@ -37,6 +39,7 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(-1.0);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[1024];
         int16_t *buffers[1] = { actual };
@@ -44,9 +47,9 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
-            printf("j:%d bytessamplesReadRead: %d \n", j, samplesRead);
+            printf("j:%d bytessamplesReadRead: %d: ", j, samplesRead);
 
-            for (int i=0; i < samplesRead; i++) {
+            for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");
@@ -56,7 +59,10 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
             j++;
         } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
-        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), false);
+        // This check is no longer correct, the reader is not 
+        // responsible for closing the file because it is called from
+        // the update() interrupt
+        // BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), false);
         resamplingSdReader->close();
     }
 
@@ -64,7 +70,8 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
 
         const uint32_t expectedDataSize = 258;
         test_sndhdrdata_sndhdr_wav[20] = expectedDataSize * 2;
-        printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        //printf("test_wav_mono_noloop_forward_playback::ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
         int16_t mockFileBytes[expectedDataSize + test_sndhdrdata_sndhdr_wav_len];
         int16_t expected[expectedDataSize * 2];
         for (int16_t i = 0; i < test_sndhdrdata_sndhdr_wav_len; i++) {
@@ -82,15 +89,17 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_backward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(-0.5);
         resamplingSdReader->playWav("test2.bin");
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         int16_t actual[expectedDataSize*2];
         int16_t *buffers[1] = { actual };
         int j = 0, samplesRead = 0, total_bytes_read = 0;
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
+            resamplingSdReader->forceTriggerReload(-0.5);
             total_bytes_read += samplesRead;
             printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i=0; i < samplesRead; i++) {
+            for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");

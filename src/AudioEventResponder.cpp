@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <AudioEventResponder.h>
+#include "AudioEventResponder.h"
 
 using namespace newdigate;
  

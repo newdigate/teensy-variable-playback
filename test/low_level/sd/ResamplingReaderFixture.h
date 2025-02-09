@@ -5,19 +5,26 @@
 #ifndef TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 #define TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H
 
+#include "Audio.h"
 #include "ResamplingSdReader.h"
 
-struct ResamplingReaderFixture {
+class ResamplingReaderFixture {
 
+public:
+    class TestResamplingSdReader : public newdigate::ResamplingSdReader
+    {
+        public:
+            void forceTriggerReload(float pbd = 1.0) {_sourceBuffer->triggerReload(pbd);}
+    };
     ResamplingReaderFixture()  {
-        resamplingSdReader = new newdigate::ResamplingSdReader();
+        resamplingSdReader = new TestResamplingSdReader;
     }
 
     ~ResamplingReaderFixture() {
         delete resamplingSdReader;
     }
 
-    newdigate::ResamplingSdReader * resamplingSdReader;
+    TestResamplingSdReader* resamplingSdReader;
 };
 
 #endif //TEENSY_RESAMPLING_SDREADER_RESAMPLINGREADERFIXTURE_H

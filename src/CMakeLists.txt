@@ -3,10 +3,12 @@ project(teensy_variable_playback C CXX)
 set(teensy_variable_playback_VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
+        AudioEventResponder.cpp
         interpolation.cpp
         )
 
 set(HEADER_FILES
+        AudioEventResponder.h
         loop_type.h
         playresmp.h
         playsdresmp.h

@@ -9,13 +9,15 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include "ResamplingReaderFixture.h"
+#include "utils.h"
 
 BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
 
     BOOST_FIXTURE_TEST_CASE(ReadForwardAtRegularPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t expectedDataSize = 1600;
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
+        printTest(expectedDataSize);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
         int16_t expected[expectedDataSize];
         for (int16_t i = 0; i < expectedDataSize; i++) {
             expected[i] = i;
@@ -33,9 +35,9 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         do {
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
-            printf("j:%d samplesRead: %d \n", j, samplesRead);
+            printf("j:%d samplesRead: %d:", j, samplesRead);
 
-            for (int i=0; i < samplesRead; i++) {
+            for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");
@@ -50,7 +52,8 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
     BOOST_FIXTURE_TEST_CASE(ReadForwardAtHalfPlaybackRate, ResamplingReaderFixture) {
 
         const uint32_t size_of_datasource = 800;
-        printf("ReadForwardAtRegularPlaybackRate(%d)\n", size_of_datasource);
+        printTest(size_of_datasource);
+        //printf("ReadForwardAtRegularPlaybackRate(%d)\n", size_of_datasource);
         int16_t dataSource[size_of_datasource];
         for (int16_t i = 0; i < size_of_datasource; i++) {
             dataSource[i] = i;
@@ -66,6 +69,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         resamplingSdReader->begin();
         resamplingSdReader->setPlaybackRate(0.5);
         resamplingSdReader->playRaw("test2.bin", 1);
+        BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
         //resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
 
@@ -76,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
             samplesRead = resamplingSdReader->read((void**)buffers, 256 );
             total_bytes_read += samplesRead * 2;
             printf("j:%d samplesRead: %d: ", j, samplesRead);
-            for (int i=0; i < samplesRead; i++) {
+            for (int i=0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");

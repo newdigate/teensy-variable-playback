@@ -7,16 +7,18 @@
 
 #include <boost/test/unit_test.hpp>
 #include "AudioWavFixture.h"
+#include "utils.h"
     
 BOOST_AUTO_TEST_SUITE(test_audio_wav_tags_in_header)
 
     const uint16_t numberOfChannels = 2;
-    const std::string referencePath = "test/resources/reference/";
-    const std::string inputPath = "test/resources/input/";
+    const std::string referencePath = REFERENCE_PATH;
+    const std::string inputPath = INPUT_PATH;
     const std::string outputPath = "output/";
 
     BOOST_FIXTURE_TEST_CASE(Wav_with_tags_in_header_1, AudioWavFixture) {
 
+        printTest();
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -60,13 +62,14 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_tags_in_header)
 
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }
     BOOST_FIXTURE_TEST_CASE(Wav_with_tags_in_header_2, AudioWavFixture) {
 
+        printTest();
         // GUItool: begin automatically generated code
         AudioPlaySdResmp         wave;        //xy=306,225
         TestAudioOutput          testout;       //xy=612,224
@@ -107,8 +110,8 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_tags_in_header)
         
         std::ifstream ifs1(outputFileName);
         std::ifstream ifs2(referenceFileName);
-        std::istream_iterator<char> b1(ifs1), e1;
-        std::istream_iterator<char> b2(ifs2), e2;
+        std::istream_iterator<int16_t> b1(ifs1), e1;
+        std::istream_iterator<int16_t> b2(ifs2), e2;
 
         BOOST_CHECK_EQUAL_COLLECTIONS(b1, e1, b2, e2);
     }

@@ -167,8 +167,8 @@ public:
         
 		_sourceBuffer = createSourceBuffer(file);
 		setLoopType(_loopType);
-		setLoopStart(_samples_to_start(_loop_start));
-		setLoopFinish(_samples_to_start(_loop_finish));
+		setLoopStart(/*_samples_to_start*/(_loop_start));
+		setLoopFinish(/*_samples_to_start*/(_loop_finish));
         reset(); // sets _bufferPosition1 ready for playback
 		if (_playbackRate >= 0.0f)
 			preLoadBuffers(_bufferPosition1, _bufferInPSRAM);
@@ -790,20 +790,19 @@ protected:
 // they need to be different for the supplied type. e.g. it makes
 // no sense to track buffer statuses for an in-memory "file".
 template<>
-void ResamplingReader<short int,File>::resetStatus(void) {}
+inline void ResamplingReader<short int,File>::resetStatus(void) {}
 template<>
-void ResamplingReader<short int,File>::getStatus(char* buf) { strcpy(buf,"int[]"); }
+inline void ResamplingReader<short int,File>::getStatus(char* buf) { strcpy(buf,"int[]"); }
 template<>
-void ResamplingReader<short int,File>::triggerReload(void) {}
+inline void ResamplingReader<short int,File>::triggerReload(void) {}
 template<>
-void ResamplingReader<short int,File>::setLoopType(loop_type loopType) { _loopType = loopType; }
+inline void ResamplingReader<short int,File>::setLoopType(loop_type loopType) { _loopType = loopType; }
 template<>
-void ResamplingReader<short int,File>::setLoopStart(uint32_t loop_start) { _loop_start = loop_start; }
+inline void ResamplingReader<short int,File>::setLoopStart(uint32_t loop_start) { _loop_start = loop_start; }
 template<>
-void ResamplingReader<short int,File>::setLoopFinish(uint32_t loop_finish) { _loop_finish = loop_finish; }
+inline void ResamplingReader<short int,File>::setLoopFinish(uint32_t loop_finish) { _loop_finish = loop_finish; }
 template<>
-size_t ResamplingReader<short int,File>::preLoadBuffers(int , bool , bool) {return 0;}
-
+inline size_t ResamplingReader<short int,File>::preLoadBuffers(int , bool , bool) {return 0;}
 }
 
 #endif //TEENSYAUDIOLIBRARY_RESAMPLINGREADER_H
