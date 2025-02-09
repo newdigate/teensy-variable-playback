@@ -27,6 +27,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: h4yn0nnym0u5e/teensy-x86-stubs
+          ref: feature/EventResponder
           path: teensy-x86-stubs
 
       - uses: actions/checkout@v2
