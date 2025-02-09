@@ -16,13 +16,13 @@ BOOST_AUTO_TEST_SUITE(test_array_mono)
 
     BOOST_FIXTURE_TEST_CASE(ReadForwardLoopAtRegularPlaybackRate, ResamplingArrayWavFixture) {
 
-        const uint32_t expectedDataSize = mono_souljah_wav_len; // 32 16bit samples = 64 bytes of space
+        const uint32_t expectedDataSize = mono_souljah_wav_len - WAV_HEADER_SIZE; // 32 16bit samples = 64 bytes of space
         printTest(expectedDataSize);
         //printf("ReadForwardAtRegularPlaybackRate(%d)\n", expectedDataSize);
 
         resamplingArrayReader->begin();
         resamplingArrayReader->setPlaybackRate(0.5f);
-        resamplingArrayReader->playWav((int16_t*)mono_souljah_wav, mono_souljah_wav_len/2);
+        resamplingArrayReader->playWav((int16_t*)mono_souljah_wav /*, mono_souljah_wav_len/2 */);
         BOOST_CHECK_EQUAL(resamplingArrayReader->isPlaying(), true);
         resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
         int16_t actual[256];
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(test_array_mono)
         } while (bytesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingArrayReader->close();
-        BOOST_CHECK_EQUAL(true, true);
+        BOOST_CHECK_EQUAL(expectedDataSize, total_bytes_read);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

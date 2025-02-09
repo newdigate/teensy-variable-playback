@@ -1,6 +1,7 @@
 #define PRINT_ALL_SAMPLES false
 #define NO_RATE -1.0
 #define LOOP_BLOCKS 42 // number of blocks to generate when looping
+#define WAV_HEADER_SIZE 44 // sleazy hack...
 
 #define REFERENCE_PATH "../../test/resources/reference/"
 #define INPUT_PATH "../../test/resources/input"

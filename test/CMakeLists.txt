@@ -49,18 +49,18 @@ if (DEFINED BUILD_FOR_LINUX)
     add_executable(tests
             audio/output_test.cpp
 
-            audio/array/AudioArrayFixture.h
+            # audio/array/AudioArrayFixture.h
             audio/array/test_array_mono_loop_backward_playback.cpp
             audio/array/test_array_mono_loop_forward_playback.cpp
             audio/array/test_array_stereo_loop_backward_playback.cpp
             audio/array/test_array_stereo_loop_forward_playback.cpp
 
-            audio/wav/AudioWavFixture.h
+            # audio/wav/AudioWavFixture.h
             audio/wav/test_wav_mono_loop_forward_playback.cpp
             audio/wav/test_wav_stereo_loop_forward_playback.cpp
             audio/wav/test_wav_tags.cpp
 
-            low_level/sd/ResamplingReaderFixture.h
+            # low_level/sd/ResamplingReaderFixture.h
             low_level/sd/test_raw_mono_noloop_forward_playback.cpp
             low_level/sd/test_raw_mono_noloop_forward_double_rate_playback.cpp
             low_level/sd/test_raw_mono_loop_forward_playback.cpp
