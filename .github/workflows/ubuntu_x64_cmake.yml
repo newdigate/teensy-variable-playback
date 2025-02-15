@@ -24,35 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/checkout@v2
-        with:
-          repository: newdigate/teensy-x86-stubs
-          path: teensy-x86-stubs
-
-      - uses: actions/checkout@v2
-        with:
-          repository: newdigate/teensy-audio-x86-stubs
-          path: teensy-audio-x86-stubs
-
-      - uses: actions/checkout@v2
-        with:
-          repository: newdigate/teensy-x86-sd-stubs
-          path: teensy-x86-sd-stubs
-
       - name: download dependencies
         run: sudo apt-get update && sudo apt-get install -yq libboost-test-dev libsoundio-dev libxml2-utils xsltproc
-
-      - name: Make and Install teensy-x86-stubs
-        run: cd teensy-x86-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
-
-      - name: Make and Install teensy-x86-sd-stubs
-        run: cd teensy-x86-sd-stubs && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
-
-      - name: Make and Install teensy-audio-x86-stubs
-        run: cd teensy-audio-x86-stubs/src && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
-
-      - name: Make and Install teensy-audio-x86-stubs-soundio
-        run: cd teensy-audio-x86-stubs/extras/soundio/src && mkdir cmake-build-$BUILD_TYPE && cd cmake-build-$BUILD_TYPE && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && sudo make install
 
       - name: Create Build Environment
         # Some projects don't allow in-source building, so create a separate build directory

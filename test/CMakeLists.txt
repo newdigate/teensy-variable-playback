@@ -8,18 +8,6 @@ if (DEFINED BUILD_FOR_LINUX)
     find_package (Boost REQUIRED COMPONENTS unit_test_framework)
     include_directories (${Boost_INCLUDE_DIRS})
 
-    find_package(teensy_x86_stubs)
-    include_directories(${teensy_x86_stubs_INCLUDE_DIR})
-    message(STATUS "include-dir: teensy_x86_stubs: ${teensy_x86_stubs_INCLUDE_DIR}")
-
-    find_package(teensy_audio_x86_stubs)
-    include_directories(${teensy_audio_x86_stubs_INCLUDE_DIR})
-    message(STATUS "include-dir: teensy_audio_x86_stubs: ${teensy_audio_x86_stubs_INCLUDE_DIR}")
-
-    find_package(teensy_x86_sd_stubs)
-    include_directories(${teensy_x86_sd_stubs_INCLUDE_DIR})
-    message(STATUS "include-dir: teensy_x86_sd_stubs: ${teensy_x86_sd_stubs_INCLUDE_DIR}")
-
     include_directories(.)
     include_directories(../src)
     include_directories(../test/audio)
