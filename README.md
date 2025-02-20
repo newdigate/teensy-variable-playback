@@ -47,8 +47,8 @@ Play 16-bit PCM RAW or WAV audio samples at variable playback rates on Teensy
 <details>
   <summary>build for teensy with cmake and gcc-arm-none-eabi</summary>  
 * required software
-    ```cmake``` [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) 
-  * remember to update ```COMPILERPATH``` in ```cmake\toolchains\teensy41.cmake``` to  ```gcc-arm-none-eabi\bin``` folder 
+    `cmake` [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) 
+  * remember to update `COMPILERPATH` in `cmake\toolchains\teensy41.cmake` to  `gcc-arm-none-eabi\bin` folder 
 
 <details>
   <summary>dependencies (click to expand image) </summary>
@@ -230,8 +230,10 @@ void loop() {
 </details>  
 
 ## updates
+
 <details>
   <summary>updates</summary>
+ 
 * 2025-02-20: build for teensy/linux without needing to install dependencies, using CMake FetchContent to pull project-relative dependencies
 * 2025-02-02: v1.1.0
   * wide-ranging changes to allow more robust playback of multiple files
