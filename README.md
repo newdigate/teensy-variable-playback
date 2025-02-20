@@ -14,60 +14,12 @@ Play 16-bit PCM RAW or WAV audio samples at variable playback rates on Teensy
 * for best performance, use SDXC UHS 30MB/sec Application Performance Class 2 (A2) class micro SD-card. 
   * [SD classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
-## updates
-* 2025-02-20: build for teensy/linux without needing to install dependencies, using CMake FetchContent to pull project-relative dependencies
-* 2025-02-02: v1.1.0
-  * wide-ranging changes to allow more robust playback of multiple files
-    * buffers in heap or PSRAM, re-loaded by EventResponder rather than in interrupt
-    * mechanism to prevent attempted simultaneous filesystem accesses from playback and user code
-  * examples added: PlayPiano and FileAccess
-  * start playback at arbitrary point in file (`play_start::play_start_arbitrary`)
-  
-* 26/02/2022: v1.0.16:
-  * add option for starting sample at beginning or at loop start
-  ``` c
-  typedef enum play_start {
-      play_start_sample,
-      play_start_loop,
-  };
-
-  wave.setPlayStart(play_start::play_start_loop); 
-  ```
-* 26/02/2022: v1.0.15:
-  * added support for dual playback head for seamless looping
-    * enable dual playback using linear crossfading
-    * set crossfade duration in number of samples
-  ``` c
-        AudioPlaySdResmp         wave;      
-        wave.setUseDualPlaybackHead(true);
-        wave.setCrossfadeDurationInSamples(1000);
-        wave.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
-        wave.setLoopStart(0); 
-        wave.setLoopFinish(3000);
-  ```
-* 16/06/2022: v1.0.14: 
-  * refactored code to generic classes
-  * improve memory leaks
-  * remove calls to StartUsingSPI(), StopUsingSPI(), __disable_irq(), __enable_irq()
-  * integrated with SerialFlash and LittleFS 
-* 25/09/2021: v1.0.13: positionMillis() implemented for AudioPlaySdResmp
-* 25/08/2021: v1.0.12: Skip over RIFF tags in .wav header
-* 12/08/2021: v1.0.11: When playing a mono sample, transmit on both channels (credit to @atoktoto) 
-* 28/07/2021: v1.0.10: Fix issues when starting playback in reverse
-* 23/07/2021: v1.0.9: Fix issue which crashes teensy when playing multiple files from SD card using array of filenames
-* 21/07/2021: v1.0.8: **Breaking changes** 
-  * ```AudioPlaySdRawResmp``` and ```AudioPlaySdWaveResmp``` merged into a single class ```AudioPlaySdResmp```
-  * ```play(...)``` method changed to ```playRaw(...)``` and ```playWav(...)```, specify number of channels in parameters of playRaw
-* 13/07/2021: v1.0.7: added multi-channel resampling
-* 07/07/2021: v1.0.6: changed to using optimised floating point interpolation, sounds much better
-* 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
-* 25/06/2021: Quadratic interpolation is now working, but is disabled by default
-
 ## contents
 * [code structure](#code-structure)
 * [requirements](#requirements)
 * [usage](#usage)
 * [example usage](#example-usage)
+* [updates](#updates)
 
 ## code structure
 | folder | target             | description                                                                                                            |
@@ -276,6 +228,58 @@ void loop() {
 ```
   
 </details>  
+
+## updates
+<details>
+  <summary>updates</summary>
+* 2025-02-20: build for teensy/linux without needing to install dependencies, using CMake FetchContent to pull project-relative dependencies
+* 2025-02-02: v1.1.0
+  * wide-ranging changes to allow more robust playback of multiple files
+    * buffers in heap or PSRAM, re-loaded by EventResponder rather than in interrupt
+    * mechanism to prevent attempted simultaneous filesystem accesses from playback and user code
+  * examples added: PlayPiano and FileAccess
+  * start playback at arbitrary point in file (`play_start::play_start_arbitrary`)
+  
+* 26/02/2022: v1.0.16:
+  * add option for starting sample at beginning or at loop start
+  ``` c
+  typedef enum play_start {
+      play_start_sample,
+      play_start_loop,
+  };
+
+  wave.setPlayStart(play_start::play_start_loop); 
+  ```
+* 26/02/2022: v1.0.15:
+  * added support for dual playback head for seamless looping
+    * enable dual playback using linear crossfading
+    * set crossfade duration in number of samples
+  ``` c
+        AudioPlaySdResmp         wave;      
+        wave.setUseDualPlaybackHead(true);
+        wave.setCrossfadeDurationInSamples(1000);
+        wave.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
+        wave.setLoopStart(0); 
+        wave.setLoopFinish(3000);
+  ```
+* 16/06/2022: v1.0.14: 
+  * refactored code to generic classes
+  * improve memory leaks
+  * remove calls to StartUsingSPI(), StopUsingSPI(), __disable_irq(), __enable_irq()
+  * integrated with SerialFlash and LittleFS 
+* 25/09/2021: v1.0.13: positionMillis() implemented for AudioPlaySdResmp
+* 25/08/2021: v1.0.12: Skip over RIFF tags in .wav header
+* 12/08/2021: v1.0.11: When playing a mono sample, transmit on both channels (credit to @atoktoto) 
+* 28/07/2021: v1.0.10: Fix issues when starting playback in reverse
+* 23/07/2021: v1.0.9: Fix issue which crashes teensy when playing multiple files from SD card using array of filenames
+* 21/07/2021: v1.0.8: **Breaking changes** 
+  * ```AudioPlaySdRawResmp``` and ```AudioPlaySdWaveResmp``` merged into a single class ```AudioPlaySdResmp```
+  * ```play(...)``` method changed to ```playRaw(...)``` and ```playWav(...)```, specify number of channels in parameters of playRaw
+* 13/07/2021: v1.0.7: added multi-channel resampling
+* 07/07/2021: v1.0.6: changed to using optimised floating point interpolation, sounds much better
+* 30/06/2021: v1.0.5: Optimised quadratic interpolation to use fixed pipeline of 4 samples and use integers instead of floating point
+* 25/06/2021: Quadratic interpolation is now working, but is disabled by default
+</details>
 
 # credits
 * convert boost test report to junit xml format: [Stuart Lange](https://stackoverflow.com/a/2975928/4634140)
