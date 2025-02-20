@@ -21,9 +21,9 @@ if (NOT DEFINED BUILD_FOR_LINUX)
 else()
 
     include(cmake_declare_and_fetch.cmake.in)
-    DeclareAndFetch(teensy_x86_stubs            https://github.com/newdigate/teensy-x86-stubs.git noinstall src)
-    DeclareAndFetch(teensy_x86_sd_stubs         https://github.com/newdigate/teensy-x86-sd-stubs noinstall src)
-    DeclareAndFetch(teensy_audio_x86_stubs      https://github.com/newdigate/teensy-audio-x86-stubs noinstall src)
+    DeclareAndFetch(teensy_x86_stubs            https://github.com/newdigate/teensy-x86-stubs.git main src)
+    DeclareAndFetch(teensy_x86_sd_stubs         https://github.com/newdigate/teensy-x86-sd-stubs main src)
+    DeclareAndFetch(teensy_audio_x86_stubs      https://github.com/newdigate/teensy-audio-x86-stubs main src)
     add_subdirectory(src)
     add_subdirectory(test)
 
