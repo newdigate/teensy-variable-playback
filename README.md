@@ -16,6 +16,7 @@ Play 16-bit PCM RAW or WAV audio samples at variable playback rates on Teensy
   * [SD classes on wikipedia](https://en.wikipedia.org/wiki/SD_card#cite_ref-93) 
 
 ## updates
+* 2025-02-20: build for teensy/linux without needing to install dependencies, using CMake FetchContent to pull project-relative dependencies
 * 2025-02-02: v1.1.0
   * wide-ranging changes to allow more robust playback of multiple files
     * buffers in heap or PSRAM, re-loaded by EventResponder rather than in interrupt
@@ -93,12 +94,11 @@ Play 16-bit PCM RAW or WAV audio samples at variable playback rates on Teensy
     
   
 <details>
-  <summary>without Teensyduino (for development)</summary>  
+  <summary>build for teensy with cmake and gcc-arm-none-eabi</summary>  
+* required software
+    ```cmake``` [gcc-arm-none-eabi](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) 
+  * remember to update ```COMPILERPATH``` in ```cmake\toolchains\teensy41.cmake``` to  ```gcc-arm-none-eabi\bin``` folder 
 
-```cmake``` ```gcc-arm-none-eabi```[^](https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1) ```teensy-cmake-macros```[^](https://github.com/newdigate/teensy-cmake-macros) ```cores```[^](https://github.com/PaulStoffregen/cores) ```Audio```[^](https://github.com/PaulStoffregen/Audio) ```SD```[^](https://github.com/PaulStoffregen/SD/tree/Juse_Use_SdFat) ```Wire```[^](https://github.com/PaulStoffregen/Wire) ```SPI```[^](https://github.com/PaulStoffregen/SPI) ```SerialFlash```[^](https://github.com/PaulStoffregen/SerialFlash) ```arm_math```[^](https://github.com/PaulStoffregen/arm_math) ```SDFat```[^](https://github.com/greiman/SdFat)
-* using [teensy-cmake-macros](https://github.com/newdigate/teensy-cmake-macros), this library can be compiled for teensy 3 and 4 boards without needing Teensyduino. This is mainly used to build the library when a commit is pushed, to verify there are no compile errors. 
-  
-  
 <details>
   <summary>dependencies (click to expand image) </summary>
   
@@ -140,11 +140,14 @@ graph G {
   You can run and test this code on your linux computer. You can write a teensy sketch, and with a few modifications, you can redirect the audio input and output to and from your soundcard. [Soundio](https://github.com/newdigate/teensy-audio-x86-stubs/tree/main/extras/soundio) bindings are optional, you can also run sketches and tests with no audio input or output.
   You will need to install the following libraries.
   
-```cmake``` ```gcc or llvm``` ```teensy-x86-stubs```[^](https://github.com/newdigate/teensy-x86-stubs) ```teensy-audio-x86-stubs```[^](https://github.com/newdigate/teensy-audio-x86-stubs) ```teensy-x86-sd-stubs```[^](https://github.com/newdigate/teensy-x86-sd-stubs) ```boost-test``` 
+  ```cmake``` ```libsoundio``` ```gcc or llvm``` ```boost-test``` 
 
   * install boost unit-test library: 
     * linux: ```sudo apt-get install -yq libboost-test-dev```
     * macos: ```brew install boost```
+  * install soundio
+    * linux: ```sudo apt-get install -yq libsoundio-dev``` 
+    * macos: ```brew install libsoundio```
 
 </details>  
   
@@ -170,31 +173,12 @@ graph G {
 ```
 
 ## teensy build
-You don't need to download or install Teensyduino or Arduino to build the library or examples. Just clone the cores library and any dependencies to a common folder, denoted by ```DEPSPATH``` (in this case ```/home/nic/teensy_libraries```). 
-<details>
-  <summary>clone dependencies (click to expand) </summary>
-  
-``` sh
- > cd /home/nic/teensy_libraries
- > git clone https://github.com/PaulStoffregen/cores.git
- > git clone https://github.com/PaulStoffregen/Audio.git
- > git clone -b Juse_Use_SdFat https://github.com/PaulStoffregen/SD.git 
- > git clone https://github.com/PaulStoffregen/Wire.git
- > git clone https://github.com/PaulStoffregen/SPI.git
- > git clone https://github.com/PaulStoffregen/SerialFlash.git
- > git clone https://github.com/PaulStoffregen/arm_math.git
- > git clone https://github.com/greiman/SdFat.git
-```
-  
-</details>
 
 <details>
   <summary>update COMPILERPATH and DEPSPATH in cmake/toolchains/teensy41.cmake</summary>
   
 ``` cmake
 set(COMPILERPATH "/Applications/Arm/bin/")
-set(DEPSPATH "/home/nic/teensy_libraries")
-set(COREPATH "${DEPSPATH}/cores/teensy4/")
 ```
 
 </details>
@@ -224,8 +208,8 @@ set(COREPATH "${DEPSPATH}/cores/teensy4/")
 ``` sh
 > mkdir cmake-build-debug
 > cd cmake-build-debug
-> cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE:FILEPATH="../cmake/toolchains/linux.cmake" ..
-> make
+> cmake -DCMAKE_BUILD_TYPE=Debug ..
+> cmake --build .
 ```
 
 ### run tests
