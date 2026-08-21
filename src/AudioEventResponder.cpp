@@ -63,7 +63,7 @@ void AudioEventResponder::removeFromList(void)
 	if (nullptr != _anext)	// not last
 		_anext->_aprev = _aprev; // following item has new previous
 		
-	if (nullptr != _prev)	// not first
+	if (nullptr != _aprev)	// not first
 		_aprev->_anext = _anext; // previous item has new following
 }
 

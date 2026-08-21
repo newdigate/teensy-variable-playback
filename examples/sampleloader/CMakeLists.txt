@@ -3,7 +3,7 @@ project(sampleloader)
 set(CMAKE_CXX_STANDARD 14)
 teensy_include_directories(../../src)
 
-import_arduino_library(sampleflashloader ${DEPSPATH}/teensy-sample-flashloader/src)
+import_arduino_library_git(sampleflashloader https://github.com/newdigate/teensy-sample-flashloader.git main "src")
 
 teensy_add_executable(sampleloader sampleloader.ino)
 teensy_target_link_libraries(sampleloader sampleflashloader SD SdFat Audio teensy_variable_playback cores arm_math SPI Wire SerialFlash  )

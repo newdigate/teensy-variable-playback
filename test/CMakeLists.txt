@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
 project(tests C CXX)
 if (DEFINED BUILD_FOR_LINUX)
     #set(CMAKE_CXX_STANDARD 11)
@@ -65,6 +68,9 @@ if (DEFINED BUILD_FOR_LINUX)
             low_level/arraywav/test_array_stereo_loop_forward_playback.cpp
 
             low_level/indexedfile/test_indexablefile.cpp
+            low_level/event_responder/test_audio_event_responder.cpp
+            low_level/interpolation/test_interpolation.cpp
+            low_level/reader/test_reader_safety.cpp
 
             # these should always compile OK
             kick_raw.c
@@ -81,4 +87,11 @@ if (DEFINED BUILD_FOR_LINUX)
     target_link_libraries(tests teensy_audio_x86_stubs)
     target_link_libraries(tests teensy_x86_sd_stubs)
     target_link_libraries(tests teensy_variable_playback)
+
+    add_executable(perf_benchmarks perf/perf_benchmarks.cpp)
+    target_compile_options(perf_benchmarks PRIVATE -O3)
+    target_link_libraries(perf_benchmarks teensy_x86_stubs)
+    target_link_libraries(perf_benchmarks teensy_audio_x86_stubs)
+    target_link_libraries(perf_benchmarks teensy_x86_sd_stubs)
+    target_link_libraries(perf_benchmarks teensy_variable_playback)
 endif()
