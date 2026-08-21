@@ -2,6 +2,7 @@
 #define TEENSY_RESAMPLING_INDEXABLE_FILE_H
 
 #include <Arduino.h>
+#include <Audio.h>
 #include <SD.h>
 #include <vector>
 #include <algorithm> // to get std::reverse
@@ -71,14 +72,16 @@ public:
     }
   
   
+    IndexableFile(const IndexableFile&) = delete;
+    IndexableFile& operator=(const IndexableFile&) = delete;
+
     virtual ~IndexableFile() {
         close();
     }
 
+	size_t getBufferSize(void) { return BUFFER_SIZE; }
 	
-	size_t getBufferSize(void) {return (size_t) fails;}//BUFFER_SIZE; }
-	
-	size_t getBufferCount(void) {return MAX_NUM_BUFFERS; }
+	size_t getBufferCount(void) { return MAX_NUM_BUFFERS; }
 	
 	
 	/**
@@ -208,11 +211,13 @@ public:
 					case reverseBuffer: // reverse the order
 						std::reverse(_buffers.begin(), _buffers.end()); 
 						prevPlaybackRate = -prevPlaybackRate; // record new playback direction
+						_last_match = nullptr;
 						break;
 						
 					case moveBuffer: // move front element to back
 						_buffers.erase(_buffers.begin());	
 						_buffers.push_back(reload);
+						_last_match = nullptr;
 						break;
 						
 					default:
@@ -266,31 +271,19 @@ public:
 	 */
 	indexedbuffer* findMaxBuffer(bool includeLoopEnds = false)
 	{
-		indexedbuffer* rv = _buffers.at(0);
+		(void)includeLoopEnds;
+		if (_buffers.empty()) return nullptr;
+		indexedbuffer* rv = _buffers[0];
 		size_t max = rv->index;
 		
-		if (includeLoopEnds)
+		for (auto && x : _buffers)
 		{
-			for (auto && x : _buffers)
+			if (x->index > max)
 			{
-				if (x->index > max)
-				{
-					max = x->index;
-					rv = x;
-				}
+				max = x->index;
+				rv = x;
 			}
 		}
-		else
-		{
-			for (auto && x : _buffers)
-			{
-				if (x->index > max)
-				{
-					max = x->index;
-					rv = x;
-				}
-			}
-		}	
 		
 		return rv;
 	}
@@ -300,31 +293,19 @@ public:
 	 */
 	indexedbuffer* findMinBuffer(bool includeLoopEnds = false)
 	{
-		indexedbuffer* rv = _buffers.at(0);
+		(void)includeLoopEnds;
+		if (_buffers.empty()) return nullptr;
+		indexedbuffer* rv = _buffers[0];
 		size_t min = rv->index;
 		
-		if (includeLoopEnds)
+		for (auto && x : _buffers)
 		{
-			for (auto && x : _buffers)
+			if (x->index < min)
 			{
-				if (x->index < min)
-				{
-					min = x->index;
-					rv = x;
-				}
+				min = x->index;
+				rv = x;
 			}
 		}
-		else
-		{
-			for (auto && x : _buffers)
-			{
-				if (x->index < min)
-				{
-					min = x->index;
-					rv = x;
-				}
-			}
-		}	
 		
 		return rv;
 	}
@@ -415,8 +396,15 @@ public:
 	 Note that the index is independent of the channel count.
 	*/
 	int16_t zero = 0;
-    int16_t &operator[](int i) {
+    indexedbuffer *_last_match = nullptr;
+
+    inline int16_t &operator[](int i) {
         int32_t indexFor_i = i >> buffer_to_index_shift;
+        if (_last_match != nullptr && _last_match->index == static_cast<size_t>(indexFor_i) && _last_match->buffer_size > 0) {
+            _last_match->status = 'r';
+            return _last_match->buffer[i & ~buffer_mask];
+        }
+
         indexedbuffer *match = find_with_index(indexFor_i); // find which buffer has the sample
 		
         if (match == nullptr)  // none of the buffers contains the required sample
@@ -425,12 +413,14 @@ public:
 			zero = 0; 		// in case someone wrote to the reference at some point!
 			return zero;	// stutter, but don't crash due to reading filesystem under interrupt
         }
+        _last_match = match;
 		match->status = 'r';
 		
         return match->buffer[i & ~buffer_mask];
     }
 
     void close() {
+        _last_match = nullptr;
 		// close file if open
         if (_file.available()) {
             _file.close();

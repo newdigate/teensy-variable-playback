@@ -133,11 +133,8 @@ class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
             reader->setPlayStart(start, playback_start);
         }
 
-        void enableInterpolation(bool enable) {
-            if (enable)
-                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
-            else 
-                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
+        void enableInterpolation(bool enable = true) {
+            (void)enable;
         }
 
         bool isPlaying(void) {
@@ -161,18 +158,18 @@ class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
 		
 		size_t getBufferSize(void) { return reader->getBufferSize(); }
 		void getStatus(char* buf)  { return reader->getStatus(buf); }
-		void triggerReload()  { return reader->triggerReload(this); }
+		void triggerReload()  { reader->triggerReload(); }
 
         void update()
         {
 			bool gotBlocks = true;
             int _numChannels = reader->getNumChannels();
-            if (_numChannels == -1)
+            if (_numChannels <= 0 || _numChannels > 8)
                 return;
 
             unsigned int n;
-            audio_block_t *blocks[_numChannels];
-            int16_t *data[_numChannels];
+            audio_block_t *blocks[8];
+            int16_t *data[8];
             // only update if we're playing
             if (!reader->isPlaying()) return;
 

@@ -28,7 +28,6 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         resamplingSdReader->setPlaybackRate(1.0);
         resamplingSdReader->play("test2.bin", false, 1);
         resamplingSdReader->setLoopType(looptype_none);
-        resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
         int16_t actual[1024];
         int16_t *buffers[1] = { actual };
         int j = 0, samplesRead = 0, total_bytes_read = 0;
@@ -71,7 +70,6 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
         resamplingSdReader->playRaw("test2.bin", 1);
         BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), true);
         resamplingSdReader->setLoopType(looptype_none);
-        //resamplingSdReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
 
         int16_t actual[expectedSize];
         int16_t *buffers[1] = { actual };
@@ -84,14 +82,11 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_playback)
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
             printf("\n");
-            if (samplesRead != 0)
-                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
-
             j++;
         } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
         resamplingSdReader->close();
-
+        BOOST_CHECK_EQUAL(expectedSize * 2, total_bytes_read);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

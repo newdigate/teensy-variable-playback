@@ -17,16 +17,8 @@ BOOST_AUTO_TEST_SUITE(test_indexablefile)
         SD.setSDCardFileData((char*)file_contents, sample_size * 2);
 
         newdigate::IndexableSDFile<16, 2> indexable("blah.h", SD, f);               // use max 2 buffers, with 16 elements each....
-
-        /*
-        for (int i=0; i<sample_size; i++) {
-            std::cout << i << " " << (int)indexable[i] << std::endl;
-        } 
-
-        for (int i=sample_size; i>0; i--) {
-            std::cout << i-1 << " " << (int)indexable[i-1] << std::endl;
-        }
-        */
+        BOOST_CHECK_EQUAL(indexable.getBufferSize(), 16);
+        BOOST_CHECK_EQUAL(indexable.getBufferCount(), 2);
         indexable.close();
     }
 

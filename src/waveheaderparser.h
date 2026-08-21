@@ -83,7 +83,7 @@ public:
 
     bool readWaveHeaderFromBuffer(const char *buffer, wav_header &header) {
         if (buffer[0] != 'R' || buffer[1] != 'I' || buffer[2] != 'F' || buffer[3] != 'F') {
-            Serial.printf("expected RIFF (was %s)\n", buffer);
+            Serial.printf("expected RIFF (was %.4s)\n", buffer);
             return false;
         }
         for (int i=0; i < 4; i++)
@@ -91,46 +91,46 @@ public:
 
         unsigned char *b = (unsigned char*)buffer;
 
-        auto header_chunk_size = static_cast<unsigned long>(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]);
+        auto header_chunk_size = static_cast<unsigned long>((uint32_t(b[7]) << 24) | (uint32_t(b[6]) << 16) | (uint32_t(b[5]) << 8) | uint32_t(b[4]));
         header.header_chunk_size = header_chunk_size;
 
         for (int i=0; i < 4; i++)
             header.wave_header[i] = buffer[i+8];
         if (buffer[8] != 'W' || buffer[9] != 'A' || buffer[10] != 'V' || buffer[11] != 'E') {
-            Serial.printf("expected WAVE (was %s)\n", buffer[8]);
+            Serial.printf("expected WAVE (was %.4s)\n", buffer + 8);
             return false;
         }
 
         for (int i=0; i < 4; i++)
             header.fmt_header[i] = buffer[i+12];
         if (buffer[12] != 'f' || buffer[13] != 'm' || buffer[14] != 't' || buffer[15] != ' ') {
-            Serial.printf("expected 'fmt ' (was %s)\n",  buffer[12]);
+            Serial.printf("expected 'fmt ' (was %.4s)\n",  buffer + 12);
             return false;
         }
 
-        auto fmt_chunk_size = static_cast<unsigned long>(b[19] << 24 | b[18] << 16 | b[17] << 8 | b[16]);
+        auto fmt_chunk_size = static_cast<unsigned long>((uint32_t(b[19]) << 24) | (uint32_t(b[18]) << 16) | (uint32_t(b[17]) << 8) | uint32_t(b[16]));
         header.fmt_chunk_size = fmt_chunk_size;
         if (fmt_chunk_size != 16) {
-            Serial.printf("chunk size should be 16 for PCM wave data... (was %d)\n", fmt_chunk_size);
+            Serial.printf("chunk size should be 16 for PCM wave data... (was %lu)\n", fmt_chunk_size);
             return false;
         }
 
-        auto audio_format = static_cast<unsigned long>((b[21] << 8) | b[20]);
+        auto audio_format = static_cast<unsigned long>((uint32_t(b[21]) << 8) | uint32_t(b[20]));
         header.audio_format = audio_format;
 
-        auto num_channels = static_cast<unsigned long>((b[23] << 8) | b[22]);
+        auto num_channels = static_cast<unsigned long>((uint32_t(b[23]) << 8) | uint32_t(b[22]));
         header.num_channels = num_channels;
 
-        uint32_t sample_rate = static_cast<uint32_t>(b[27] << 24 | b[26] << 16 | b[25] << 8 | b[24]);
+        uint32_t sample_rate = (uint32_t(b[27]) << 24) | (uint32_t(b[26]) << 16) | (uint32_t(b[25]) << 8) | uint32_t(b[24]);
         header.sample_rate = sample_rate;
 
-        uint32_t byte_rate = static_cast<uint32_t>(b[31] << 24 | b[30] << 16 | b[29] << 8 | b[28]);
+        uint32_t byte_rate = (uint32_t(b[31]) << 24) | (uint32_t(b[30]) << 16) | (uint32_t(b[29]) << 8) | uint32_t(b[28]);
         header.byte_rate = byte_rate;
 
-        auto sample_alignment = static_cast<unsigned long>((b[33] << 8) | b[32]);
+        auto sample_alignment = static_cast<unsigned long>((uint32_t(b[33]) << 8) | uint32_t(b[32]));
         header.sample_alignment = sample_alignment;
 
-        auto bit_depth = static_cast<unsigned long>(b[35] << 8 | b[34]);
+        auto bit_depth = static_cast<unsigned long>((uint32_t(b[35]) << 8) | uint32_t(b[34]));
         header.bit_depth = bit_depth;
 
         return true;
@@ -141,7 +141,7 @@ public:
              && buffer[offset+1] == 'I' 
              && buffer[offset+2] == 'S' 
              && buffer[offset+3] == 'T') {
-            infoTagsSize = static_cast<uint32_t>(buffer[offset+7] << 24 | buffer[offset+6] << 16 | buffer[offset+5] << 8 | buffer[offset+4]);    
+            infoTagsSize = (uint32_t(buffer[offset+7]) << 24) | (uint32_t(buffer[offset+6]) << 16) | (uint32_t(buffer[offset+5]) << 8) | uint32_t(buffer[offset+4]);    
             infoTagsSize += 8;
             return true;
         }
@@ -164,11 +164,11 @@ public:
             data_header.data_header[i] = buffer[i+offset];
 
         if (buffer[offset+0] != 'd' || buffer[offset+1] != 'a' || buffer[offset+2] != 't' || buffer[offset+3] != 'a') {
-            Serial.printf("expected data... (was %d)\n", buffer);
+            Serial.printf("expected data... (was %.4s)\n", buffer + offset);
             return false;
         }
 
-        auto data_bytes = static_cast<unsigned long>(buffer[offset+7] << 24 | buffer[offset+6] << 16 | buffer[offset+5] << 8 | buffer[offset+4]);
+        auto data_bytes = static_cast<unsigned long>((uint32_t(buffer[offset+7]) << 24) | (uint32_t(buffer[offset+6]) << 16) | (uint32_t(buffer[offset+5]) << 8) | uint32_t(buffer[offset+4]));
         data_header.data_bytes = data_bytes;
         return true;
     }

@@ -6,7 +6,9 @@
 #include <TeensyVariablePlayback.h>
 
 LittleFS_Program         myfs;
+#ifndef PROG_FLASH_SIZE
 #define PROG_FLASH_SIZE 1024 * 1024 * 1 // Specify size to use of onboard Teensy Program Flash chip
+#endif
 
 // GUItool: begin automatically generated code
 AudioPlayLfsResmp        playLfsRaw1(myfs);     //xy=324,457
@@ -90,6 +92,7 @@ void loop() {
 
 
 namespace std {
-    void __throw_bad_function_call() {}
-    void __throw_length_error(char const*) {}
+    void __throw_bad_function_call() { while(1); }
+    void __throw_length_error(char const*) { while(1); }
+    void __throw_out_of_range_fmt(char const*, ...) { while(1); }
 }

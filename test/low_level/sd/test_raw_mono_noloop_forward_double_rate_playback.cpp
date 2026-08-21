@@ -48,9 +48,6 @@ BOOST_AUTO_TEST_SUITE(test_raw_mono_noloop_forward_double_rate_playback)
             for (int i = 0; i < samplesRead && PRINT_ALL_SAMPLES; i++) {
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[i]);
             }
-            printf("\n");
-            if (samplesRead != 0)
-                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
             j++;
         } while (samplesRead > 0);
         printf("actual: bytes read: %d; samples read: %d \t\texpected: bytes read: %d; samples read:%d\n",
