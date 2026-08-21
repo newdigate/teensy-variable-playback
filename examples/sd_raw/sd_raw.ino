@@ -39,7 +39,6 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSdRaw1.enableInterpolation(true);
     int newsensorValue = analogRead(analogInPin);
     playSdRaw1.setPlaybackRate(getPlaybackRate(newsensorValue));
 

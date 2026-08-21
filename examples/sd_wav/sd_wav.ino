@@ -42,7 +42,6 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSdWav1.enableInterpolation(true);
     int newsensorValue = analogRead(analogInPin);
     playSdWav1.setPlaybackRate(getPlaybackRate(newsensorValue));
 

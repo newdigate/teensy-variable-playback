@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
  
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
@@ -72,7 +71,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
@@ -108,7 +106,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());     
         memory.begin();           
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
@@ -144,7 +141,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
@@ -181,7 +177,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {
@@ -217,7 +212,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_array_mono_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         memory.begin();        
-        memory.enableInterpolation(true);
         memory.setPlaybackRate(playbackRate);
         memory.playRaw((int16_t*)kick_raw, kick_raw_len / 2, numberOfChannels);
         for (int i=0; i < ((kick_raw_len)/128) + 20; i++) {

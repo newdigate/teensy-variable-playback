@@ -133,12 +133,6 @@ class AudioPlayResmp : public AudioStream, public newdigate::AudioEventResponder
             reader->setPlayStart(start, playback_start);
         }
 
-        void enableInterpolation(bool enable) {
-            if (enable)
-                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_quadratic);
-            else 
-                reader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_none);
-        }
 
         bool isPlaying(void) {
             return reader->isPlaying();

@@ -171,7 +171,6 @@ bool Voice::noteOn(int note, int velocity)
     // change playback rate as needed
     double rate = pow(semitone, note % 6 - 3);
     
-    // playWav.enableInterpolation(true); // uncomment for better quality but more CPU usage!
     playWav.playWav(samples[idx]);
     playWav.setPlaybackRate(rate);
     envL.noteOn();

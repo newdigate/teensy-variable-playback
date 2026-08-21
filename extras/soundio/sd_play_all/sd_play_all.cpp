@@ -48,7 +48,6 @@ void setup() {
     Serial.begin(9600);       
 
     playSd1.setPlaybackRate(1.0f);
-    playSd1.enableInterpolation(true);
     //rraw_a1.play((int16_t*)kick_raw, kick_raw_len/2);    
     Serial.println("setup done");
 

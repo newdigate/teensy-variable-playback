@@ -38,7 +38,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_tags_in_header)
             BOOST_ERROR("not able to save output file (1)...");
         }
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         bool isPlaying = wave.playWav(outputFile.c_str());
         if (!isPlaying) {
@@ -90,7 +89,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_tags_in_header)
             return;
         }
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav(outputFile.c_str());
 

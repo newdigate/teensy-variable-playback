@@ -143,7 +143,6 @@ void setup()
   audioShield.enable();
   audioShield.volume(0.1);
 
-  playWav1.enableInterpolation(true);
   //    playWav1.setBufferInPSRAM(true);
   playWav1.setUseDualPlaybackHead(true);
   playWav1.setCrossfadeDurationInSamples(500);
