@@ -44,6 +44,12 @@ constexpr bool isPowerOf2(size_t value){
 }
 
 
+constexpr size_t compute_shift(size_t n) {
+    size_t s = 0;
+    while ((1ULL << s) < n) s++;
+    return s;
+}
+
 template<size_t BUFFER_SIZE, size_t MAX_NUM_BUFFERS, class TFile> // BUFFER_SIZE needs to be a power of two
 class IndexableFile
 {
@@ -55,14 +61,13 @@ public:
     virtual TFile open(const char *filename) = 0;
 
     static constexpr size_t element_size = sizeof(int16_t);
-    size_t buffer_to_index_shift;
-	size_t buffer_mask;
+    static constexpr size_t buffer_to_index_shift = compute_shift(BUFFER_SIZE);
+	static constexpr size_t buffer_mask = ~(BUFFER_SIZE - 1);
+	static constexpr size_t buffer_offset_mask = BUFFER_SIZE - 1;
 	int fails;
 	float prevPlaybackRate; // record of playback rate in force on previous reload
 	
     IndexableFile(const char *filename) : 
-        buffer_to_index_shift(log2(BUFFER_SIZE)), 
-		buffer_mask(~(BUFFER_SIZE - 1)),
 		fails(0),
 		prevPlaybackRate(0.0f),
         _buffers()
@@ -402,7 +407,7 @@ public:
         int32_t indexFor_i = i >> buffer_to_index_shift;
         if (_last_match != nullptr && _last_match->index == static_cast<size_t>(indexFor_i) && _last_match->buffer_size > 0) {
             _last_match->status = 'r';
-            return _last_match->buffer[i & ~buffer_mask];
+            return _last_match->buffer[i & buffer_offset_mask];
         }
 
         indexedbuffer *match = find_with_index(indexFor_i); // find which buffer has the sample
@@ -416,7 +421,7 @@ public:
         _last_match = match;
 		match->status = 'r';
 		
-        return match->buffer[i & ~buffer_mask];
+        return match->buffer[i & buffer_offset_mask];
     }
 
     void close() {

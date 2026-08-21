@@ -65,7 +65,7 @@ void benchmark_interpolation_kernels(int iterations = 20000000) {
     int16_t d1 = 1200, d2 = 3400, d3 = -2100, d4 = -8500;
     std::vector<float> x_vals(1024);
     for (size_t i = 0; i < x_vals.size(); i++) {
-        x_vals[i] = 1.0f + static_cast<float>(i) / 1024.0f;
+        x_vals[i] = static_cast<float>(i) / 1024.0f;
     }
 
     // Benchmark fastinterpolate
@@ -73,8 +73,8 @@ void benchmark_interpolation_kernels(int iterations = 20000000) {
         volatile int32_t accumulator = 0;
         auto start = high_resolution_clock::now();
         for (int i = 0; i < iterations; i++) {
-            float x = x_vals[i & 1023];
-            int16_t val = fastinterpolate(d1, d2, d3, d4, x);
+            float t = x_vals[i & 1023];
+            int16_t val = fastinterpolate(d1, d2, d3, d4, t);
             accumulator += val;
         }
         auto end = high_resolution_clock::now();

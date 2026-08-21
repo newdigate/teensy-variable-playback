@@ -22,15 +22,14 @@ struct InterpolationData
 // n represents the number of known data points
 int16_t interpolate(InterpolationData *f, double xi, int n);
 
-inline int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, float x) {
-    const float t = x - 1.0f;
+inline int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, float t) {
     const float a = (1.0f / 6.0f) * (-static_cast<float>(d1) + 3.0f * (static_cast<float>(d2) - static_cast<float>(d3)) + static_cast<float>(d4));
     const float b = 0.5f * (static_cast<float>(d1) - 2.0f * static_cast<float>(d2) + static_cast<float>(d3));
     const float c = (1.0f / 6.0f) * (-2.0f * static_cast<float>(d1) - 3.0f * static_cast<float>(d2) + 6.0f * static_cast<float>(d3) - static_cast<float>(d4));
     const float d = static_cast<float>(d2);
 
     const float result = ((a * t + b) * t + c) * t + d;
-    int32_t rounded = static_cast<int32_t>(roundf(result));
+    int32_t rounded = static_cast<int32_t>(lrintf(result));
     if (rounded < -32768) return -32768;
     if (rounded > 32767) return 32767;
     return static_cast<int16_t>(rounded);

@@ -10,13 +10,13 @@ BOOST_AUTO_TEST_SUITE(test_interpolation_suite)
         int16_t d3 = 3000;
         int16_t d4 = 4000;
 
-        // At x = 1.0, the interpolation should exactly equal d2
-        int16_t val_at_1 = fastinterpolate(d1, d2, d3, d4, 1.0f);
-        BOOST_CHECK_EQUAL(val_at_1, d2);
+        // At t = 0.0, the interpolation should exactly equal d2
+        int16_t val_at_0 = fastinterpolate(d1, d2, d3, d4, 0.0f);
+        BOOST_CHECK_EQUAL(val_at_0, d2);
 
-        // At x = 2.0, the interpolation should exactly equal d3
-        int16_t val_at_2 = fastinterpolate(d1, d2, d3, d4, 2.0f);
-        BOOST_CHECK_EQUAL(val_at_2, d3);
+        // At t = 1.0, the interpolation should exactly equal d3
+        int16_t val_at_1 = fastinterpolate(d1, d2, d3, d4, 1.0f);
+        BOOST_CHECK_EQUAL(val_at_1, d3);
     }
 
     BOOST_AUTO_TEST_CASE(test_fastinterpolate_non_trivial_curve) {
@@ -25,20 +25,14 @@ BOOST_AUTO_TEST_SUITE(test_interpolation_suite)
         int16_t d3 = 16000;
         int16_t d4 = -4000;
 
-        // At x = 1.0 -> d2
-        BOOST_CHECK_EQUAL(fastinterpolate(d1, d2, d3, d4, 1.0f), d2);
+        // At t = 0.0 -> d2
+        BOOST_CHECK_EQUAL(fastinterpolate(d1, d2, d3, d4, 0.0f), d2);
 
-        // At x = 2.0 -> d3
-        BOOST_CHECK_EQUAL(fastinterpolate(d1, d2, d3, d4, 2.0f), d3);
+        // At t = 1.0 -> d3
+        BOOST_CHECK_EQUAL(fastinterpolate(d1, d2, d3, d4, 1.0f), d3);
 
-        // Exact Lagrange at x = 1.5:
-        // L0(1.5) = -1/6 * (0.5) * (-0.5) * (-1.5) = -0.0625
-        // L1(1.5) =  1/2 * (1.5) * (-0.5) * (-1.5) =  0.5625
-        // L2(1.5) = -1/2 * (1.5) * (0.5)  * (-1.5) =  0.5625
-        // L3(1.5) =  1/6 * (1.5) * (0.5)  * (-0.5) = -0.0625
-        // Expected = -0.0625 * 12000 + 0.5625 * (-8000) + 0.5625 * 16000 + -0.0625 * (-4000)
-        //          = -750 - 4500 + 9000 + 250 = 4000
-        int16_t val_mid = fastinterpolate(d1, d2, d3, d4, 1.5f);
+        // Exact Lagrange at t = 0.5:
+        int16_t val_mid = fastinterpolate(d1, d2, d3, d4, 0.5f);
         BOOST_CHECK_EQUAL(val_mid, 4000);
     }
 
@@ -48,8 +42,8 @@ BOOST_AUTO_TEST_SUITE(test_interpolation_suite)
         int16_t d3 = 32000;
         int16_t d4 = -30000;
 
-        // Peak between 1 and 2 could overshoot 32767
-        int16_t clamped = fastinterpolate(d1, d2, d3, d4, 1.5f);
+        // Peak between 0 and 1 could overshoot 32767
+        int16_t clamped = fastinterpolate(d1, d2, d3, d4, 0.5f);
         BOOST_CHECK(clamped <= 32767);
         BOOST_CHECK(clamped >= -32768);
     }
