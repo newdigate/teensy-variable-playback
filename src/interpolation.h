@@ -9,12 +9,6 @@
 #include <math.h>
 
 
-enum ResampleInterpolationType {
-    resampleinterpolation_none = 1,
-    resampleinterpolation_linear = 2,
-    resampleinterpolation_quadratic = 3,
-};
-
 struct InterpolationData
 {
     uint32_t x;

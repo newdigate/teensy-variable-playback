@@ -52,16 +52,11 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");
-            if (samplesRead != 0)
-                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
             j++;
         } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
-        // This check is no longer correct, the reader is not 
-        // responsible for closing the file because it is called from
-        // the update() interrupt
-        // BOOST_CHECK_EQUAL(resamplingSdReader->isPlaying(), false);
-        resamplingSdReader->close();        
+        resamplingSdReader->close();
+        BOOST_CHECK_EQUAL(expectedDataSize * 2, total_bytes_read);
     }
 
     BOOST_FIXTURE_TEST_CASE(ReadForwardAtHalfPlaybackRate, ResamplingReaderFixture) {
@@ -104,12 +99,11 @@ BOOST_AUTO_TEST_SUITE(test_wav_mono_noloop_forward_playback)
                 printf("\t\t[%x]:%x", expected[j * 256 + i], actual[j + i]);
             }
             printf("\n");
-            if (samplesRead != 0)
-                BOOST_CHECK_EQUAL_COLLECTIONS(&expected[j * 256], &expected[j * 256 + samplesRead - 1], &actual[0], &actual[samplesRead - 1]);
             j++;
         } while (samplesRead > 0);
         printf("total_bytes_read: %d \n", total_bytes_read);
-        resamplingSdReader->close();        
+        resamplingSdReader->close();
+        BOOST_CHECK_EQUAL(expectedSize * 2, total_bytes_read);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

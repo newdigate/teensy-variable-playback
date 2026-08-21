@@ -138,38 +138,31 @@ void benchmark_resampling_reader(int target_blocks = 20000) {
         std::string name;
         uint16_t channels;
         double playbackRate;
-        ResampleInterpolationType interp;
         loop_type loopType;
         bool crossfade;
     };
 
     std::vector<Scenario> scenarios = {
-        // Mono 1.0x baseline
-        {"Mono 1ch | Rate 1.00x | No Interp | No Loop", 1, 1.0, resampleinterpolation_none, looptype_none, false},
-        {"Mono 1ch | Rate 1.00x | Linear Interp | No Loop", 1, 1.0, resampleinterpolation_linear, looptype_none, false},
-        {"Mono 1ch | Rate 1.00x | Quadratic Interp | No Loop", 1, 1.0, resampleinterpolation_quadratic, looptype_none, false},
-
-        // Mono Fractional Speeds (Forces Interpolation Hot Path)
-        {"Mono 1ch | Rate 0.75x | Linear Interp | Repeat", 1, 0.75, resampleinterpolation_linear, looptype_repeat, false},
-        {"Mono 1ch | Rate 0.75x | Quadratic Interp | Repeat", 1, 0.75, resampleinterpolation_quadratic, looptype_repeat, false},
-        {"Mono 1ch | Rate 1.33x | Linear Interp | Repeat", 1, 1.3333, resampleinterpolation_linear, looptype_repeat, false},
-        {"Mono 1ch | Rate 1.33x | Quadratic Interp | Repeat", 1, 1.3333, resampleinterpolation_quadratic, looptype_repeat, false},
-        {"Mono 1ch | Rate 2.50x | Quadratic Interp | Repeat", 1, 2.5, resampleinterpolation_quadratic, looptype_repeat, false},
+        // Mono Playback Rates
+        {"Mono 1ch | Rate 1.00x | No Loop", 1, 1.0, looptype_none, false},
+        {"Mono 1ch | Rate 0.75x | Repeat", 1, 0.75, looptype_repeat, false},
+        {"Mono 1ch | Rate 1.33x | Repeat", 1, 1.3333, looptype_repeat, false},
+        {"Mono 2.50x | Repeat", 1, 2.5, looptype_repeat, false},
 
         // Reverse Playback
-        {"Mono 1ch | Rate -1.00x | Linear Interp | Repeat", 1, -1.0, resampleinterpolation_linear, looptype_repeat, false},
-        {"Mono 1ch | Rate -1.25x | Quadratic Interp | Repeat", 1, -1.25, resampleinterpolation_quadratic, looptype_repeat, false},
+        {"Mono 1ch | Rate -1.00x | Repeat", 1, -1.0, looptype_repeat, false},
+        {"Mono 1ch | Rate -1.25x | Repeat", 1, -1.25, looptype_repeat, false},
 
         // Stereo & Multi-Channel
-        {"Stereo 2ch | Rate 1.00x | Quadratic Interp | Repeat", 2, 1.0, resampleinterpolation_quadratic, looptype_repeat, false},
-        {"Stereo 2ch | Rate 0.85x | Quadratic Interp | Repeat", 2, 0.85, resampleinterpolation_quadratic, looptype_repeat, false},
-        {"Stereo 2ch | Rate 1.50x | Quadratic Interp | Repeat", 2, 1.5, resampleinterpolation_quadratic, looptype_repeat, false},
-        {"Quad 4ch | Rate 1.25x | Quadratic Interp | Repeat", 4, 1.25, resampleinterpolation_quadratic, looptype_repeat, false},
+        {"Stereo 2ch | Rate 1.00x | Repeat", 2, 1.0, looptype_repeat, false},
+        {"Stereo 2ch | Rate 0.85x | Repeat", 2, 0.85, looptype_repeat, false},
+        {"Stereo 2ch | Rate 1.50x | Repeat", 2, 1.5, looptype_repeat, false},
+        {"Quad 4ch | Rate 1.25x | Repeat", 4, 1.25, looptype_repeat, false},
 
         // Looping & Crossfade
-        {"Stereo 2ch | Rate 1.00x | PingPong | No Crossfade", 2, 1.0, resampleinterpolation_linear, looptype_pingpong, false},
-        {"Stereo 2ch | Rate 1.00x | Repeat | Crossfade 256", 2, 1.0, resampleinterpolation_linear, looptype_repeat, true},
-        {"Stereo 2ch | Rate 0.90x | PingPong | Crossfade 256", 2, 0.9, resampleinterpolation_quadratic, looptype_pingpong, true},
+        {"Stereo 2ch | Rate 1.00x | PingPong | No Crossfade", 2, 1.0, looptype_pingpong, false},
+        {"Stereo 2ch | Rate 1.00x | Repeat | Crossfade 256", 2, 1.0, looptype_repeat, true},
+        {"Stereo 2ch | Rate 0.90x | PingPong | Crossfade 256", 2, 0.9, looptype_pingpong, true},
     };
 
     int16_t out_buffers[8][128];
@@ -181,7 +174,6 @@ void benchmark_resampling_reader(int target_blocks = 20000) {
     for (const auto &sc : scenarios) {
         ResamplingArrayReader reader;
         reader.begin();
-        reader.setInterpolationType(sc.interp);
         reader.setLoopType(sc.loopType);
         if (sc.crossfade) {
             reader.setCrossfadeDurationInSamples(256);

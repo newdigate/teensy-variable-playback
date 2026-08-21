@@ -24,7 +24,6 @@ BOOST_AUTO_TEST_SUITE(test_array_stereo)
         resamplingArrayReader->setPlaybackRate(1.0f);
         resamplingArrayReader->playWav((int16_t*)stereo_souljah_wav/*, stereo_souljah_wav_len/2 */);
         BOOST_CHECK_EQUAL(resamplingArrayReader->isPlaying(), true);
-        resamplingArrayReader->setInterpolationType(ResampleInterpolationType::resampleinterpolation_linear);
         int16_t actualLeft[256], actualRight[256];
         int16_t *buffers[2] = { actualLeft, actualRight };
 
