@@ -1,7 +1,9 @@
 include(FetchContent)
-FetchContent_Declare(cmake_declare_and_fetch
-        GIT_REPOSITORY https://github.com/newdigate/cmake-declare-and-fetch.git
-        GIT_TAG        main
-)
-FetchContent_MakeAvailable(cmake_declare_and_fetch)
+if(NOT EXISTS "${FETCHCONTENT_BASE_DIR}/cmake_declare_and_fetch-src/DeclareAndFetchCMake.in")
+    FetchContent_Declare(cmake_declare_and_fetch
+            GIT_REPOSITORY https://github.com/newdigate/cmake-declare-and-fetch.git
+            GIT_TAG        main
+    )
+    FetchContent_MakeAvailable(cmake_declare_and_fetch)
+endif()
 include("${FETCHCONTENT_BASE_DIR}/cmake_declare_and_fetch-src/DeclareAndFetchCMake.in")

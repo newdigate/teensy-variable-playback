@@ -30,10 +30,13 @@ public:
     }
 
     virtual ~ResamplingSerialFlashReader() {
+        close();
     }
 
     int16_t getSourceBufferValue(long index) override {
-        return (*_sourceBuffer)[index];
+        return (_sourceBuffer == nullptr)
+            ? 0
+            : (*_sourceBuffer)[index];
     }
 
     int available(void)
@@ -69,7 +72,7 @@ public:
         return new IndexableSerialFlashFile<RESAMPLE_BUFFER_SAMPLE_SIZE, RESAMPLE_BUFFER_COUNT>(_myFS, _filename, file);
     }
 
-    uint32_t positionMillis(void) {
+    uint32_t positionMillis(void) override {
         if (_file_size == 0) return 0;
         if (!_useDualPlaybackHead) {
             return (uint32_t) (( (double)_bufferPosition1 * lengthMillis() ) / (double)(_file_size/2));
@@ -82,7 +85,7 @@ public:
         }
     }
     
-    uint32_t lengthMillis(void) {
+    uint32_t lengthMillis(void) override {
         return ((uint64_t)_file_size * B2M) >> 32;
     }
     

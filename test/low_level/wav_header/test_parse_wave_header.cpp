@@ -38,6 +38,34 @@ BOOST_AUTO_TEST_SUITE(WaveHeaderParsingTests)
         //BOOST_CHECK_EQUAL(File::numOpenFiles,0);
         //BOOST_CHECK_EQUAL(File::numInstances,0);
     }
+
+    BOOST_FIXTURE_TEST_CASE(ReadInvalidWaveHeader_NotRIFF, WaveHeaderParserFixture) {
+        char invalid_riff[] = "FLAC\0\0\0\0WAVEfmt \x10\0\0\0\x01\0\x02\0\x44\xac\0\0\x10\xb1\x02\0\x04\0\x10\0";
+        wav_header header;
+        bool success = waveHeaderParser->readWaveHeaderFromBuffer(invalid_riff, header);
+        BOOST_CHECK_EQUAL(success, false);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(ReadInvalidWaveHeader_NotWAVE, WaveHeaderParserFixture) {
+        char invalid_wave[] = "RIFF\x24\0\0\0NOPEfmt \x10\0\0\0\x01\0\x02\0\x44\xac\0\0\x10\xb1\x02\0\x04\0\x10\0";
+        wav_header header;
+        bool success = waveHeaderParser->readWaveHeaderFromBuffer(invalid_wave, header);
+        BOOST_CHECK_EQUAL(success, false);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(ReadInvalidWaveHeader_NotFmt, WaveHeaderParserFixture) {
+        char invalid_fmt[] = "RIFF\x24\0\0\0WAVEbad \x10\0\0\0\x01\0\x02\0\x44\xac\0\0\x10\xb1\x02\0\x04\0\x10\0";
+        wav_header header;
+        bool success = waveHeaderParser->readWaveHeaderFromBuffer(invalid_fmt, header);
+        BOOST_CHECK_EQUAL(success, false);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(ReadInvalidDataHeader, WaveHeaderParserFixture) {
+        unsigned char invalid_data[8] = {'b', 'a', 'd', '!', 0, 0, 0, 0};
+        wav_data_header data_header;
+        bool success = waveHeaderParser->readDataHeader(invalid_data, 0, data_header);
+        BOOST_CHECK_EQUAL(success, false);
+    }
 BOOST_AUTO_TEST_SUITE_END()
 
 #endif //TEENSY_RESAMPLING_WAVEHEADER_PARSER_TESTS_CPP

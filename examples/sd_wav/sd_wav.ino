@@ -75,6 +75,7 @@ void loop() {
 
 
 namespace std {
-    void __throw_bad_function_call() {}
-    void __throw_length_error(char const*) {}
+    void __throw_bad_function_call() { while(1); }
+    void __throw_length_error(char const*) { while(1); }
+    void __throw_out_of_range_fmt(char const*, ...) { while(1); }
 }
