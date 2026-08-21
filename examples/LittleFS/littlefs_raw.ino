@@ -62,7 +62,6 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playLfsRaw1.enableInterpolation(true);
     int newsensorValue = analogRead(analogInPin);
     playLfsRaw1.setPlaybackRate(getPlaybackRate(newsensorValue));
 

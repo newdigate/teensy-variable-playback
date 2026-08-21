@@ -16,7 +16,6 @@ getLoopFinish	KEYWORD2
 startLoop	KEYWORD2
 setUseDualPlaybackHead	KEYWORD2
 getUseDualPlaybackHead	KEYWORD2
-enableInterpolation	KEYWORD2
 setCrossfadeDurationInSamples	KEYWORD2
 setPlayStart	KEYWORD2
 setBufferInPSRAM	KEYWORD2

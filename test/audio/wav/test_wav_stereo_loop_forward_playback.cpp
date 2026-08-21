@@ -36,7 +36,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
@@ -74,7 +73,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
     
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
@@ -112,7 +110,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());     
         wave.begin();           
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
@@ -150,7 +147,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
@@ -189,7 +185,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {
@@ -227,7 +222,6 @@ BOOST_AUTO_TEST_SUITE(test_audio_wav_stereo_loop_forward_playback)
 
         testout.saveOutputFile(outputPath.c_str(), outputFile.c_str());
         wave.begin();        
-        wave.enableInterpolation(true);
         wave.setPlaybackRate(playbackRate);
         wave.playWav("stereo_souljah.wav");
         while (wave.isPlaying()) {

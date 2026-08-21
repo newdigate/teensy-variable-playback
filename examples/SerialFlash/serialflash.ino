@@ -44,7 +44,6 @@ void setup() {
     audioShield.enable();
     audioShield.volume(0.5);
 
-    playSerialFlash1.enableInterpolation(true);
     int newsensorValue = analogRead(analogInPin);
     playSerialFlash1.setPlaybackRate(getPlaybackRate(newsensorValue));
 
