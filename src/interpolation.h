@@ -29,7 +29,7 @@ inline int16_t fastinterpolate(int16_t d1, int16_t d2, int16_t d3, int16_t d4, f
     const float d = static_cast<float>(d2);
 
     const float result = ((a * t + b) * t + c) * t + d;
-    int32_t rounded = static_cast<int32_t>(lrintf(result));
+    int32_t rounded = static_cast<int32_t>(roundf(result));
     if (rounded < -32768) return -32768;
     if (rounded > 32767) return 32767;
     return static_cast<int16_t>(rounded);
